@@ -1,9 +1,10 @@
 package com.malyvoj3.csvwvalidator.domain.metadata.properties;
 
-import java.util.List;
+import com.fasterxml.jackson.databind.JsonNode;
 
-public class IntegerAtomicProperty extends ArrayProperty<Integer> {
-    public IntegerAtomicProperty(String stringValue, List<Integer> parsedValue) {
-        super(stringValue, parsedValue);
+public class IntegerAtomicProperty extends AtomicProperty<Integer> {
+
+    public IntegerAtomicProperty(JsonNode jsonValue, Integer parsedValue) {
+        super(jsonValue, parsedValue);
     }
 }

@@ -1,7 +1,10 @@
 package com.malyvoj3.csvwvalidator.domain.metadata.properties;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 public class DoubleAtomicProperty extends AtomicProperty<Double> {
-    public DoubleAtomicProperty(String stringValue, Double parsedValue) {
-        super(stringValue, parsedValue);
+
+    public DoubleAtomicProperty(JsonNode jsonValue, Double parsedValue) {
+        super(jsonValue, parsedValue);
     }
 }
