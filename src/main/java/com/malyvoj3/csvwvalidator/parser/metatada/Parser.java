@@ -1,30 +1,34 @@
 package com.malyvoj3.csvwvalidator.parser.metatada;
 
-import com.github.jsonldjava.utils.JsonUtils;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.malyvoj3.csvwvalidator.CsvwKeywords;
 import com.malyvoj3.csvwvalidator.domain.metadata.TableDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.TableGroupDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.TopLevelDescription;
 import com.malyvoj3.csvwvalidator.parser.metatada.factory.TableGroupPropertyParserFactory;
 import com.malyvoj3.csvwvalidator.parser.metatada.properties.PropertyParser;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
 
+@Slf4j
 public class Parser {
 
     public TopLevelDescription parseJson(InputStream inputStream) {
         try {
-            Object parsedFile = JsonUtils.fromInputStream(inputStream);
-            if (parsedFile instanceof Map) {
-                Map<String, Object> jsonMap = (Map) parsedFile;
-                Object context = jsonMap.get(CsvwKeywords.CONTEXT_KEY);
-                Object url = jsonMap.get(CsvwKeywords.URL_KEY);
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode mainNode = objectMapper.readTree(inputStream);
+            if (mainNode.isObject()) {
+                ObjectNode mainObject = (ObjectNode) mainNode;
+                JsonNode context = mainObject.findValue(CsvwKeywords.CONTEXT_KEY);
+                JsonNode url = mainObject.findValue(CsvwKeywords.URL_KEY);
                 if (context != null) {
-                    return parseTableGroup(jsonMap);
+                    return parseTableGroup(mainObject);
                 } else if (url != null) {
-                    return parseTable(jsonMap);
+                    return parseTable(mainObject);
                 } else {
                     throw new ParserException();
                 }
@@ -36,20 +40,22 @@ public class Parser {
         }
     }
 
-    private TableDescription parseTable(Map<String, Object> map) {
+    private TableDescription parseTable(ObjectNode tableObject) {
         return null;
     }
 
-    private TableGroupDescription parseTableGroup(Map<String, Object> map) {
+    private TableGroupDescription parseTableGroup(ObjectNode tableGroupObject) {
         TableGroupDescription tableGroup = new TableGroupDescription();
-        for (String key : map.keySet()) {
-            PropertyParser<TableGroupDescription> propertyParser = TableGroupPropertyParserFactory.createParser(key);
+        tableGroupObject.fields().forEachRemaining(entry -> {
+            PropertyParser<TableGroupDescription> propertyParser =
+                    TableGroupPropertyParserFactory.createParser(entry.getKey());
             if (propertyParser != null) {
-                propertyParser.parseProperty(tableGroup);
+                propertyParser.parseProperty(tableGroup, entry.getValue());
             } else {
-
+                // TODO properly logged WARNING
+                log.warn("Unknown property");
             }
-        }
+        });
         return tableGroup;
     }
 
