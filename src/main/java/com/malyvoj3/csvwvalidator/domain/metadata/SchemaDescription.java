@@ -1,12 +1,17 @@
 package com.malyvoj3.csvwvalidator.domain.metadata;
 
-import com.malyvoj3.csvwvalidator.domain.metadata.properties.ArrayProperty;
-import com.malyvoj3.csvwvalidator.domain.metadata.properties.ColumnReferenceProperty;
-import com.malyvoj3.csvwvalidator.domain.metadata.properties.LinkProperty;
-import com.malyvoj3.csvwvalidator.domain.metadata.properties.StringAtomicProperty;
+import com.malyvoj3.csvwvalidator.domain.metadata.properties.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-public class SchemaDescription {
+import java.util.ArrayList;
+import java.util.List;
 
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class SchemaDescription extends InheritanceDescription implements CommonDescription {
+
+    private List<CommonProperty> commonProperties = new ArrayList<>();
     // do abstraktniho predka?
     private LinkProperty id;
     private StringAtomicProperty type;
@@ -19,5 +24,8 @@ public class SchemaDescription {
 
     private ArrayProperty<ForeignKeyDescription> foreignKeys;
 
-
+    @Override
+    public void addCommonProperty(CommonProperty commonProperty) {
+        commonProperties.add(commonProperty);
+    }
 }
