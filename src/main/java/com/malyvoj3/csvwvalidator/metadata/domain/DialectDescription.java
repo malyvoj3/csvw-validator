@@ -1,7 +1,9 @@
 package com.malyvoj3.csvwvalidator.metadata.domain;
 
 import com.malyvoj3.csvwvalidator.metadata.domain.properties.*;
+import lombok.Data;
 
+@Data
 public class DialectDescription {
 
     // do abstraktniho predka?
