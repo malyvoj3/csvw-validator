@@ -18,7 +18,7 @@ public class SchemaDescription extends InheritanceDescription implements CommonD
 
     private ArrayProperty<ColumnDescription> columns;
 
-    private ColumnReferenceProperty privateKey;
+    private ColumnReferenceProperty primaryKey;
 
     private ColumnReferenceProperty rowTitles;
 

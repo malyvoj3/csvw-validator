@@ -1,11 +1,13 @@
 package com.malyvoj3.csvwvalidator.metadata.domain;
 
-import com.malyvoj3.csvwvalidator.metadata.domain.properties.IntegerAtomicProperty;
-import com.malyvoj3.csvwvalidator.metadata.domain.properties.LinkProperty;
-import com.malyvoj3.csvwvalidator.metadata.domain.properties.ObjectProperty;
-import com.malyvoj3.csvwvalidator.metadata.domain.properties.StringAtomicProperty;
+import com.malyvoj3.csvwvalidator.metadata.domain.properties.*;
 
-public class DataTypeDescription {
+import java.util.ArrayList;
+import java.util.List;
+
+public class DataTypeDescription implements CommonDescription {
+
+    private List<CommonProperty> commonProperties = new ArrayList<>();
 
     // do abstraktniho predka?
     private LinkProperty id;
@@ -27,4 +29,9 @@ public class DataTypeDescription {
     private StringAtomicProperty maximum;
     private StringAtomicProperty maxInclusive;
     private StringAtomicProperty maxExclusive;
+
+    @Override
+    public void addCommonProperty(CommonProperty commonProperty) {
+        commonProperties.add(commonProperty);
+    }
 }
