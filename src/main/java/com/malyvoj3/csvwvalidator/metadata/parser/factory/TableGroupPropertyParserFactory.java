@@ -1,27 +1,23 @@
 package com.malyvoj3.csvwvalidator.metadata.parser.factory;
 
+import com.malyvoj3.csvwvalidator.CsvwKeywords;
 import com.malyvoj3.csvwvalidator.metadata.domain.TableGroupDescription;
 import com.malyvoj3.csvwvalidator.metadata.parser.properties.PropertyParser;
-import com.malyvoj3.csvwvalidator.metadata.parser.properties.tablegroup.TableDirectionPropertyParser;
+import com.malyvoj3.csvwvalidator.metadata.parser.properties.tablegroup.TablesPropertyParser;
 
 public class TableGroupPropertyParserFactory {
 
-    //    TODO: Spring beans?
-//    private CommonPropertyParserFactory commonFactory = new CommonPropertyParserFactory();
-//    private InheritedPropertyParserFactory inheritedFactory = new InheritedPropertyParserFactory();
+//    TODO: Spring beans?
+//    private TopLevelPropertyParserFactory topLeveFactory = new TopLevelPropertyParserFactory();
 
     public static PropertyParser<TableGroupDescription> createParser(String key) {
-        PropertyParser<TableGroupDescription> commonParser = CommonPropertyParserFactory.createParser(key);
-        if (commonParser != null) {
-            return commonParser;
-        }
-        PropertyParser<TableGroupDescription> inheritedParser = InheritedPropertyParserFactory.createParser(key);
-        if (inheritedParser != null) {
-            return inheritedParser;
+        PropertyParser<TableGroupDescription> topLevelParser = TopLevelPropertyParserFactory.createParser(key);
+        if (topLevelParser != null) {
+            return topLevelParser;
         }
         switch (key) {
-            case "tableDirection":
-                return new TableDirectionPropertyParser<>();
+            case CsvwKeywords.TABLES_PROPERTY:
+                return new TablesPropertyParser<>();
             default:
                 return null;
         }

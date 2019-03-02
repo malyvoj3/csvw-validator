@@ -1,5 +1,6 @@
 package com.malyvoj3.csvwvalidator.metadata.parser.factory;
 
+import com.malyvoj3.csvwvalidator.CsvwKeywords;
 import com.malyvoj3.csvwvalidator.metadata.domain.DialectDescription;
 import com.malyvoj3.csvwvalidator.metadata.parser.properties.PropertyParser;
 import com.malyvoj3.csvwvalidator.metadata.parser.properties.dialect.*;
@@ -8,31 +9,31 @@ public class DialectPropertyParserFactory {
 
     public static PropertyParser<DialectDescription> createParser(String key) {
         switch (key) {
-            case "commentPrefix":
+            case CsvwKeywords.COMMENT_PREFIX_PROPERTY:
                 return new CommentPrefixPropertyParser<>();
-            case "delimiter":
+            case CsvwKeywords.DELIMITER_PROPERTY:
                 return new DelimiterPropertyParser<>();
-            case "doubleQuote":
+            case CsvwKeywords.DOUBLE_QUOTE_PROPERTY:
                 return new DoubleQuotePropertyParser<>();
-            case "encoding":
+            case CsvwKeywords.ENCODING_PROPERTY:
                 return new EncodingPropertyParser<>();
-            case "header":
+            case CsvwKeywords.HEADER_PROPERTY:
                 return new HeaderPropertyParser<>();
-            case "headerRowCount":
+            case CsvwKeywords.HEADER_ROW_COUNT_PROPERTY:
                 return new HeaderRowCountPropertyParser<>();
-            case "lineTerminators":
+            case CsvwKeywords.LINE_TERMINATORS_PROPERTY:
                 return new LineTerminatorsPropertyParser<>();
-            case "quoteChar":
+            case CsvwKeywords.QUOTE_CHAR_PROPERTY:
                 return new QuoteCharPropertyParser<>();
-            case "skipBlankRows":
+            case CsvwKeywords.SKIP_BLANK_ROWS_PROPERTY:
                 return new SkipBlankRowsPropertyParser<>();
-            case "skipColumns":
+            case CsvwKeywords.SKIP_COLUMNS_PROPERTY:
                 return new SkipColumnsPropertyParser<>();
-            case "skipInitialSpace":
+            case CsvwKeywords.SKIP_INITIAL_SPACE_PROPERTY:
                 return new SkipInitialSpacePropertyParser<>();
-            case "skipRows":
+            case CsvwKeywords.SKIP_ROWS_PROPERTY:
                 return new SkipRowsPropertyParser<>();
-            case "trim":
+            case CsvwKeywords.TRIM_PROPERTY:
                 return new TrimPropertyParser<>();
             default:
                 return null;

@@ -1,5 +1,6 @@
 package com.malyvoj3.csvwvalidator.metadata.parser.factory;
 
+import com.malyvoj3.csvwvalidator.CsvwKeywords;
 import com.malyvoj3.csvwvalidator.metadata.domain.ColumnDescription;
 import com.malyvoj3.csvwvalidator.metadata.parser.properties.PropertyParser;
 import com.malyvoj3.csvwvalidator.metadata.parser.properties.column.NamePropertyParser;
@@ -23,13 +24,13 @@ public class ColumnPropertyParserFactory {
             return inheritedParser;
         }
         switch (key) {
-            case "name":
+            case CsvwKeywords.NAME_PROPERTY:
                 return new NamePropertyParser<>();
-            case "suppressOutput":
+            case CsvwKeywords.SUPPRESS_OUTPUT_PROPERTY:
                 return new SuppressOutputPropertyParser<>();
-            case "titles":
+            case CsvwKeywords.TITLES_PROPERTY:
                 return new TitlesPropertyParser<>();
-            case "virtual":
+            case CsvwKeywords.VIRTUAL_PROPERTY:
                 return new VirtualPropertyParser<>();
             default:
                 return null;

@@ -1,10 +1,10 @@
-package com.malyvoj3.csvwvalidator.metadata.parser.properties.table;
+package com.malyvoj3.csvwvalidator.metadata.parser.properties.toplevel;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.malyvoj3.csvwvalidator.metadata.domain.TableDescription;
+import com.malyvoj3.csvwvalidator.metadata.domain.TopLevelDescription;
 import com.malyvoj3.csvwvalidator.metadata.parser.properties.PropertyParser;
 
-public class NotesPropertyParser<T extends TableDescription> implements PropertyParser<T> {
+public class NotesPropertyParser<T extends TopLevelDescription> implements PropertyParser<T> {
 
     @Override
     public T parseProperty(T description, JsonNode property) {

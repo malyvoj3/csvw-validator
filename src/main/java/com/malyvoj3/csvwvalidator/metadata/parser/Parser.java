@@ -23,8 +23,8 @@ public class Parser {
             JsonNode mainNode = objectMapper.readTree(inputStream);
             if (mainNode.isObject()) {
                 ObjectNode mainObject = (ObjectNode) mainNode;
-                JsonNode context = mainObject.findValue(CsvwKeywords.CONTEXT_KEY);
-                JsonNode url = mainObject.findValue(CsvwKeywords.URL_KEY);
+                JsonNode context = mainObject.findValue(CsvwKeywords.CONTEXT_PROPERTY);
+                JsonNode url = mainObject.findValue(CsvwKeywords.URL_PROPERTY);
                 if (context != null) {
                     return parseTableGroup(mainObject);
                 } else if (url != null) {

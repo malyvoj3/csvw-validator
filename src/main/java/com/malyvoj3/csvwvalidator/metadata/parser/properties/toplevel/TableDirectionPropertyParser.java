@@ -1,7 +1,7 @@
-package com.malyvoj3.csvwvalidator.metadata.parser.properties.tablegroup;
+package com.malyvoj3.csvwvalidator.metadata.parser.properties.toplevel;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.malyvoj3.csvwvalidator.metadata.domain.TableGroupDescription;
+import com.malyvoj3.csvwvalidator.metadata.domain.TopLevelDescription;
 import com.malyvoj3.csvwvalidator.metadata.domain.properties.StringAtomicProperty;
 import com.malyvoj3.csvwvalidator.metadata.parser.properties.PropertyParser;
 
@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class TableDirectionPropertyParser<T extends TableGroupDescription> implements PropertyParser<T> {
+public class TableDirectionPropertyParser<T extends TopLevelDescription> implements PropertyParser<T> {
 
     private static final String TABLE_DIRECTION_DEFAULT_VALUE = "auto";
     private static final Set<String> possibleValues = Stream.of("auto", "ltr", "rtl").collect(Collectors.toSet());
@@ -22,7 +22,7 @@ public class TableDirectionPropertyParser<T extends TableGroupDescription> imple
         } else {
             textDirection = new StringAtomicProperty(property, TABLE_DIRECTION_DEFAULT_VALUE);
         }
-        description.setTextDirection(textDirection);
+        description.setTableDirection(textDirection);
         return description;
     }
 }
