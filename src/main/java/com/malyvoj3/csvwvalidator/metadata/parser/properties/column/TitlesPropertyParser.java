@@ -14,6 +14,7 @@ public class TitlesPropertyParser<T extends ColumnDescription> implements Proper
 
     @Override
     public T parseProperty(T description, JsonNode property) {
+        NaturalLanguageProperty titles = null;
         Map<String, List<String>> titlesMap = null;
         if (property.isTextual()) {
             titlesMap = Collections.singletonMap(CsvwKeywords.NATURAL_LANGUAGE_CODE,
@@ -25,7 +26,9 @@ public class TitlesPropertyParser<T extends ColumnDescription> implements Proper
             ObjectNode objectNode = (ObjectNode) property;
             titlesMap = titlesFromObject(objectNode);
         }
-        NaturalLanguageProperty titles = new NaturalLanguageProperty(titlesMap);
+        if (titlesMap != null) {
+            titles = new NaturalLanguageProperty(titlesMap);
+        }
         description.setTitles(titles);
         return description;
     }
