@@ -21,7 +21,7 @@ public class DialectDescriptionParser {
                 propertyParser.parseProperty(dialectDescription, entry.getValue());
             } else {
                 // TODO properly logged WARNING
-                log.warn("Unknown property");
+                log.warn("Unknown property {}.", entry.getKey());
             }
         });
         return dialectDescription;

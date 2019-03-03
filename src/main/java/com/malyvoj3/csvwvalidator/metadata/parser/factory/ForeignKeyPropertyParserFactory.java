@@ -12,7 +12,7 @@ public class ForeignKeyPropertyParserFactory {
         switch (key) {
             case CsvwKeywords.COLUMN_REFERENCE_PROPERTY:
                 return new ColumnReferencePropertyParser<>();
-            case CsvwKeywords.RESOURCE_PROPERTY:
+            case CsvwKeywords.REFERENCE_PROPERTY:
                 return new ReferencePropertyParser<>();
             default:
                 return null;

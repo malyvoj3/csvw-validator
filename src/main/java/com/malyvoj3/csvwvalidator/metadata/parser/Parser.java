@@ -4,11 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.malyvoj3.csvwvalidator.CsvwKeywords;
-import com.malyvoj3.csvwvalidator.metadata.domain.TableDescription;
-import com.malyvoj3.csvwvalidator.metadata.domain.TableGroupDescription;
 import com.malyvoj3.csvwvalidator.metadata.domain.TopLevelDescription;
-import com.malyvoj3.csvwvalidator.metadata.parser.factory.TableGroupPropertyParserFactory;
-import com.malyvoj3.csvwvalidator.metadata.parser.properties.PropertyParser;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -17,18 +13,22 @@ import java.io.InputStream;
 @Slf4j
 public class Parser {
 
+    // TODO string bean?
+    private TableDescriptionParser tableParser = new TableDescriptionParser();
+    private TableGroupDescriptionParser tableGroupParser = new TableGroupDescriptionParser();
+
     public TopLevelDescription parseJson(InputStream inputStream) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode mainNode = objectMapper.readTree(inputStream);
             if (mainNode.isObject()) {
                 ObjectNode mainObject = (ObjectNode) mainNode;
-                JsonNode context = mainObject.findValue(CsvwKeywords.CONTEXT_PROPERTY);
+                JsonNode tables = mainObject.findValue(CsvwKeywords.TABLES_PROPERTY);
                 JsonNode url = mainObject.findValue(CsvwKeywords.URL_PROPERTY);
-                if (context != null) {
-                    return parseTableGroup(mainObject);
+                if (tables != null) {
+                    return tableGroupParser.parse(mainObject);
                 } else if (url != null) {
-                    return parseTable(mainObject);
+                    return tableParser.parse(mainObject);
                 } else {
                     throw new ParserException();
                 }
@@ -38,25 +38,6 @@ public class Parser {
         } catch (IOException e) {
             throw new ParserException();
         }
-    }
-
-    private TableDescription parseTable(ObjectNode tableObject) {
-        return null;
-    }
-
-    private TableGroupDescription parseTableGroup(ObjectNode tableGroupObject) {
-        TableGroupDescription tableGroup = new TableGroupDescription();
-        tableGroupObject.fields().forEachRemaining(entry -> {
-            PropertyParser<TableGroupDescription> propertyParser =
-                    TableGroupPropertyParserFactory.createParser(entry.getKey());
-            if (propertyParser != null) {
-                propertyParser.parseProperty(tableGroup, entry.getValue());
-            } else {
-                // TODO properly logged WARNING
-                log.warn("Unknown property");
-            }
-        });
-        return tableGroup;
     }
 
 }

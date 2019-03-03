@@ -21,7 +21,7 @@ public class ColumnDescriptionParser {
                 propertyParser.parseProperty(columnDescription, entry.getValue());
             } else {
                 // TODO properly logged WARNING
-                log.warn("Unknown property");
+                log.warn("Unknown property {}.", entry.getKey());
             }
         });
         return columnDescription;

@@ -21,7 +21,7 @@ public class TableGroupDescriptionParser {
                 propertyParser.parseProperty(tableGroupDescription, entry.getValue());
             } else {
                 // TODO properly logged WARNING
-                log.warn("Unknown property");
+                log.warn("Unknown property {}.", entry.getKey());
             }
         });
         return tableGroupDescription;

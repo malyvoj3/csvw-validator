@@ -12,9 +12,9 @@ import com.malyvoj3.csvwvalidator.metadata.parser.properties.PropertyParser;
 public class ContextPropertyParser<T extends TopLevelDescription> implements PropertyParser<T> {
     @Override
     public T parseProperty(T description, JsonNode property) {
-        // TODO
-        Context context = new Context();
+        Context context = null;
         if (property.isTextual()) {
+            context = new Context();
             // Then string must be URL of CSVW Vocabulary
             // TODO Normalize URL pred porovnani??
             if (CsvwKeywords.CSVW_VOCABULARY_URL.equals(property.textValue())) {
@@ -26,6 +26,7 @@ public class ContextPropertyParser<T extends TopLevelDescription> implements Pro
                 JsonNode first = arrayNode.get(0);
                 JsonNode second = arrayNode.get(1);
                 if (first.isTextual() && CsvwKeywords.CSVW_VOCABULARY_URL.equals(first.textValue()) && second.isObject()) {
+                    context = new Context();
                     ObjectNode objectNode = (ObjectNode) second;
                     JsonNode base = objectNode.get(CsvwKeywords.BASE_PROPERTY);
                     JsonNode language = objectNode.get(CsvwKeywords.LANGUAGE_PROPERTY);
@@ -34,17 +35,18 @@ public class ContextPropertyParser<T extends TopLevelDescription> implements Pro
                 }
             }
         }
-        return null;
+        description.setContext(context);
+        return description;
     }
 
     private void addBase(Context context, JsonNode base) {
-        if (base.isTextual() && isUrl(base.textValue())) {
+        if (base != null && base.isTextual() && isUrl(base.textValue())) {
             context.setBase(new StringAtomicProperty(base, base.textValue()));
         }
     }
 
     private void addLanguage(Context context, JsonNode language) {
-        if (language.isTextual() && isLanguageCode(language.textValue())) {
+        if (language != null && language.isTextual() && isLanguageCode(language.textValue())) {
             context.setLanguage(new StringAtomicProperty(language, language.textValue()));
         }
     }

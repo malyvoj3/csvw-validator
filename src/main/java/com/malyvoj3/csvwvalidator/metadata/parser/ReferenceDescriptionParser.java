@@ -21,7 +21,7 @@ public class ReferenceDescriptionParser {
                 propertyParser.parseProperty(referenceDescription, entry.getValue());
             } else {
                 // TODO properly logged WARNING
-                log.warn("Unknown property");
+                log.warn("Unknown property {}.", entry.getKey());
             }
         });
         return referenceDescription;
