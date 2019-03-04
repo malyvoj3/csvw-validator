@@ -20,6 +20,12 @@
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>org.dmfs</groupId>
+			<artifactId>rfc3986-uri</artifactId>
+			<version>0.8</version>
+		</dependency>
+
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>

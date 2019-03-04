@@ -1,0 +1,60 @@
+package com.malyvoj3.csvwvalidator.parser.metadata;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.malyvoj3.csvwvalidator.utils.CsvwKeywords;
+import com.malyvoj3.csvwvalidator.domain.metadata.Context;
+import com.malyvoj3.csvwvalidator.domain.metadata.properties.StringAtomicProperty;
+
+public class ContextParser {
+
+    public Context parse(JsonNode jsonNode) {
+        Context context = null;
+        if (jsonNode.isTextual()) {
+            context = new Context();
+            // Then string must be URL of CSVW Vocabulary
+            // TODO Normalize URL pred porovnani??
+            if (CsvwKeywords.CSVW_VOCABULARY_URL.equals(jsonNode.textValue())) {
+                context.setRefContext(new StringAtomicProperty(CsvwKeywords.CSVW_VOCABULARY_URL));
+            }
+        } else if (jsonNode.isArray()) {
+            ArrayNode arrayNode = (ArrayNode) jsonNode;
+            if (arrayNode.size() == 2) {
+                JsonNode first = arrayNode.get(0);
+                JsonNode second = arrayNode.get(1);
+                if (first.isTextual() && CsvwKeywords.CSVW_VOCABULARY_URL.equals(first.textValue()) && second.isObject()) {
+                    context = new Context();
+                    ObjectNode objectNode = (ObjectNode) second;
+                    JsonNode base = objectNode.get(CsvwKeywords.BASE_PROPERTY);
+                    JsonNode language = objectNode.get(CsvwKeywords.LANGUAGE_PROPERTY);
+                    addBase(context, base);
+                    addLanguage(context, language);
+                }
+            }
+        }
+        return context;
+    }
+
+    private void addBase(Context context, JsonNode base) {
+        if (base != null && base.isTextual() && isUrl(base.textValue())) {
+            context.setBase(new StringAtomicProperty(base.textValue()));
+        }
+    }
+
+    private void addLanguage(Context context, JsonNode language) {
+        if (language != null && language.isTextual() && isLanguageCode(language.textValue())) {
+            context.setLanguage(new StringAtomicProperty(language.textValue()));
+        }
+    }
+
+    private boolean isLanguageCode(String textValue) {
+        // TODO
+        return true;
+    }
+
+    private boolean isUrl(String textValue) {
+        // TODO
+        return true;
+    }
+}
