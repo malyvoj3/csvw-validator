@@ -1,7 +1,7 @@
 package com.malyvoj3.csvwvalidator;
 
-import com.malyvoj3.csvwvalidator.metadata.domain.TopLevelDescription;
-import com.malyvoj3.csvwvalidator.metadata.parser.Parser;
+import com.malyvoj3.csvwvalidator.domain.metadata.TopLevelDescription;
+import com.malyvoj3.csvwvalidator.parser.metadata.Parser;
 
 import java.io.FileInputStream;
 import java.io.IOException;
