@@ -5,9 +5,7 @@ import com.malyvoj3.csvwvalidator.domain.metadata.properties.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DataTypeDescription extends ObjectDescription implements CommonDescription {
-
-    private List<CommonProperty> commonProperties = new ArrayList<>();
+public class DataTypeDescription extends CommonDescription {
 
     private StringAtomicProperty base;
     // Format je string a nebo numberFormat.
@@ -27,14 +25,8 @@ public class DataTypeDescription extends ObjectDescription implements CommonDesc
     private StringAtomicProperty maxExclusive;
 
     @Override
-    public void addCommonProperty(CommonProperty commonProperty) {
-        commonProperties.add(commonProperty);
-    }
-
-    @Override
     public void normalize(Context context) {
         super.normalize(context);
-        commonProperties.forEach(commonProperty -> normalizeProperty(commonProperty, context));
         normalizeProperty(numberFormat, context);
     }
 }

@@ -1,9 +1,21 @@
 package com.malyvoj3.csvwvalidator.domain.metadata;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.CommonProperty;
 
-public interface CommonDescription {
+public abstract class CommonDescription extends ObjectDescription {
 
-    void addCommonProperty(CommonProperty commonProperty);
+    private List<CommonProperty> commonProperties = new ArrayList<>();
 
+    public void addCommonProperty(CommonProperty commonProperty) {
+        commonProperties.add(commonProperty);
+    }
+
+    @Override
+    public void normalize(Context context) {
+        super.normalize(context);
+        commonProperties.forEach(commonProperty -> normalizeProperty(commonProperty, context));
+    }
 }
