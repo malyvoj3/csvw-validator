@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public abstract class InheritanceDescription extends ObjectDescription {
+public abstract class InheritanceDescription extends CommonDescription {
 
     protected UriTemplateProperty aboutUrl;
     // Muze byt i jen string.

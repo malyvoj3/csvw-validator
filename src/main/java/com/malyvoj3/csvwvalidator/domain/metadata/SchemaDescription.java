@@ -11,9 +11,7 @@ import java.util.stream.Collectors;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class SchemaDescription extends InheritanceDescription implements CommonDescription, CompatibleDescription<SchemaDescription> {
-
-    private List<CommonProperty> commonProperties = new ArrayList<>();
+public class SchemaDescription extends InheritanceDescription implements CompatibleDescription<SchemaDescription> {
 
     private ArrayProperty<ColumnDescription> columns;
 
@@ -22,11 +20,6 @@ public class SchemaDescription extends InheritanceDescription implements CommonD
     private ColumnReferenceProperty rowTitles;
 
     private ArrayProperty<ForeignKeyDescription> foreignKeys;
-
-    @Override
-    public void addCommonProperty(CommonProperty commonProperty) {
-        commonProperties.add(commonProperty);
-    }
 
     @Override
     public boolean isCompatibleWith(@NonNull SchemaDescription other) {
@@ -53,7 +46,6 @@ public class SchemaDescription extends InheritanceDescription implements CommonD
     @Override
     public void normalize(Context context) {
         super.normalize(context);
-        commonProperties.forEach(commonProperty -> normalizeProperty(commonProperty, context));
         normalizeProperty(columns, context);
         normalizeProperty(primaryKey, context);
         normalizeProperty(rowTitles, context);

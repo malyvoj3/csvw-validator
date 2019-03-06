@@ -9,7 +9,7 @@ import lombok.NonNull;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class TableDescription extends TopLevelDescription implements CommonDescription, CompatibleDescription<TableDescription> {
+public class TableDescription extends TopLevelDescription implements CompatibleDescription<TableDescription> {
 
     private LinkProperty url;
     private BooleanAtomicProperty suppressOutput;

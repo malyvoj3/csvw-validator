@@ -1,18 +1,17 @@
 package com.malyvoj3.csvwvalidator.domain.metadata.properties;
 
-import java.io.IOException;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.malyvoj3.csvwvalidator.utils.UriUtils;
 import com.malyvoj3.csvwvalidator.domain.metadata.Context;
 import com.malyvoj3.csvwvalidator.domain.metadata.ObjectDescription;
-import com.malyvoj3.csvwvalidator.parser.metadata.ContextParser;
-import com.malyvoj3.csvwvalidator.parser.metadata.ObjectDescriptionParser;
-
+import com.malyvoj3.csvwvalidator.parser.metadata.parsers.ContextParser;
+import com.malyvoj3.csvwvalidator.parser.metadata.parsers.ObjectDescriptionParser;
+import com.malyvoj3.csvwvalidator.utils.UriUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.io.IOException;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

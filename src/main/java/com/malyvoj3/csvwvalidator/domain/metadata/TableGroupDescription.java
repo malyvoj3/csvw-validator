@@ -8,7 +8,7 @@ import lombok.NonNull;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class TableGroupDescription extends TopLevelDescription implements CommonDescription, CompatibleDescription<TableGroupDescription>, Normalizable {
+public class TableGroupDescription extends TopLevelDescription implements CompatibleDescription<TableGroupDescription>, Normalizable {
 
     private ArrayProperty<TableDescription> tables;
 

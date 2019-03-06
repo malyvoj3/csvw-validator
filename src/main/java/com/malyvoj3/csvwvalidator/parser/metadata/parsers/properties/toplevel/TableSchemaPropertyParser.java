@@ -1,0 +1,49 @@
+package com.malyvoj3.csvwvalidator.parser.metadata.parsers.properties.toplevel;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.malyvoj3.csvwvalidator.domain.metadata.SchemaDescription;
+import com.malyvoj3.csvwvalidator.domain.metadata.TopLevelDescription;
+import com.malyvoj3.csvwvalidator.domain.metadata.properties.ObjectProperty;
+import com.malyvoj3.csvwvalidator.parser.metadata.JsonObject;
+import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;
+import com.malyvoj3.csvwvalidator.parser.metadata.parsers.PropertyParser;
+import com.malyvoj3.csvwvalidator.parser.metadata.parsers.descriptions.SchemaDescriptionParser;
+import com.malyvoj3.csvwvalidator.validation.ErrorFactory;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
+public class TableSchemaPropertyParser<T extends TopLevelDescription> implements PropertyParser<T> {
+
+    private final SchemaDescriptionParser schemaDescriptionParser;
+
+    @Override
+    public void parsePropertyToDescription(@NonNull T description,
+                                           @NonNull JsonProperty jsonProperty) {
+        JsonNode property = jsonProperty.getJsonValue();
+        ObjectProperty<SchemaDescription> tableSchema;
+        if (property.isObject()) {
+            JsonObject jsonObject = new JsonObject(jsonProperty.getName(), (ObjectNode) property);
+            SchemaDescription schemaDescription = schemaDescriptionParser.parse(jsonObject);
+            jsonObject.getParsingErrors().forEach(error -> {
+                error.addKey(jsonProperty.getName());
+                jsonProperty.addError(error);
+            });
+            tableSchema = new ObjectProperty<>(schemaDescription);
+        } else if (property.isTextual() && isUrl(property.textValue())) {
+            tableSchema = new ObjectProperty<>(property.textValue(), schemaDescriptionParser);
+        } else {
+            jsonProperty.addError(ErrorFactory.invalidPropertyType(jsonProperty.getName()));
+            tableSchema = null;
+        }
+        description.setTableSchema(tableSchema);
+    }
+
+    private boolean isUrl(String textValue) {
+        // TODO
+        return true;
+    }
+
+}
+
