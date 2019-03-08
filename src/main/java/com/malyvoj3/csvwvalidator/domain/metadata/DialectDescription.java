@@ -1,6 +1,9 @@
 package com.malyvoj3.csvwvalidator.domain.metadata;
 
-import com.malyvoj3.csvwvalidator.domain.metadata.properties.*;
+import com.malyvoj3.csvwvalidator.domain.metadata.properties.BooleanAtomicProperty;
+import com.malyvoj3.csvwvalidator.domain.metadata.properties.IntegerAtomicProperty;
+import com.malyvoj3.csvwvalidator.domain.metadata.properties.ListAtomicProperty;
+import com.malyvoj3.csvwvalidator.domain.metadata.properties.StringAtomicProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -33,9 +36,4 @@ public class DialectDescription extends ObjectDescription {
     private IntegerAtomicProperty skipRows;
 
     private StringAtomicProperty trim;
-
-    @Override
-    public void normalize(Context context) {
-        super.normalize(context);
-    }
 }

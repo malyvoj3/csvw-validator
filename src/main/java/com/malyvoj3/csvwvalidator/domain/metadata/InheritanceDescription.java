@@ -1,8 +1,11 @@
 package com.malyvoj3.csvwvalidator.domain.metadata;
 
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.*;
+import com.malyvoj3.csvwvalidator.validation.ValidationError;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -22,18 +25,19 @@ public abstract class InheritanceDescription extends CommonDescription {
     protected UriTemplateProperty valueUrl;
 
     @Override
-    public void normalize(Context context) {
-        super.normalize(context);
-        normalizeProperty(aboutUrl, context);
-        normalizeProperty(dataType, context);
-        normalizeProperty(defaultValue, context);
-        normalizeProperty(lang, context);
-        normalizeProperty(nullValue, context);
-        normalizeProperty(ordered, context);
-        normalizeProperty(propertyUrl, context);
-        normalizeProperty(required, context);
-        normalizeProperty(separator, context);
-        normalizeProperty(textDirection, context);
-        normalizeProperty(valueUrl, context);
+    public List<ValidationError> normalize(Context context) {
+        List<ValidationError> normalizationErrors = super.normalize(context);
+        normalizationErrors.addAll(normalizeProperty(aboutUrl, context));
+        normalizationErrors.addAll(normalizeProperty(dataType, context));
+        normalizationErrors.addAll(normalizeProperty(defaultValue, context));
+        normalizationErrors.addAll(normalizeProperty(lang, context));
+        normalizationErrors.addAll(normalizeProperty(nullValue, context));
+        normalizationErrors.addAll(normalizeProperty(ordered, context));
+        normalizationErrors.addAll(normalizeProperty(propertyUrl, context));
+        normalizationErrors.addAll(normalizeProperty(required, context));
+        normalizationErrors.addAll(normalizeProperty(separator, context));
+        normalizationErrors.addAll(normalizeProperty(textDirection, context));
+        normalizationErrors.addAll(normalizeProperty(valueUrl, context));
+        return normalizationErrors;
     }
 }

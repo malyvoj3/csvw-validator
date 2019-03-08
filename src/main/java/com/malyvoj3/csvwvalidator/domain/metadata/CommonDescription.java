@@ -1,9 +1,10 @@
 package com.malyvoj3.csvwvalidator.domain.metadata;
 
+import com.malyvoj3.csvwvalidator.domain.metadata.properties.CommonProperty;
+import com.malyvoj3.csvwvalidator.validation.ValidationError;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import com.malyvoj3.csvwvalidator.domain.metadata.properties.CommonProperty;
 
 public abstract class CommonDescription extends ObjectDescription {
 
@@ -14,8 +15,9 @@ public abstract class CommonDescription extends ObjectDescription {
     }
 
     @Override
-    public void normalize(Context context) {
-        super.normalize(context);
-        commonProperties.forEach(commonProperty -> normalizeProperty(commonProperty, context));
+    public List<ValidationError> normalize(Context context) {
+        List<ValidationError> normalizationErrors = super.normalize(context);
+        commonProperties.forEach(commonProperty -> normalizationErrors.addAll(normalizeProperty(commonProperty, context)));
+        return normalizationErrors;
     }
 }

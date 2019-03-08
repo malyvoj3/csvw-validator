@@ -11,6 +11,7 @@ import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.PropertyParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.descriptions.TableDescriptionParser;
 import com.malyvoj3.csvwvalidator.validation.ErrorFactory;
+import com.malyvoj3.csvwvalidator.validation.JsonParserError;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -46,7 +47,9 @@ public class TablesPropertyParser<T extends TableGroupDescription> implements Pr
                         jsonProperty.addError(error);
                     });
                 } else {
-                    jsonProperty.addError(ErrorFactory.invalidPropertyType(String.valueOf(arrayCounter)));
+                    JsonParserError error = ErrorFactory.invalidPropertyType(String.valueOf(arrayCounter));
+                    error.addKey(jsonProperty.getName());
+                    jsonProperty.addError(error);
                 }
             }
         }

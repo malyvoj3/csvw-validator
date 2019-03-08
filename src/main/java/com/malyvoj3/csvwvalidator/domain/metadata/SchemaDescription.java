@@ -1,11 +1,12 @@
 package com.malyvoj3.csvwvalidator.domain.metadata;
 
-import com.malyvoj3.csvwvalidator.domain.metadata.properties.*;
+import com.malyvoj3.csvwvalidator.domain.metadata.properties.ArrayProperty;
+import com.malyvoj3.csvwvalidator.domain.metadata.properties.ColumnReferenceProperty;
+import com.malyvoj3.csvwvalidator.validation.ValidationError;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,11 +45,12 @@ public class SchemaDescription extends InheritanceDescription implements Compati
     }
 
     @Override
-    public void normalize(Context context) {
-        super.normalize(context);
-        normalizeProperty(columns, context);
-        normalizeProperty(primaryKey, context);
-        normalizeProperty(rowTitles, context);
-        normalizeProperty(foreignKeys, context);
+    public List<ValidationError> normalize(Context context) {
+        List<ValidationError> normalizationErrors = super.normalize(context);
+        normalizationErrors.addAll(normalizeProperty(columns, context));
+        normalizationErrors.addAll(normalizeProperty(primaryKey, context));
+        normalizationErrors.addAll(normalizeProperty(rowTitles, context));
+        normalizationErrors.addAll(normalizeProperty(foreignKeys, context));
+        return normalizationErrors;
     }
 }
