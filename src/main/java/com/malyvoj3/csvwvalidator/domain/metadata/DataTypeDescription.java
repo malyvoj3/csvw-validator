@@ -1,8 +1,10 @@
 package com.malyvoj3.csvwvalidator.domain.metadata;
 
-import com.malyvoj3.csvwvalidator.domain.metadata.properties.*;
+import com.malyvoj3.csvwvalidator.domain.metadata.properties.IntegerAtomicProperty;
+import com.malyvoj3.csvwvalidator.domain.metadata.properties.ObjectProperty;
+import com.malyvoj3.csvwvalidator.domain.metadata.properties.StringAtomicProperty;
+import com.malyvoj3.csvwvalidator.validation.ValidationError;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class DataTypeDescription extends CommonDescription {
@@ -25,8 +27,9 @@ public class DataTypeDescription extends CommonDescription {
     private StringAtomicProperty maxExclusive;
 
     @Override
-    public void normalize(Context context) {
-        super.normalize(context);
-        normalizeProperty(numberFormat, context);
+    public List<ValidationError> normalize(Context context) {
+        List<ValidationError> normalizationErrors = super.normalize(context);
+        normalizationErrors.addAll(normalizeProperty(numberFormat, context));
+        return normalizationErrors;
     }
 }

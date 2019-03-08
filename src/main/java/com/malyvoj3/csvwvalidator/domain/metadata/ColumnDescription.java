@@ -3,10 +3,12 @@ package com.malyvoj3.csvwvalidator.domain.metadata;
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.BooleanAtomicProperty;
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.NaturalLanguageProperty;
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.StringAtomicProperty;
-
+import com.malyvoj3.csvwvalidator.validation.ValidationError;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
+
+import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -34,8 +36,9 @@ public class ColumnDescription extends InheritanceDescription implements Compati
     }
 
     @Override
-    public void normalize(Context context) {
-        super.normalize(context);
-        normalizeProperty(titles, context);
+    public List<ValidationError> normalize(Context context) {
+        List<ValidationError> normalizationErrors = super.normalize(context);
+        normalizationErrors.addAll(normalizeProperty(titles, context));
+        return normalizationErrors;
     }
 }

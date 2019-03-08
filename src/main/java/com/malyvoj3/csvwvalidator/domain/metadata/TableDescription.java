@@ -2,10 +2,12 @@ package com.malyvoj3.csvwvalidator.domain.metadata;
 
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.BooleanAtomicProperty;
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.LinkProperty;
-
+import com.malyvoj3.csvwvalidator.validation.ValidationError;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
+
+import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -21,9 +23,10 @@ public class TableDescription extends TopLevelDescription implements CompatibleD
     }
 
     @Override
-    public void normalize(Context context) {
-        super.normalize(context);
-        normalizeProperty(url, context);
-        normalizeProperty(suppressOutput, context);
+    public List<ValidationError> normalize(Context context) {
+        List<ValidationError> normalizationErrors = super.normalize(context);
+        normalizationErrors.addAll(normalizeProperty(url, context));
+        normalizationErrors.addAll(normalizeProperty(suppressOutput, context));
+        return normalizationErrors;
     }
 }

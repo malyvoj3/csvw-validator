@@ -12,7 +12,9 @@ import com.malyvoj3.csvwvalidator.parser.metadata.parsers.descriptions.SchemaDes
 import com.malyvoj3.csvwvalidator.validation.ErrorFactory;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
 public class TableSchemaPropertyParser<T extends TopLevelDescription> implements PropertyParser<T> {
 
@@ -26,10 +28,7 @@ public class TableSchemaPropertyParser<T extends TopLevelDescription> implements
         if (property.isObject()) {
             JsonObject jsonObject = new JsonObject(jsonProperty.getName(), (ObjectNode) property);
             SchemaDescription schemaDescription = schemaDescriptionParser.parse(jsonObject);
-            jsonObject.getParsingErrors().forEach(error -> {
-                error.addKey(jsonProperty.getName());
-                jsonProperty.addError(error);
-            });
+            jsonObject.getParsingErrors().forEach(jsonProperty::addError);
             tableSchema = new ObjectProperty<>(schemaDescription);
         } else if (property.isTextual() && isUrl(property.textValue())) {
             tableSchema = new ObjectProperty<>(property.textValue(), schemaDescriptionParser);

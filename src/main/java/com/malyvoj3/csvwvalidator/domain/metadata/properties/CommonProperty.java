@@ -4,11 +4,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.malyvoj3.csvwvalidator.utils.CsvwKeywords;
 import com.malyvoj3.csvwvalidator.domain.metadata.Context;
-
+import com.malyvoj3.csvwvalidator.utils.CsvwKeywords;
+import com.malyvoj3.csvwvalidator.validation.ValidationError;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -17,13 +19,14 @@ public class CommonProperty extends Property<JsonNode> {
     private String compactIRI;
     ObjectMapper objectMapper = new ObjectMapper();
 
-  public CommonProperty(JsonNode value, String compactIRI) {
-    super(value);
-    this.compactIRI = compactIRI;
-  }
+    public CommonProperty(JsonNode value, String compactIRI) {
+        super(value);
+        this.compactIRI = compactIRI;
+    }
 
-  @Override
-    public void normalize(Context context) {
+    @Override
+    public List<ValidationError> normalize(Context context) {
+        List<ValidationError> normalizationErrors = super.normalize(context);
         if (value.isArray()) {
             // Normalize each element int array.
             ArrayNode normalizeArray = objectMapper.createArrayNode();
@@ -31,8 +34,9 @@ public class CommonProperty extends Property<JsonNode> {
                 normalizeArray.add(normalizeCommonProperty(context));
             });
         } else {
-          value = normalizeCommonProperty(context);
+            value = normalizeCommonProperty(context);
         }
+        return normalizationErrors;
     }
 
     private JsonNode normalizeCommonProperty(Context context) {

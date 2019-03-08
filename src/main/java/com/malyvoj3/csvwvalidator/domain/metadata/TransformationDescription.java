@@ -3,6 +3,9 @@ package com.malyvoj3.csvwvalidator.domain.metadata;
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.LinkProperty;
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.NaturalLanguageProperty;
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.StringAtomicProperty;
+import com.malyvoj3.csvwvalidator.validation.ValidationError;
+
+import java.util.List;
 
 public class TransformationDescription extends ObjectDescription {
 
@@ -16,12 +19,13 @@ public class TransformationDescription extends ObjectDescription {
     private NaturalLanguageProperty titles;
 
     @Override
-    public void normalize(Context context) {
-        super.normalize(context);
-        normalizeProperty(url, context);
-        normalizeProperty(scriptFormat, context);
-        normalizeProperty(targetFormat, context);
-        normalizeProperty(source, context);
-        normalizeProperty(titles, context);
+    public List<ValidationError> normalize(Context context) {
+        List<ValidationError> normalizationErrors = super.normalize(context);
+        normalizationErrors.addAll(normalizeProperty(url, context));
+        normalizationErrors.addAll(normalizeProperty(scriptFormat, context));
+        normalizationErrors.addAll(normalizeProperty(targetFormat, context));
+        normalizationErrors.addAll(normalizeProperty(source, context));
+        normalizationErrors.addAll(normalizeProperty(titles, context));
+        return normalizationErrors;
     }
 }

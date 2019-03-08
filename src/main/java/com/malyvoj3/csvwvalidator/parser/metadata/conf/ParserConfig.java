@@ -39,12 +39,12 @@ public class ParserConfig {
 
     @Bean
     public TableGroupParserFactory<TableGroupDescription> tableGroupParserFactory() {
-        return new TableGroupParserFactory<>(schemaDescriptionParser(), tableDescriptionParser());
+        return new TableGroupParserFactory<>(schemaDescriptionParser(), dialectDescriptionParser(), tableDescriptionParser());
     }
 
     @Bean
     public TableParserFactory<TableDescription> tableParserFactory() {
-        return new TableParserFactory<>(schemaDescriptionParser());
+        return new TableParserFactory<>(schemaDescriptionParser(), dialectDescriptionParser());
     }
 
     // DESCRIPTION PARSERS
