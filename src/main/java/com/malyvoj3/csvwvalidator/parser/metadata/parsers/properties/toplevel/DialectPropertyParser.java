@@ -2,8 +2,8 @@ package com.malyvoj3.csvwvalidator.parser.metadata.parsers.properties.toplevel;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.malyvoj3.csvwvalidator.domain.metadata.DialectDescription;
-import com.malyvoj3.csvwvalidator.domain.metadata.TopLevelDescription;
+import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.DialectDescription;
+import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.TopLevelDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.ObjectProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonObject;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.malyvoj3.csvwvalidator.domain.metadata.Context;
 import com.malyvoj3.csvwvalidator.domain.metadata.ObjectDescription;
+import com.malyvoj3.csvwvalidator.domain.metadata.Property;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonObject;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.ContextParser;

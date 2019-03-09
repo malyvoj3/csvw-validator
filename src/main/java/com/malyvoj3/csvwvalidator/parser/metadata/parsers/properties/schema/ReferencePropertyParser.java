@@ -2,8 +2,8 @@ package com.malyvoj3.csvwvalidator.parser.metadata.parsers.properties.schema;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.malyvoj3.csvwvalidator.domain.metadata.ForeignKeyDescription;
-import com.malyvoj3.csvwvalidator.domain.metadata.ReferenceDescription;
+import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.ForeignKeyDescription;
+import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.ReferenceDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.ObjectProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonObject;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;

@@ -3,7 +3,7 @@ package com.malyvoj3.csvwvalidator.parser.metadata.parsers.descriptions;
 import com.malyvoj3.csvwvalidator.domain.metadata.ObjectDescription;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonObject;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;
-import com.malyvoj3.csvwvalidator.parser.metadata.factory.ParserFactory;
+import com.malyvoj3.csvwvalidator.parser.metadata.ParserFactory;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.ObjectDescriptionParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.PropertyParser;
 import com.malyvoj3.csvwvalidator.validation.ErrorFactory;

@@ -1,5 +1,6 @@
 package com.malyvoj3.csvwvalidator.domain.metadata.properties;
 
+import com.malyvoj3.csvwvalidator.domain.metadata.Property;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
