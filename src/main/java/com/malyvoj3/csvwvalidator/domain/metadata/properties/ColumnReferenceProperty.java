@@ -1,9 +1,10 @@
 package com.malyvoj3.csvwvalidator.domain.metadata.properties;
 
-import java.util.List;
-
+import com.malyvoj3.csvwvalidator.domain.metadata.Property;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

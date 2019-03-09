@@ -3,8 +3,8 @@ package com.malyvoj3.csvwvalidator.parser.metadata.parsers.properties.tablegroup
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.malyvoj3.csvwvalidator.domain.metadata.TableDescription;
-import com.malyvoj3.csvwvalidator.domain.metadata.TableGroupDescription;
+import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.TableDescription;
+import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.TableGroupDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.ArrayProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonObject;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;
