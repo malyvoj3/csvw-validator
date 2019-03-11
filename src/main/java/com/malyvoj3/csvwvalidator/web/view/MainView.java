@@ -78,7 +78,7 @@ public class MainView extends VerticalLayout {
         Button validationButton = new Button("Validate");
         validationButton.addClickListener(e -> {
             if (metadataUpload != null && metadataFiles.size() > 0) {
-                showResult(metadataFiles.get(0), "");
+                showResult(metadataFiles.get(0), "http://example.com");
             } else if (metadataTextfield != null && metadataTextfield.getValue() != null) {
                 showResult(new ByteArrayInputStream(FileUtils.downloadFile(metadataTextfield.getValue()).getContent()), metadataTextfield.getValue());
             } else {

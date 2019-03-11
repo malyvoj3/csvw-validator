@@ -15,9 +15,10 @@ public class FileUtils {
 
     public static FileResponse downloadFile(String stringUrl) {
         FileResponse fileResponse;
+        String normalizedUrl = UriUtils.normalizeUri(stringUrl);
         URL url;
         try {
-            url = new URL(stringUrl);
+            url = new URL(normalizedUrl);
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException("Invalid URL.");
         }
