@@ -11,7 +11,10 @@ import com.malyvoj3.csvwvalidator.utils.CsvwKeywords;
 import com.malyvoj3.csvwvalidator.validation.ErrorFactory;
 import lombok.NonNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class TitlesPropertyParser<T extends ColumnDescription> implements PropertyParser<T> {
 
@@ -20,13 +23,12 @@ public class TitlesPropertyParser<T extends ColumnDescription> implements Proper
                                            @NonNull JsonProperty jsonProperty) {
         JsonNode property = jsonProperty.getJsonValue();
         NaturalLanguageProperty titles = null;
-        Map<String, List<String>> titlesMap = null;
+        Map<String, List<String>> titlesMap = new HashMap<>();
         if (property.isTextual()) {
-            titlesMap = Collections.singletonMap(CsvwKeywords.NATURAL_LANGUAGE_CODE,
-                    Collections.singletonList(property.textValue()));
+            titlesMap.put(CsvwKeywords.NATURAL_LANGUAGE_CODE, titlesFromValue(property.textValue()));
         } else if (property.isArray()) {
             ArrayNode arrayNode = (ArrayNode) property;
-            titlesMap = Collections.singletonMap(CsvwKeywords.NATURAL_LANGUAGE_CODE, titlesFromArray(arrayNode));
+            titlesMap.put(CsvwKeywords.NATURAL_LANGUAGE_CODE, titlesFromArray(arrayNode));
         } else if (property.isObject()) {
             ObjectNode objectNode = (ObjectNode) property;
             titlesMap = titlesFromObject(objectNode);
@@ -47,7 +49,7 @@ public class TitlesPropertyParser<T extends ColumnDescription> implements Proper
             if (isLanguageCode(key)) {
                 JsonNode value = entry.getValue();
                 if (value.isTextual()) {
-                    putToMap(key, Collections.singletonList(value.textValue()), map);
+                    putToMap(key, titlesFromValue(value.textValue()), map);
                 } else if (value.isArray()) {
                     putToMap(key, titlesFromArray((ArrayNode) value), map);
                 }
@@ -63,6 +65,12 @@ public class TitlesPropertyParser<T extends ColumnDescription> implements Proper
                 titlesList.add(jsonNode.textValue());
             }
         });
+        return titlesList;
+    }
+
+    private List<String> titlesFromValue(String value) {
+        List<String> titlesList = new ArrayList<>();
+        titlesList.add(value);
         return titlesList;
     }
 

@@ -50,7 +50,7 @@ public class ObjectProperty<T extends ObjectDescription> extends Property<T> {
     }
 
     private void normalizeUrlObject(Context context) {
-        String normalizedUrl = UriUtils.resolveAndNormalizeUri(context.getBase().getValue(), objectUrl);
+        String normalizedUrl = UriUtils.resolveUri(context.getBase().getValue(), objectUrl);
         JsonNode node = null;
         try {
             node = objectMapper.readTree(normalizedUrl);
