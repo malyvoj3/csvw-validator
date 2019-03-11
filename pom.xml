@@ -43,15 +43,16 @@
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-spring-boot-starter</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-upload-flow</artifactId>
-		</dependency>
 
+		<dependency>
+			<groupId>org.codehaus.groovy</groupId>
+			<artifactId>groovy-all</artifactId>
+			<version>2.4.15</version>
+		</dependency>
 		<dependency>
 			<groupId>org.spockframework</groupId>
 			<artifactId>spock-core</artifactId>
-			<version>1.1-groovy-2.4-rc-2</version>
+			<version>1.2-groovy-2.4</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -85,6 +86,25 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<!-- The gmavenplus plugin is used to compile Groovy code. -->
+				<groupId>org.codehaus.gmavenplus</groupId>
+				<artifactId>gmavenplus-plugin</artifactId>
+				<version>1.6</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>compile</goal>
+							<goal>compileTests</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.18.1</version>
 			</plugin>
 		</plugins>
 	</build>

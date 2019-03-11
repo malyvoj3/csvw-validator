@@ -31,14 +31,14 @@ public class MetadataParser {
             if (mainNode.isObject()) {
                 MetadataParsingResult result = new MetadataParsingResult();
                 ObjectNode objectNode = (ObjectNode) mainNode;
-                JsonNode tables = objectNode.findValue(CsvwKeywords.TABLES_PROPERTY);
-                JsonNode url = objectNode.findValue(CsvwKeywords.URL_PROPERTY);
+                boolean hasTables = objectNode.hasNonNull(CsvwKeywords.TABLES_PROPERTY);
+                boolean hasUrl = objectNode.hasNonNull(CsvwKeywords.URL_PROPERTY);
                 JsonObject jsonObject = new JsonObject(null, objectNode);
                 TopLevelDescription topLevelDescription;
 
-                if (tables != null) {
+                if (hasTables && !hasUrl) {
                     topLevelDescription = tableGroupParser.parse(jsonObject);
-                } else if (url != null) {
+                } else if (hasUrl && !hasTables) {
                     topLevelDescription = tableParser.parse(jsonObject);
                 } else {
                     throw new ParserException();

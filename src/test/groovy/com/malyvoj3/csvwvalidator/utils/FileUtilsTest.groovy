@@ -1,4 +1,6 @@
 package com.malyvoj3.csvwvalidator.utils
 
-class FileUtilsTest {
+import spock.lang.Specification
+
+class FileUtilsTest extends Specification {
 }
