@@ -61,11 +61,11 @@ public class MainView extends VerticalLayout {
         add(createValidationButton());
     }
 
-    private void showResult(InputStream inputStream) {
+    private void showResult(InputStream inputStream, String url) {
         removeAll();
 
         ValidationErrorFormatter<JsonParserError> formatter = new JsonParserErrorDefaultFormatter();
-        MetadataParsingResult result = metadataParser.parseJson(inputStream, "test");
+        MetadataParsingResult result = metadataParser.parseJson(inputStream, url);
         result.getParsingErrors().forEach(error -> {
             Label label = new Label(formatter.format(error));
             add(label);
@@ -78,9 +78,9 @@ public class MainView extends VerticalLayout {
         Button validationButton = new Button("Validate");
         validationButton.addClickListener(e -> {
             if (metadataUpload != null && metadataFiles.size() > 0) {
-                showResult(metadataFiles.get(0));
+                showResult(metadataFiles.get(0), "");
             } else if (metadataTextfield != null && metadataTextfield.getValue() != null) {
-                showResult(new ByteArrayInputStream(FileUtils.downloadFile(metadataTextfield.getValue()).getContent()));
+                showResult(new ByteArrayInputStream(FileUtils.downloadFile(metadataTextfield.getValue()).getContent()), metadataTextfield.getValue());
             } else {
                 Notification.show("Insert some files!");
             }

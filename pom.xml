@@ -21,9 +21,9 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.dmfs</groupId>
-			<artifactId>rfc3986-uri</artifactId>
-			<version>0.8</version>
+			<groupId>org.urllib</groupId>
+			<artifactId>urllib</artifactId>
+			<version>master-SNAPSHOT</version>
 		</dependency>
 
         <dependency>
@@ -60,6 +60,13 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>
+	</repositories>
 
 	<dependencyManagement>
 		<dependencies>

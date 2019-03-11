@@ -10,7 +10,7 @@ import lombok.EqualsAndHashCode;
 import java.util.List;
 
 @Data
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 public class LinkProperty extends Property<String> {
 
     public LinkProperty(String value) {
@@ -20,7 +20,7 @@ public class LinkProperty extends Property<String> {
     @Override
     public List<ValidationError> normalize(Context context) {
         List<ValidationError> normalizationErrors = super.normalize(context);
-        value = UriUtils.resolveAndNormalizeUri(context.getBase().getValue(), value);
+        value = UriUtils.resolveUri(context.getBase().getValue(), value);
         return normalizationErrors;
     }
 }

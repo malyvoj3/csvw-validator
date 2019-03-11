@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @Data
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 public class NaturalLanguageProperty extends Property<Map<String, List<String>>> {
 
     public NaturalLanguageProperty(Map<String, List<String>> value) {
