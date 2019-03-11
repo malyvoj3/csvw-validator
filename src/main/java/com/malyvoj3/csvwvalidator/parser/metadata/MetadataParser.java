@@ -36,9 +36,9 @@ public class MetadataParser {
                 JsonObject jsonObject = new JsonObject(null, objectNode);
                 TopLevelDescription topLevelDescription;
 
-                if (tables != null && url == null) {
+                if (tables != null) {
                     topLevelDescription = tableGroupParser.parse(jsonObject);
-                } else if (url != null && tables == null) {
+                } else if (url != null) {
                     topLevelDescription = tableParser.parse(jsonObject);
                 } else {
                     throw new ParserException();
