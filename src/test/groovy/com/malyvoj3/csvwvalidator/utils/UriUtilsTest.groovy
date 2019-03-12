@@ -1,9 +1,11 @@
 package com.malyvoj3.csvwvalidator.utils
 
 import spock.lang.Specification
+import spock.lang.Unroll
 
 class UriUtilsTest extends Specification {
 
+    @Unroll
     def "Is string valid http/https URI test"() {
         when: "Receive string"
         boolean isValid = UriUtils.isValidUri(uriString)
@@ -22,6 +24,7 @@ class UriUtilsTest extends Specification {
         ""                                                                                      | false
     }
 
+    @Unroll
     def "Http URIs normalization test"() {
         when: "Receive URI"
         String normalizedUri = UriUtils.normalizeUri(uri)
@@ -46,6 +49,7 @@ class UriUtilsTest extends Specification {
         "foo"                                                       | null
     }
 
+    @Unroll
     def "Http URIs equals test"() {
         when: "Receive two URIs"
         boolean areEquals = UriUtils.uriEquals(firstUri, secondUri)
@@ -71,6 +75,7 @@ class UriUtilsTest extends Specification {
         "https://example.com"              | null                                          | false
     }
 
+    @Unroll
     def "Http URIs resolving test"() {
         when: "Receive Base URI and relative URI"
         String resolvedUri = UriUtils.resolveUri(baseUri, uri)
