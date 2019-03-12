@@ -1,9 +1,11 @@
 package com.malyvoj3.csvwvalidator.parser.metadata.parsers.properties.common;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.CommonDescription;
+import com.malyvoj3.csvwvalidator.domain.metadata.properties.CommonProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.PropertyParser;
+import com.malyvoj3.csvwvalidator.utils.UriUtils;
+
 import lombok.NonNull;
 
 public class CommonPropertyParser<T extends CommonDescription> implements PropertyParser<T> {
@@ -11,8 +13,8 @@ public class CommonPropertyParser<T extends CommonDescription> implements Proper
     @Override
     public void parsePropertyToDescription(@NonNull T description,
                                            @NonNull JsonProperty jsonProperty) {
-        JsonNode property = jsonProperty.getJsonValue();
-        // TODO
+        CommonProperty commonProperty = new CommonProperty(jsonProperty.getJsonValue(), UriUtils.resolveCommonProperty(jsonProperty.getName()));
+        description.addCommonProperty(commonProperty);
     }
 
 }

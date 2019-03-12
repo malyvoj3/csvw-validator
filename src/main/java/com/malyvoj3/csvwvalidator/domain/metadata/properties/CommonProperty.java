@@ -17,12 +17,15 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class CommonProperty extends Property<JsonNode> {
 
-    private String compactIRI;
+    /**
+     * Normalized absolute iri of common properties
+     */
+    private String iri;
     ObjectMapper objectMapper = new ObjectMapper();
 
-    public CommonProperty(JsonNode value, String compactIRI) {
+    public CommonProperty(JsonNode value, String iri) {
         super(value);
-        this.compactIRI = compactIRI;
+        this.iri = iri;
     }
 
     @Override
