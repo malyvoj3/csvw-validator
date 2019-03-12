@@ -19,6 +19,7 @@ class UriUtilsTest extends Specification {
         "http://example.com"                                                                    | true
         "https://example.com"                                                                   | true
         "https://john.doe@www.example.com:123/forum/questions/?tag=networking&order=newest#top" | true
+        "https://en.wiktionary.org/wiki/Ῥόδος"                                                  | true
         "mailto:John.Doe@example.com"                                                           | false
         "foo"                                                                                   | false
         ""                                                                                      | false
@@ -44,6 +45,7 @@ class UriUtilsTest extends Specification {
         "https://example.com/"                                      | "https://example.com/"
         "https://example.com:/"                                     | "https://example.com/"
         "https://example.com:443/"                                  | "https://example.com/"
+        "https://en.wiktionary.org/wiki/Ῥόδος"                      | "https://en.wiktionary.org/wiki/%E1%BF%AC%CF%8C%CE%B4%CE%BF%CF%82"
         "http://example.com/Příliš žluťoučký-kůň%úpěl*ďábelské-ódy" | "http://example.com/P%C5%99%C3%ADli%C5%A1%20%C5%BElu%C5%A5ou%C4%8Dk%C3%BD-k%C5%AF%C5%88%25%C3%BAp%C4%9Bl*%C4%8F%C3%A1belsk%C3%A9-%C3%B3dy"
         "mailto:John.Doe@example.com"                               | null
         "foo"                                                       | null
@@ -127,7 +129,67 @@ class UriUtilsTest extends Specification {
         "http://a/b/c/d;p?q"                                                | "g#s/./x"         | "http://a/b/c/g#s/./x"
         "http://a/b/c/d;p?q"                                                | "g#s/../x"        | "http://a/b/c/g#s/../x"
         "https://dev.nkod.opendata.cz/soubor/datové-sady.csv-metadata.json" | "datové-sady.csv" | "https://dev.nkod.opendata.cz/soubor/datové-sady.csv"
+    }
 
+    @Unroll
+    def "Resolve '#uriString' to #expectedValue"() {
+        when: "Receive string"
+        String resolvedUri = UriUtils.resolveCommonProperty(uriString)
+
+        then: "Resolve string to normalized absolute URI (if it was common property)"
+        resolvedUri == expectedValue
+
+        where:
+        uriString                                                                               | expectedValue
+        null                                                                                    | null
+        ""                                                                                      | null
+        "foo"                                                                                   | null
+        ":"                                                                                     | null
+        ":aaaa"                                                                                 | null
+        "hTtP://a/./b/../b/%63/%7bfoo%7d"                                                       | "http://a/b/c/%7Bfoo%7D"
+        "http://example.com"                                                                    | "http://example.com/"
+        "https://example.com"                                                                   | "https://example.com/"
+        "https://en.wiktionary.org/wiki/Ῥόδος"                                                  | "https://en.wiktionary.org/wiki/%E1%BF%AC%CF%8C%CE%B4%CE%BF%CF%82"
+        "dc:description"                                                                        | "http://purl.org/dc/terms/description"
+        "dcat:Catalog"                                                                          | "http://www.w3.org/ns/dcat#Catalog"
+        "rdf:type"                                                                              | "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+        "schema:address"                                                                        | "http://schema.org/address"
+        "csvw:Table"                                                                            | "http://www.w3.org/ns/csvw#Table"
+        "foaf:Person"                                                                           | "http://xmlns.com/foaf/0.1/Person"
+        "foo:test"                                                                              | null
+        "a:test"                                                                                | null
+        "err:test"                                                                              | null
+    }
+
+    @Unroll
+    def "Is '#uriString' valid common property - #expectedValue"() {
+        when: "Receive string"
+        boolean isValid = UriUtils.isCommonProperty(uriString)
+
+        then: "Validate string if it is valid common property"
+        isValid == expectedValue
+
+        where:
+        uriString                                                                               | expectedValue
+        null                                                                                    | false
+        ""                                                                                      | false
+        "foo"                                                                                   | false
+        ":"                                                                                     | false
+        ":aaaa"                                                                                 | false
+        "hTtP://a/./b/../b/%63/%7bfoo%7d"                                                       | true
+        "http://example.com"                                                                    | true
+        "https://example.com"                                                                   | true
+        "https://john.doe@www.example.com:123/forum/questions/?tag=networking&order=newest#top" | true
+        "https://en.wiktionary.org/wiki/Ῥόδος"                                                  | true
+        "dc:description"                                                                        | true
+        "dcat:Catalog"                                                                          | true
+        "rdf:type"                                                                              | true
+        "schema:address"                                                                        | true
+        "csvw:Table"                                                                            | true
+        "foaf:Person"                                                                           | true
+        "foo:test"                                                                              | false
+        "a:test"                                                                                | false
+        "err:test"                                                                              | false
     }
 
 }
