@@ -86,49 +86,51 @@ class UriUtilsTest extends Specification {
         UriUtils.uriEquals(resolvedUri, expectedUri)
 
         where: "Examples mostly from RFC 3986 specification"
-        baseUri                                                             | uri               | expectedUri
-        "http://a/b/c/d;p?q"                                                | "http:g"          | "http:g"
-        "http://a/b/c/d;p?q"                                                | "g"               | "http://a/b/c/g"
-        "http://a/b/c/d;p?q"                                                | "./g"             | "http://a/b/c/g"
-        "http://a/b/c/d;p?q"                                                | "g/"              | "http://a/b/c/g/"
-        "http://a/b/c/d;p?q"                                                | "/g"              | "http://a/g"
-        "http://a/b/c/d;p?q"                                                | "//g"             | "http://g"
-        "http://a/b/c/d;p?q"                                                | "?y"              | "http://a/b/c/d;p?y"
-        "http://a/b/c/d;p?q"                                                | "g?y"             | "http://a/b/c/g?y"
-        "http://a/b/c/d;p?q"                                                | "#s"              | "http://a/b/c/d;p?q#s"
-        "http://a/b/c/d;p?q"                                                | "g#s"             | "http://a/b/c/g#s"
-        "http://a/b/c/d;p?q"                                                | "g?y#s"           | "http://a/b/c/g?y#s"
-        "http://a/b/c/d;p?q"                                                | ";x"              | "http://a/b/c/;x"
-        "http://a/b/c/d;p?q"                                                | "g;x"             | "http://a/b/c/g;x"
-        "http://a/b/c/d;p?q"                                                | "g;x?y#s"         | "http://a/b/c/g;x?y#s"
-        "http://a/b/c/d;p?q"                                                | ""                | "http://a/b/c/d;p?q"
-        "http://a/b/c/d;p?q"                                                | "."               | "http://a/b/c/"
-        "http://a/b/c/d;p?q"                                                | "./"              | "http://a/b/c/"
-        "http://a/b/c/d;p?q"                                                | ".."              | "http://a/b/"
-        "http://a/b/c/d;p?q"                                                | "../"             | "http://a/b/"
-        "http://a/b/c/d;p?q"                                                | "../g"            | "http://a/b/g"
-        "http://a/b/c/d;p?q"                                                | "../.."           | "http://a/"
-        "http://a/b/c/d;p?q"                                                | "../../"          | "http://a/"
-        "http://a/b/c/d;p?q"                                                | "../../g"         | "http://a/g"
-        "http://a/b/c/d;p?q"                                                | "../../../g"      | "http://a/g"
-        "http://a/b/c/d;p?q"                                                | "../../../../g"   | "http://a/g"
-        "http://a/b/c/d;p?q"                                                | "/./g"            | "http://a/g"
-        "http://a/b/c/d;p?q"                                                | "/../g"           | "http://a/g"
-        "http://a/b/c/d;p?q"                                                | "g."              | "http://a/b/c/g."
-        "http://a/b/c/d;p?q"                                                | ".g"              | "http://a/b/c/.g"
-        "http://a/b/c/d;p?q"                                                | "g.."             | "http://a/b/c/g.."
-        "http://a/b/c/d;p?q"                                                | "..g"             | "http://a/b/c/..g"
-        "http://a/b/c/d;p?q"                                                | "./../g"          | "http://a/b/g"
-        "http://a/b/c/d;p?q"                                                | "./g/."           | "http://a/b/c/g/"
-        "http://a/b/c/d;p?q"                                                | "g/./h"           | "http://a/b/c/g/h"
-        "http://a/b/c/d;p?q"                                                | "g/../h"          | "http://a/b/c/h"
-        "http://a/b/c/d;p?q"                                                | "g;x=1/./y"       | "http://a/b/c/g;x=1/y"
-        "http://a/b/c/d;p?q"                                                | "g;x=1/../y"      | "http://a/b/c/y"
-        "http://a/b/c/d;p?q"                                                | "g?y/./x"         | "http://a/b/c/g?y/./x"
-        "http://a/b/c/d;p?q"                                                | "g?y/../x"        | "http://a/b/c/g?y/../x"
-        "http://a/b/c/d;p?q"                                                | "g#s/./x"         | "http://a/b/c/g#s/./x"
-        "http://a/b/c/d;p?q"                                                | "g#s/../x"        | "http://a/b/c/g#s/../x"
-        "https://dev.nkod.opendata.cz/soubor/datové-sady.csv-metadata.json" | "datové-sady.csv" | "https://dev.nkod.opendata.cz/soubor/datové-sady.csv"
+        baseUri                                                             | uri                  | expectedUri
+        "http://a/b/c/d;p?q"                                                | "http:g"             | "http:g"
+        "http://a/b/c/d;p?q"                                                | "g"                  | "http://a/b/c/g"
+        "http://a/b/c/d;p?q"                                                | "./g"                | "http://a/b/c/g"
+        "http://a/b/c/d;p?q"                                                | "g/"                 | "http://a/b/c/g/"
+        "http://a/b/c/d;p?q"                                                | "/g"                 | "http://a/g"
+        "http://a/b/c/d;p?q"                                                | "//g"                | "http://g"
+        "http://a/b/c/d;p?q"                                                | "?y"                 | "http://a/b/c/d;p?y"
+        "http://a/b/c/d;p?q"                                                | "g?y"                | "http://a/b/c/g?y"
+        "http://a/b/c/d;p?q"                                                | "#s"                 | "http://a/b/c/d;p?q#s"
+        "http://a/b/c/d;p?q"                                                | "g#s"                | "http://a/b/c/g#s"
+        "http://a/b/c/d;p?q"                                                | "g?y#s"              | "http://a/b/c/g?y#s"
+        "http://a/b/c/d;p?q"                                                | ";x"                 | "http://a/b/c/;x"
+        "http://a/b/c/d;p?q"                                                | "g;x"                | "http://a/b/c/g;x"
+        "http://a/b/c/d;p?q"                                                | "g;x?y#s"            | "http://a/b/c/g;x?y#s"
+        "http://a/b/c/d;p?q"                                                | ""                   | "http://a/b/c/d;p?q"
+        "http://a/b/c/d;p?q"                                                | "."                  | "http://a/b/c/"
+        "http://a/b/c/d;p?q"                                                | "./"                 | "http://a/b/c/"
+        "http://a/b/c/d;p?q"                                                | ".."                 | "http://a/b/"
+        "http://a/b/c/d;p?q"                                                | "../"                | "http://a/b/"
+        "http://a/b/c/d;p?q"                                                | "../g"               | "http://a/b/g"
+        "http://a/b/c/d;p?q"                                                | "../.."              | "http://a/"
+        "http://a/b/c/d;p?q"                                                | "../../"             | "http://a/"
+        "http://a/b/c/d;p?q"                                                | "../../g"            | "http://a/g"
+        "http://a/b/c/d;p?q"                                                | "../../../g"         | "http://a/g"
+        "http://a/b/c/d;p?q"                                                | "../../../../g"      | "http://a/g"
+        "http://a/b/c/d;p?q"                                                | "/./g"               | "http://a/g"
+        "http://a/b/c/d;p?q"                                                | "/../g"              | "http://a/g"
+        "http://a/b/c/d;p?q"                                                | "g."                 | "http://a/b/c/g."
+        "http://a/b/c/d;p?q"                                                | ".g"                 | "http://a/b/c/.g"
+        "http://a/b/c/d;p?q"                                                | "g.."                | "http://a/b/c/g.."
+        "http://a/b/c/d;p?q"                                                | "..g"                | "http://a/b/c/..g"
+        "http://a/b/c/d;p?q"                                                | "./../g"             | "http://a/b/g"
+        "http://a/b/c/d;p?q"                                                | "./g/."              | "http://a/b/c/g/"
+        "http://a/b/c/d;p?q"                                                | "g/./h"              | "http://a/b/c/g/h"
+        "http://a/b/c/d;p?q"                                                | "g/../h"             | "http://a/b/c/h"
+        "http://a/b/c/d;p?q"                                                | "g;x=1/./y"          | "http://a/b/c/g;x=1/y"
+        "http://a/b/c/d;p?q"                                                | "g;x=1/../y"         | "http://a/b/c/y"
+        "http://a/b/c/d;p?q"                                                | "g?y/./x"            | "http://a/b/c/g?y/./x"
+        "http://a/b/c/d;p?q"                                                | "g?y/../x"           | "http://a/b/c/g?y/../x"
+        "http://a/b/c/d;p?q"                                                | "g#s/./x"            | "http://a/b/c/g#s/./x"
+        "http://a/b/c/d;p?q"                                                | "g#s/../x"           | "http://a/b/c/g#s/../x"
+        "https://dev.nkod.opendata.cz/soubor/datové-sady.csv-metadata.json" | "datové-sady.csv"    | "https://dev.nkod.opendata.cz/soubor/datové-sady.csv"
+        "http://example.com"                                                | "http://foo.com"     | "http://foo.com"
+        "http://example.org/south-west/devon.csv "                          | "/.well-known/csvm " | "http://example.org/.well-known/csvm"
     }
 
     @Unroll
@@ -140,25 +142,25 @@ class UriUtilsTest extends Specification {
         resolvedUri == expectedValue
 
         where:
-        uriString                                                                               | expectedValue
-        null                                                                                    | null
-        ""                                                                                      | null
-        "foo"                                                                                   | null
-        ":"                                                                                     | null
-        ":aaaa"                                                                                 | null
-        "hTtP://a/./b/../b/%63/%7bfoo%7d"                                                       | "http://a/b/c/%7Bfoo%7D"
-        "http://example.com"                                                                    | "http://example.com/"
-        "https://example.com"                                                                   | "https://example.com/"
-        "https://en.wiktionary.org/wiki/Ῥόδος"                                                  | "https://en.wiktionary.org/wiki/%E1%BF%AC%CF%8C%CE%B4%CE%BF%CF%82"
-        "dc:description"                                                                        | "http://purl.org/dc/terms/description"
-        "dcat:Catalog"                                                                          | "http://www.w3.org/ns/dcat#Catalog"
-        "rdf:type"                                                                              | "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
-        "schema:address"                                                                        | "http://schema.org/address"
-        "csvw:Table"                                                                            | "http://www.w3.org/ns/csvw#Table"
-        "foaf:Person"                                                                           | "http://xmlns.com/foaf/0.1/Person"
-        "foo:test"                                                                              | null
-        "a:test"                                                                                | null
-        "err:test"                                                                              | null
+        uriString                              | expectedValue
+        null                                   | null
+        ""                                     | null
+        "foo"                                  | null
+        ":"                                    | null
+        ":aaaa"                                | null
+        "hTtP://a/./b/../b/%63/%7bfoo%7d"      | "http://a/b/c/%7Bfoo%7D"
+        "http://example.com"                   | "http://example.com/"
+        "https://example.com"                  | "https://example.com/"
+        "https://en.wiktionary.org/wiki/Ῥόδος" | "https://en.wiktionary.org/wiki/%E1%BF%AC%CF%8C%CE%B4%CE%BF%CF%82"
+        "dc:description"                       | "http://purl.org/dc/terms/description"
+        "dcat:Catalog"                         | "http://www.w3.org/ns/dcat#Catalog"
+        "rdf:type"                             | "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+        "schema:address"                       | "http://schema.org/address"
+        "csvw:Table"                           | "http://www.w3.org/ns/csvw#Table"
+        "foaf:Person"                          | "http://xmlns.com/foaf/0.1/Person"
+        "foo:test"                             | null
+        "a:test"                               | null
+        "err:test"                             | null
     }
 
     @Unroll
