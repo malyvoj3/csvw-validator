@@ -1,15 +1,17 @@
 package com.malyvoj3.csvwvalidator.domain.metadata.properties;
 
+import java.util.List;
+import java.util.Map;
+
 import com.malyvoj3.csvwvalidator.domain.metadata.Context;
 import com.malyvoj3.csvwvalidator.domain.metadata.Property;
 import com.malyvoj3.csvwvalidator.utils.CsvwKeywords;
+import com.malyvoj3.csvwvalidator.utils.LanguageUtils;
 import com.malyvoj3.csvwvalidator.validation.ValidationError;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import lombok.NonNull;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -29,25 +31,26 @@ public class NaturalLanguageProperty extends Property<Map<String, List<String>>>
         return normalizationErrors;
     }
 
-    public boolean hasIntersectionWith(NaturalLanguageProperty otherTitles) {
-        for (String language : value.keySet()) {
-            if (CsvwKeywords.NATURAL_LANGUAGE_CODE.equals(language)) {
-                // If language is UND then it can be equal to any language.
-                for (String title : value.get(language)) {
-                    boolean titleExistInAnyLanguage = otherTitles.getValue().values().stream()
-                            .flatMap(Collection::stream)
-                            .anyMatch(otherTitle -> otherTitle.equals(title));
-                    if (titleExistInAnyLanguage) {
+    public boolean hasIntersectionWith(@NonNull NaturalLanguageProperty otherTitles) {
+        for (String firstLanguage : value.keySet()) {
+            for (String secondLanguage : otherTitles.getValue().keySet()) {
+                if (LanguageUtils.equalsLanguageTags(firstLanguage, secondLanguage)) {
+                    List<String> firstTitles = value.get(firstLanguage);
+                    List<String> secondTitles = otherTitles.getValue().get(secondLanguage);
+                    if (arrayHasIntersection(firstTitles, secondTitles)) {
                         return true;
                     }
                 }
-            } else {
-                for (String title : value.get(language)) {
-                    boolean titleExistInSameLanguage = otherTitles.getValue().get(language).contains(title);
-                    boolean titleExistInDefaultLanguage = otherTitles.getValue().get(CsvwKeywords.NATURAL_LANGUAGE_CODE).contains(title);
-                    if (titleExistInSameLanguage || titleExistInDefaultLanguage) {
-                        return true;
-                    }
+            }
+        }
+        return false;
+    }
+
+    private boolean arrayHasIntersection(@NonNull List<String> firstTitles, @NonNull List<String> secondTitles) {
+        for (String first : firstTitles) {
+            for (String second : secondTitles) {
+                if (first.equals(second)) {
+                    return true;
                 }
             }
         }

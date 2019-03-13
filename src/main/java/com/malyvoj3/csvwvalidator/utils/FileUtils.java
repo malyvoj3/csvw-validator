@@ -1,6 +1,8 @@
 package com.malyvoj3.csvwvalidator.utils;
 
 import lombok.NonNull;
+import lombok.experimental.UtilityClass;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -11,6 +13,7 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 
+@UtilityClass
 public class FileUtils {
 
     public static FileResponse downloadFile(String stringUrl) {
