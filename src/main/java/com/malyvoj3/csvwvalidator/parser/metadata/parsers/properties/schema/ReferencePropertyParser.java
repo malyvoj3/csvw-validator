@@ -28,7 +28,7 @@ public class ReferencePropertyParser<T extends ForeignKeyDescription> implements
             ReferenceDescription referenceDescription = referenceDescriptionParser.parse(jsonObject);
             jsonObject.getParsingErrors().forEach(jsonProperty::addError);
             reference = new ObjectProperty<>(referenceDescription);
-        } else if (property.isTextual() && isUrl(property.textValue())) {
+        } else if (property.isTextual()) {
             reference = new ObjectProperty<>(property.textValue(), referenceDescriptionParser);
         } else {
             jsonProperty.addError(ErrorFactory.invalidPropertyType(jsonProperty.getName()));
@@ -37,8 +37,4 @@ public class ReferencePropertyParser<T extends ForeignKeyDescription> implements
         description.setReference(reference);
     }
 
-    private boolean isUrl(String textValue) {
-        // TODO
-        return true;
-    }
 }

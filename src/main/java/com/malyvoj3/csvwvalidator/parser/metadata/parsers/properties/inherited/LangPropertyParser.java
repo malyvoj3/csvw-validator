@@ -5,7 +5,9 @@ import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.InheritanceDescri
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.StringAtomicProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.PropertyParser;
+import com.malyvoj3.csvwvalidator.utils.LanguageUtils;
 import com.malyvoj3.csvwvalidator.validation.ErrorFactory;
+
 import lombok.NonNull;
 
 public class LangPropertyParser<T extends InheritanceDescription> implements PropertyParser<T> {
@@ -17,7 +19,7 @@ public class LangPropertyParser<T extends InheritanceDescription> implements Pro
                                            @NonNull JsonProperty jsonProperty) {
         JsonNode property = jsonProperty.getJsonValue();
         StringAtomicProperty langProperty;
-        if (property.isTextual() && isLanguageCode()) {
+        if (property.isTextual() && LanguageUtils.isLanguageTag(property.textValue())) {
             langProperty = new StringAtomicProperty(property.textValue());
         } else {
             jsonProperty.addError(ErrorFactory.invalidPropertyType(jsonProperty.getName()));
@@ -26,8 +28,4 @@ public class LangPropertyParser<T extends InheritanceDescription> implements Pro
         description.setLang(langProperty);
     }
 
-    private boolean isLanguageCode() {
-        // TODO language codes
-        return true;
-    }
 }

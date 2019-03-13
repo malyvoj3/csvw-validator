@@ -30,18 +30,13 @@ public class DialectPropertyParser<T extends TopLevelDescription> implements Pro
             DialectDescription dialectDescription = dialectDescriptionParser.parse(jsonObject);
             jsonObject.getParsingErrors().forEach(jsonProperty::addError);
             dialect = new ObjectProperty<>(dialectDescription);
-        } else if (property.isTextual() && isUrl(property.textValue())) {
+        } else if (property.isTextual()) {
             dialect = new ObjectProperty<>(property.textValue(), dialectDescriptionParser);
         } else {
             jsonProperty.addError(ErrorFactory.invalidPropertyType(jsonProperty.getName()));
             dialect = null;
         }
         description.setDialect(dialect);
-    }
-
-    private boolean isUrl(String textValue) {
-        // TODO
-        return true;
     }
 
 }
