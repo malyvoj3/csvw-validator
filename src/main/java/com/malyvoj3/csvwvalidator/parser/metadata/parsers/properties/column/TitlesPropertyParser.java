@@ -8,6 +8,7 @@ import com.malyvoj3.csvwvalidator.domain.metadata.properties.NaturalLanguageProp
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.PropertyParser;
 import com.malyvoj3.csvwvalidator.utils.CsvwKeywords;
+import com.malyvoj3.csvwvalidator.utils.LanguageUtils;
 import com.malyvoj3.csvwvalidator.validation.ErrorFactory;
 import lombok.NonNull;
 
@@ -36,7 +37,7 @@ public class TitlesPropertyParser<T extends ColumnDescription> implements Proper
             jsonProperty.addError(ErrorFactory.invalidPropertyType(jsonProperty.getName()));
         }
 
-        if (titlesMap != null) {
+        if (!titlesMap.isEmpty()) {
             titles = new NaturalLanguageProperty(titlesMap);
         }
         description.setTitles(titles);
@@ -46,7 +47,7 @@ public class TitlesPropertyParser<T extends ColumnDescription> implements Proper
         Map<String, List<String>> map = new HashMap<>();
         objectNode.fields().forEachRemaining(entry -> {
             String key = entry.getKey();
-            if (isLanguageCode(key)) {
+            if (LanguageUtils.isLanguageTag(key)) {
                 JsonNode value = entry.getValue();
                 if (value.isTextual()) {
                     putToMap(key, titlesFromValue(value.textValue()), map);
@@ -86,11 +87,6 @@ public class TitlesPropertyParser<T extends ColumnDescription> implements Proper
         } else {
             map.put(key, value);
         }
-    }
-
-    private boolean isLanguageCode(String key) {
-        // TODO
-        return true;
     }
 
 }

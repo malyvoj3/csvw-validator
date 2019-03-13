@@ -18,7 +18,6 @@ public class ValueUrlPropertyParser<T extends InheritanceDescription> implements
         JsonNode property = jsonProperty.getJsonValue();
         UriTemplateProperty valueUrl;
         if (property.isTextual()) {
-            // String value asi neni potreba?
             valueUrl = new UriTemplateProperty(property.textValue());
         } else {
             jsonProperty.addError(ErrorFactory.invalidPropertyType(jsonProperty.getName()));

@@ -30,18 +30,13 @@ public class TableSchemaPropertyParser<T extends TopLevelDescription> implements
             SchemaDescription schemaDescription = schemaDescriptionParser.parse(jsonObject);
             jsonObject.getParsingErrors().forEach(jsonProperty::addError);
             tableSchema = new ObjectProperty<>(schemaDescription);
-        } else if (property.isTextual() && isUrl(property.textValue())) {
+        } else if (property.isTextual()) {
             tableSchema = new ObjectProperty<>(property.textValue(), schemaDescriptionParser);
         } else {
             jsonProperty.addError(ErrorFactory.invalidPropertyType(jsonProperty.getName()));
             tableSchema = null;
         }
         description.setTableSchema(tableSchema);
-    }
-
-    private boolean isUrl(String textValue) {
-        // TODO
-        return true;
     }
 
 }

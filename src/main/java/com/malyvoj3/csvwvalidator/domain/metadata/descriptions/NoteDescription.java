@@ -4,14 +4,21 @@ import com.malyvoj3.csvwvalidator.domain.metadata.Context;
 import com.malyvoj3.csvwvalidator.domain.metadata.ObjectDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.CommonProperty;
 import com.malyvoj3.csvwvalidator.validation.ValidationError;
+
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.util.List;
 
 @Getter
+@EqualsAndHashCode(callSuper = true)
 public class NoteDescription extends ObjectDescription {
 
     private CommonProperty note;
+
+    public NoteDescription(CommonProperty note) {
+        this.note = note;
+    }
 
     @Override
     public List<ValidationError> normalize(Context context) {
