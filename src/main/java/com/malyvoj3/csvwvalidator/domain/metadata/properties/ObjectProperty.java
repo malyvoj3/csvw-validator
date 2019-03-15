@@ -10,6 +10,8 @@ import com.malyvoj3.csvwvalidator.parser.metadata.JsonObject;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.ContextParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.ObjectDescriptionParser;
+import com.malyvoj3.csvwvalidator.utils.FileResponse;
+import com.malyvoj3.csvwvalidator.utils.FileUtils;
 import com.malyvoj3.csvwvalidator.utils.UriUtils;
 import com.malyvoj3.csvwvalidator.validation.ValidationError;
 import lombok.Data;
@@ -51,9 +53,10 @@ public class ObjectProperty<T extends ObjectDescription> extends Property<T> {
 
     private void normalizeUrlObject(Context context) {
         String normalizedUrl = UriUtils.resolveUri(context.getBase().getValue(), objectUrl);
+        FileResponse fileResponse = FileUtils.downloadFile(normalizedUrl);
         JsonNode node = null;
         try {
-            node = objectMapper.readTree(normalizedUrl);
+            node = objectMapper.readTree(fileResponse.getContent());
             if (node != null && node.isObject()) {
                 JsonObject jsonObject = new JsonObject(null, (ObjectNode) node);
                 JsonProperty jsonProperty = new JsonProperty(null, node);
