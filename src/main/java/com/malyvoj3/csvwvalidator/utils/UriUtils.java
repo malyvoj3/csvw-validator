@@ -85,43 +85,44 @@ public class UriUtils {
     }
 
     /**
-     * Validates given string if it is valid http/https URI as is specified in RFC 3986.
+     * Validates given string if it is valid http/https/file URI as is specified in RFC 3986.
      *
      * @param string String for validation.
-     * @return true If given string is valid URI with http/https schema as is specified in RFC 3986.
+     * @return true If given string is valid URI with http/https/file schema as is specified in RFC 3986.
      */
     public boolean isValidUri(String string) {
-        boolean isValid = true;
-        try {
-            Urls.parse(string);
-        } catch (Exception ex) {
-            isValid = false;
-        }
-        return isValid;
+        return normalizeUri(string) != null;
     }
 
     /**
-     * Normalize http/https URI as is specified in RFC 3986.
+     * Normalize http/https/file URI as is specified in RFC 3986.
      *
-     * @param uri Http/https URI which should be normalize.
+     * @param uri Http/https/file URI which should be normalize.
      * @return Normalized URL or null if it is not valid http/https URI.
      */
     public String normalizeUri(String uri) {
-        Url normalizedUrl = getNormalizedUrl(uri);
-        return normalizedUrl != null ? normalizedUrl.toString() : null;
+        String normalizedUrl;
+        String fileScheme = getFileScheme(uri);
+        String url = fileScheme != null ? StringUtils.replaceOnceIgnoreCase(uri, fileScheme, "http://") : uri;
+        try {
+            normalizedUrl = Urls.parse(url).toString();
+        } catch (Exception ex) {
+            normalizedUrl = null;
+        }
+        return fileScheme != null ? StringUtils.replaceOnceIgnoreCase(normalizedUrl, "http://", fileScheme) : normalizedUrl;
     }
 
     /**
      * Normalizes two URIs and compare them if they are equals.
      *
-     * @param firstUri  First http/https URI.
-     * @param secondUri Second http/https URI.
+     * @param firstUri  First http/https/file URI.
+     * @param secondUri Second http/https/file URI.
      * @return true if firstUri is equal to secondUri after their normalization.
      */
     public boolean uriEquals(String firstUri, String secondUri) {
         boolean areEquals = false;
-        Url first = getNormalizedUrl(firstUri);
-        Url second = getNormalizedUrl(secondUri);
+        String first = normalizeUri(firstUri);
+        String second = normalizeUri(secondUri);
         if (first != null && second != null) {
             areEquals = first.equals(second);
         }
@@ -131,23 +132,31 @@ public class UriUtils {
     /**
      * Resolves relative URI against base URI.
      *
-     * @param baseUri Http/https base URI.
-     * @param uri     Http/https relative URI.
+     * @param baseUri Http/https/file base URI.
+     * @param uri     Http/https/file relative URI.
      * @return Resolved uri against baseUri as it is specified in RFC 3986.
      */
     public String resolveUri(String baseUri, String uri) {
-        Url base = Urls.parse(baseUri);
+        String normalizedBase = normalizeUri(baseUri);
+        String fileScheme = getFileScheme(normalizedBase);
+        normalizedBase = fileScheme != null ? StringUtils.replaceOnceIgnoreCase(normalizedBase, fileScheme, "http://") : normalizedBase;
+        Url base = Urls.parse(normalizedBase);
         Url resolved = base.resolve(uri);
-        return resolved.toString();
+        return fileScheme != null ? StringUtils.replaceOnceIgnoreCase(resolved.toString(), "http://", fileScheme) : resolved.toString();
     }
 
-    private Url getNormalizedUrl(String uri) {
-        Url normalizedUrl;
-        try {
-            normalizedUrl = Urls.parse(uri);
-        } catch (Exception ex) {
-            normalizedUrl = null;
+    private String getFileScheme(String fileUrl) {
+        String fileScheme = null;
+        if (StringUtils.isNotEmpty(fileUrl)) {
+            if (StringUtils.startsWithIgnoreCase(fileUrl, "file:///")) {
+                fileScheme = "file:///";
+            } else if (StringUtils.startsWithIgnoreCase(fileUrl, "file://")) {
+                fileScheme = "file://";
+            } else if (StringUtils.startsWithIgnoreCase(fileUrl, "file:/")) {
+                fileScheme = "file:///";
+            }
         }
-        return normalizedUrl;
+        return fileScheme;
     }
+
 }
