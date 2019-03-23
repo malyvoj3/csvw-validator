@@ -1,5 +1,8 @@
 package com.malyvoj3.csvwvalidator.web.view;
 
+import com.malyvoj3.csvwvalidator.parser.csv.CsvParser;
+import com.malyvoj3.csvwvalidator.parser.csv.CsvParsingResult;
+import com.malyvoj3.csvwvalidator.parser.csv.Dialect;
 import com.malyvoj3.csvwvalidator.parser.metadata.MetadataParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.MetadataParsingResult;
 import com.malyvoj3.csvwvalidator.utils.FileUtils;
@@ -19,6 +22,7 @@ import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +36,11 @@ public class MainView extends VerticalLayout {
     @Autowired
     private MetadataParser metadataParser;
 
+    @Autowired
+    private CsvParser csvParser;
+
     private InputStream tabularDataFile;
+    private String tabularDataFileName;
     private List<InputStream> metadataFiles;
 
     private Upload tabularUpload;
@@ -74,6 +82,26 @@ public class MainView extends VerticalLayout {
         add(createBackButton());
     }
 
+    private void showCsvResult(InputStream inputStream, String url) {
+        try {
+            Dialect dialect = Dialect.builder()
+                    .header(true)
+                    .build();
+
+            CsvParsingResult parsingResult = csvParser.parse(dialect, url, inputStream);
+
+            removeAll();
+            parsingResult.getParsingErrors().forEach(error -> {
+                Label label = new Label(error.getSeverity() + ": " + error.getMessage());
+                add(label);
+            });
+
+            add(createBackButton());
+        } catch (IOException e) {
+            Notification.show("IO error");
+        }
+    }
+
     private Button createValidationButton() {
         Button validationButton = new Button("Validate");
         validationButton.addClickListener(e -> {
@@ -81,6 +109,10 @@ public class MainView extends VerticalLayout {
                 showResult(metadataFiles.get(0), "http://example.com");
             } else if (metadataTextfield != null && metadataTextfield.getValue() != null) {
                 showResult(new ByteArrayInputStream(FileUtils.downloadFile(metadataTextfield.getValue()).getContent()), metadataTextfield.getValue());
+            } else if (tabularUpload != null && tabularDataFile != null) {
+                showCsvResult(tabularDataFile, tabularDataFileName);
+            } else if (tabularTextfield != null && tabularTextfield.getValue() != null) {
+                showCsvResult(new ByteArrayInputStream(FileUtils.downloadFile(tabularTextfield.getValue()).getContent()), tabularTextfield.getValue());
             } else {
                 Notification.show("Insert some files!");
             }
@@ -143,7 +175,10 @@ public class MainView extends VerticalLayout {
     private Upload createTabularUpload() {
         MemoryBuffer buffer = new MemoryBuffer();
         Upload upload = new Upload(buffer);
-        upload.setAcceptedFileTypes("text/csv");
+        upload.addSucceededListener(event -> {
+            tabularDataFile = buffer.getInputStream();
+            tabularDataFileName = buffer.getFileName();
+        });
         return upload;
     }
 
