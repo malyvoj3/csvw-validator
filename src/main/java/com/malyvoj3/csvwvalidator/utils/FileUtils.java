@@ -2,21 +2,43 @@ package com.malyvoj3.csvwvalidator.utils;
 
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
+import java.net.*;
+import java.nio.ByteBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.StandardCharsets;
 
 @UtilityClass
 public class FileUtils {
 
-    public static FileResponse downloadFile(String stringUrl) {
+    public boolean isUtf8(URI uri) {
+        boolean isUtf;
+        try {
+            isUtf = isUtf8(IOUtils.toByteArray(uri));
+        } catch (IOException e) {
+            isUtf = false;
+        }
+        return isUtf;
+    }
+
+    public boolean isUtf8(byte[] array) {
+        CharsetDecoder decoder =
+                StandardCharsets.UTF_8.newDecoder();
+        try {
+            decoder.decode(
+                    ByteBuffer.wrap(array));
+        } catch (CharacterCodingException ex) {
+           return false;
+        }
+        return true;
+    }
+
+    public FileResponse downloadFile(String stringUrl) {
         FileResponse fileResponse;
         String normalizedUrl = UriUtils.normalizeUri(stringUrl);
         URL url;
@@ -32,6 +54,7 @@ public class FileUtils {
             try (InputStream inputStream = connection.getInputStream()) {
                 fileResponse = new FileResponse();
                 fileResponse.setResponseCode(connection.getResponseCode());
+                fileResponse.setUrl(normalizedUrl);
                 if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
                     fileResponse.setContent(IOUtils.toByteArray(inputStream));
                     fileResponse.setContentType(createContentType(connection.getContentType()));
@@ -50,7 +73,7 @@ public class FileUtils {
         return fileResponse;
     }
 
-    private static ContentType createContentType(String contentTypeHeader) {
+    private ContentType createContentType(String contentTypeHeader) {
         ContentType contentType = new ContentType();
         contentType.setType(getHeaderValue(contentTypeHeader));
         contentType.setCharset(getHeaderParameter(contentTypeHeader, "charset"));
@@ -58,7 +81,7 @@ public class FileUtils {
         return contentType;
     }
 
-    private static Link createLink(String linkHeader) {
+    private Link createLink(String linkHeader) {
         Link link = new Link();
         link.setLink(getHeaderValue(linkHeader));
         link.setRel(getHeaderParameter(linkHeader, "rel"));
@@ -66,7 +89,7 @@ public class FileUtils {
         return link;
     }
 
-    private static String getHeaderValue(String header) {
+    private String getHeaderValue(String header) {
         String value = null;
         if (StringUtils.isNotEmpty(header)) {
             int index = StringUtils.indexOf(header, ";");
@@ -77,7 +100,7 @@ public class FileUtils {
         return value;
     }
 
-    private static String getHeaderParameter(String header, @NonNull String parameterName) {
+    private String getHeaderParameter(String header, @NonNull String parameterName) {
         String value = null;
         if (StringUtils.isNotEmpty(header)) {
             int index = StringUtils.indexOfIgnoreCase(header, parameterName + "=");

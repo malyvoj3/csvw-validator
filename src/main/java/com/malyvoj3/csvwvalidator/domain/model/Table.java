@@ -9,12 +9,13 @@ import java.util.List;
 public class Table {
 
     private List<Column> columns = new ArrayList<>();
+    private List<Row> rows = new ArrayList<>();
     private TableDirection tableDirection;
     // TODO foreignKeys
     private String id;
     // TODO notes
     private String schema;
-    private Boolean suppressOutput;
+    private boolean suppressOutput;
     // TODO transformations
     private String url;
 

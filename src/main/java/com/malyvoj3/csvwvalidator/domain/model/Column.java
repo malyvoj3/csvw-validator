@@ -1,10 +1,12 @@
 package com.malyvoj3.csvwvalidator.domain.model;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Builder
 @Data
 public class Column {
 
@@ -16,15 +18,15 @@ public class Column {
     private String name;
     private List<String> nullValues = new ArrayList<>();
     private Integer number;
-    private Boolean ordered;
+    private boolean ordered;
     private String propertyUrl;
-    private Boolean required;
+    private boolean required;
     private String separator;
     private Integer sourceNumber;
-    private Boolean suppressOutput;
+    private boolean suppressOutput;
     private Table table;
     private TextDirection textDirection;
-    private List<String> titles;
+    private List<String> titles = new ArrayList<>();
     private String valueUrl;
-    private Boolean virtual;
+    private boolean virtual;
 }

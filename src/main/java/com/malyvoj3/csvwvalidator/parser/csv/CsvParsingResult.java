@@ -1,0 +1,21 @@
+package com.malyvoj3.csvwvalidator.parser.csv;
+
+import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.TableDescription;
+import com.malyvoj3.csvwvalidator.domain.model.Table;
+import com.malyvoj3.csvwvalidator.validation.ValidationError;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+public class CsvParsingResult {
+
+    private List<ValidationError> parsingErrors;
+    private Table table;
+    private TableDescription tableDescription;
+
+}

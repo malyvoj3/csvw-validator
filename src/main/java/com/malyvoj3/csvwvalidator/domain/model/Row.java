@@ -12,7 +12,7 @@ public class Row {
     private Integer number;
     private List<Cell> primaryKey = new ArrayList<>();
     private List<String> titles = new ArrayList<>();
-    // TODO referenced rows
+    private List<Row> referencedRows = new ArrayList<>();
     private Integer sourceNumber;
     private Table table;
 }
