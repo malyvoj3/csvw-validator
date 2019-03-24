@@ -35,4 +35,6 @@ public abstract class TopLevelDescription extends InheritanceDescription {
         normalizationErrors.addAll(normalizeProperty(transformations, context));
         return normalizationErrors;
     }
+
+    public abstract boolean describesTabularData(String tabularUrl);
 }

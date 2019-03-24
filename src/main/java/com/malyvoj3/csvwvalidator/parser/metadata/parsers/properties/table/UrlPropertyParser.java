@@ -5,6 +5,7 @@ import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.TableDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.LinkProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.PropertyParser;
+import com.malyvoj3.csvwvalidator.utils.UriUtils;
 import com.malyvoj3.csvwvalidator.validation.ErrorFactory;
 import lombok.NonNull;
 
@@ -16,7 +17,8 @@ public class UrlPropertyParser<T extends TableDescription> implements PropertyPa
         JsonNode property = jsonProperty.getJsonValue();
         LinkProperty url;
         if (property.isTextual()) {
-            url = new LinkProperty(property.textValue());
+            String resolvedUrl = UriUtils.resolveUri(jsonProperty.getParsingContext().getMetadataUrl(), property.textValue());
+            url = new LinkProperty(resolvedUrl);
         } else {
             jsonProperty.addError(ErrorFactory.invalidPropertyType(jsonProperty.getName()));
             url = null;

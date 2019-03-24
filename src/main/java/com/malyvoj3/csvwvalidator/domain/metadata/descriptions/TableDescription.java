@@ -4,6 +4,7 @@ import com.malyvoj3.csvwvalidator.domain.metadata.CompatibleDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.Context;
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.BooleanAtomicProperty;
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.LinkProperty;
+import com.malyvoj3.csvwvalidator.utils.UriUtils;
 import com.malyvoj3.csvwvalidator.validation.ValidationError;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -27,8 +28,12 @@ public class TableDescription extends TopLevelDescription implements CompatibleD
     @Override
     public List<ValidationError> normalize(Context context) {
         List<ValidationError> normalizationErrors = super.normalize(context);
-        normalizationErrors.addAll(normalizeProperty(url, context));
         normalizationErrors.addAll(normalizeProperty(suppressOutput, context));
         return normalizationErrors;
+    }
+
+    @Override
+    public boolean describesTabularData(String tabularUrl) {
+        return UriUtils.uriEquals(url.getValue(), tabularUrl);
     }
 }

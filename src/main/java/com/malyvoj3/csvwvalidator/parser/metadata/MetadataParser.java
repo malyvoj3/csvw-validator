@@ -24,7 +24,7 @@ public class MetadataParser {
     private final TableDescriptionParser tableParser;
     private final TableGroupDescriptionParser tableGroupParser;
 
-    public MetadataParsingResult parseJson(InputStream inputStream, String metadataURL) {
+    public MetadataParsingResult parseJson(InputStream inputStream, String metadataUrl) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode mainNode = objectMapper.readTree(inputStream);
@@ -34,12 +34,15 @@ public class MetadataParser {
                 boolean hasTables = objectNode.hasNonNull(CsvwKeywords.TABLES_PROPERTY);
                 boolean hasUrl = objectNode.hasNonNull(CsvwKeywords.URL_PROPERTY);
                 JsonObject jsonObject = new JsonObject(null, objectNode);
+                jsonObject.setParsingContext(new ParsingContext(metadataUrl));
                 TopLevelDescription topLevelDescription;
 
                 if (hasTables && !hasUrl) {
                     topLevelDescription = tableGroupParser.parse(jsonObject);
+                    result.setTopLevelType(TopLevelType.TABLE_GROUP);
                 } else if (hasUrl && !hasTables) {
                     topLevelDescription = tableParser.parse(jsonObject);
+                    result.setTopLevelType(TopLevelType.TABLE);
                 } else {
                     throw new ParserException();
                 }
@@ -47,7 +50,7 @@ public class MetadataParser {
                 // If base property is null, base URL is url of metadata document.
                 Context context = topLevelDescription.getContext();
                 if (context.getBase() == null) {
-                    context.setBase(new StringAtomicProperty(metadataURL));
+                    context.setBase(new StringAtomicProperty(metadataUrl));
                 }
 
                 // Normalize.

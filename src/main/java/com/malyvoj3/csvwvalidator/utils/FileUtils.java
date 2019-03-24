@@ -12,6 +12,8 @@ import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Optional;
 
 @UtilityClass
 public class FileUtils {
@@ -58,7 +60,7 @@ public class FileUtils {
                 if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
                     fileResponse.setContent(IOUtils.toByteArray(inputStream));
                     fileResponse.setContentType(createContentType(connection.getContentType()));
-                    fileResponse.setLink(createLink(connection.getHeaderField("Link")));
+                    fileResponse.setLink(createLink(connection.getHeaderFields().get("Link"), normalizedUrl));
                 }
             }
         } catch (ProtocolException e) {
@@ -81,12 +83,36 @@ public class FileUtils {
         return contentType;
     }
 
-    private Link createLink(String linkHeader) {
-        Link link = new Link();
-        link.setLink(getHeaderValue(linkHeader));
-        link.setRel(getHeaderParameter(linkHeader, "rel"));
-        link.setType(getHeaderParameter(linkHeader, "type"));
+    private Link createLink(List<String> linkHeaders, String fileUrl) {
+        Link link = null;
+        String linkHeader = null;
+        if (linkHeaders.size() > 0) {
+            linkHeader = linkHeaders.get(linkHeaders.size() - 1);
+            Link tmp = new Link();
+            String url = Optional.ofNullable(getHeaderValue(linkHeader))
+                    .map(FileUtils::removeLinkBrackets)
+                    .orElse(null);
+            tmp.setLink(UriUtils.resolveUri(fileUrl, url));
+            tmp.setRel(getHeaderParameter(linkHeader, "rel"));
+            tmp.setType(getHeaderParameter(linkHeader, "type"));
+            if ("describedby".equals(tmp.getRel())) {
+                link = tmp;
+            }
+        }
         return link;
+    }
+
+    private String removeLinkBrackets(String link) {
+        String result = link;
+        if (result != null) {
+            if (result.startsWith("<")) {
+                result = result.substring(1);
+            }
+            if (result.endsWith(">")) {
+                result = result.substring(0, result.length() - 1);
+            }
+        }
+        return result;
     }
 
     private String getHeaderValue(String header) {
