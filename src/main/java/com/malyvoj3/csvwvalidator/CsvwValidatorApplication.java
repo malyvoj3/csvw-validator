@@ -20,9 +20,9 @@ public class CsvwValidatorApplication {
 
     @PostConstruct
     public void init() throws URISyntaxException, IOException {
-//        String s = "file:/c:/Users/Vojta/IdeaProjects/csvw-validator/test015-user-metadata.json";
-////        File a = new File(new URI(s));
-////        System.out.println(a);
+//        String s = "file:/c/Users/Vojta/IdeaProjects/csvw-validator/test015-user-metadata.json";
+//        File a = new File(new URI(s));
+//        System.out.println(a);
 //        Dialect dialect = Dialect.builder().header(true).build();
 //        new CsvParser().parse(dialect, "file:/c:/Users/Vojta/IdeaProjects/csvw-validator/2007-quote.csv");
     }

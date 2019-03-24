@@ -97,53 +97,55 @@ class UriUtilsTest extends Specification {
         UriUtils.uriEquals(resolvedUri, expectedUri)
 
         where: "Examples mostly from RFC 3986 specification"
-        baseUri                                                             | uri                     | expectedUri
-        "http://a/b/c/d;p?q"                                                | "http:g"                | "http:g"
-        "http://a/b/c/d;p?q"                                                | "g"                     | "http://a/b/c/g"
-        "http://a/b/c/d;p?q"                                                | "./g"                   | "http://a/b/c/g"
-        "http://a/b/c/d;p?q"                                                | "g/"                    | "http://a/b/c/g/"
-        "http://a/b/c/d;p?q"                                                | "/g"                    | "http://a/g"
-        "http://a/b/c/d;p?q"                                                | "//g"                   | "http://g"
-        "http://a/b/c/d;p?q"                                                | "?y"                    | "http://a/b/c/d;p?y"
-        "http://a/b/c/d;p?q"                                                | "g?y"                   | "http://a/b/c/g?y"
-        "http://a/b/c/d;p?q"                                                | "#s"                    | "http://a/b/c/d;p?q#s"
-        "http://a/b/c/d;p?q"                                                | "g#s"                   | "http://a/b/c/g#s"
-        "http://a/b/c/d;p?q"                                                | "g?y#s"                 | "http://a/b/c/g?y#s"
-        "http://a/b/c/d;p?q"                                                | ";x"                    | "http://a/b/c/;x"
-        "http://a/b/c/d;p?q"                                                | "g;x"                   | "http://a/b/c/g;x"
-        "http://a/b/c/d;p?q"                                                | "g;x?y#s"               | "http://a/b/c/g;x?y#s"
-        "http://a/b/c/d;p?q"                                                | ""                      | "http://a/b/c/d;p?q"
-        "http://a/b/c/d;p?q"                                                | "."                     | "http://a/b/c/"
-        "http://a/b/c/d;p?q"                                                | "./"                    | "http://a/b/c/"
-        "http://a/b/c/d;p?q"                                                | ".."                    | "http://a/b/"
-        "http://a/b/c/d;p?q"                                                | "../"                   | "http://a/b/"
-        "http://a/b/c/d;p?q"                                                | "../g"                  | "http://a/b/g"
-        "http://a/b/c/d;p?q"                                                | "../.."                 | "http://a/"
-        "http://a/b/c/d;p?q"                                                | "../../"                | "http://a/"
-        "http://a/b/c/d;p?q"                                                | "../../g"               | "http://a/g"
-        "http://a/b/c/d;p?q"                                                | "../../../g"            | "http://a/g"
-        "http://a/b/c/d;p?q"                                                | "../../../../g"         | "http://a/g"
-        "http://a/b/c/d;p?q"                                                | "/./g"                  | "http://a/g"
-        "http://a/b/c/d;p?q"                                                | "/../g"                 | "http://a/g"
-        "http://a/b/c/d;p?q"                                                | "g."                    | "http://a/b/c/g."
-        "http://a/b/c/d;p?q"                                                | ".g"                    | "http://a/b/c/.g"
-        "http://a/b/c/d;p?q"                                                | "g.."                   | "http://a/b/c/g.."
-        "http://a/b/c/d;p?q"                                                | "..g"                   | "http://a/b/c/..g"
-        "http://a/b/c/d;p?q"                                                | "./../g"                | "http://a/b/g"
-        "http://a/b/c/d;p?q"                                                | "./g/."                 | "http://a/b/c/g/"
-        "http://a/b/c/d;p?q"                                                | "g/./h"                 | "http://a/b/c/g/h"
-        "http://a/b/c/d;p?q"                                                | "g/../h"                | "http://a/b/c/h"
-        "http://a/b/c/d;p?q"                                                | "g;x=1/./y"             | "http://a/b/c/g;x=1/y"
-        "http://a/b/c/d;p?q"                                                | "g;x=1/../y"            | "http://a/b/c/y"
-        "http://a/b/c/d;p?q"                                                | "g?y/./x"               | "http://a/b/c/g?y/./x"
-        "http://a/b/c/d;p?q"                                                | "g?y/../x"              | "http://a/b/c/g?y/../x"
-        "http://a/b/c/d;p?q"                                                | "g#s/./x"               | "http://a/b/c/g#s/./x"
-        "http://a/b/c/d;p?q"                                                | "g#s/../x"              | "http://a/b/c/g#s/../x"
-        "https://dev.nkod.opendata.cz/soubor/datové-sady.csv-metadata.json" | "datové-sady.csv"       | "https://dev.nkod.opendata.cz/soubor/datové-sady.csv"
-        "http://example.com"                                                | "http://foo.com"        | "http://foo.com"
-        "http://example.org/south-west/devon.csv "                          | "/.well-known/csvm "    | "http://example.org/.well-known/csvm"
-        "file://example.com/test.csv"                                       | "g"                     | "file://example.com/g"
-        "file:///c:/path/to/the%20file.txt"                                 | "../directory/test.txt" | "file:///c:/path/directory/test.txt"
+        baseUri                                                             | uri                                   | expectedUri
+        "http://a/b/c/d;p?q"                                                | "http:g"                              | "http:g"
+        "http://a/b/c/d;p?q"                                                | "g"                                   | "http://a/b/c/g"
+        "http://a/b/c/d;p?q"                                                | "./g"                                 | "http://a/b/c/g"
+        "http://a/b/c/d;p?q"                                                | "g/"                                  | "http://a/b/c/g/"
+        "http://a/b/c/d;p?q"                                                | "/g"                                  | "http://a/g"
+        "http://a/b/c/d;p?q"                                                | "//g"                                 | "http://g"
+        "http://a/b/c/d;p?q"                                                | "?y"                                  | "http://a/b/c/d;p?y"
+        "http://a/b/c/d;p?q"                                                | "g?y"                                 | "http://a/b/c/g?y"
+        "http://a/b/c/d;p?q"                                                | "#s"                                  | "http://a/b/c/d;p?q#s"
+        "http://a/b/c/d;p?q"                                                | "g#s"                                 | "http://a/b/c/g#s"
+        "http://a/b/c/d;p?q"                                                | "g?y#s"                               | "http://a/b/c/g?y#s"
+        "http://a/b/c/d;p?q"                                                | ";x"                                  | "http://a/b/c/;x"
+        "http://a/b/c/d;p?q"                                                | "g;x"                                 | "http://a/b/c/g;x"
+        "http://a/b/c/d;p?q"                                                | "g;x?y#s"                             | "http://a/b/c/g;x?y#s"
+        "http://a/b/c/d;p?q"                                                | ""                                    | "http://a/b/c/d;p?q"
+        "http://a/b/c/d;p?q"                                                | "."                                   | "http://a/b/c/"
+        "http://a/b/c/d;p?q"                                                | "./"                                  | "http://a/b/c/"
+        "http://a/b/c/d;p?q"                                                | ".."                                  | "http://a/b/"
+        "http://a/b/c/d;p?q"                                                | "../"                                 | "http://a/b/"
+        "http://a/b/c/d;p?q"                                                | "../g"                                | "http://a/b/g"
+        "http://a/b/c/d;p?q"                                                | "../.."                               | "http://a/"
+        "http://a/b/c/d;p?q"                                                | "../../"                              | "http://a/"
+        "http://a/b/c/d;p?q"                                                | "../../g"                             | "http://a/g"
+        "http://a/b/c/d;p?q"                                                | "../../../g"                          | "http://a/g"
+        "http://a/b/c/d;p?q"                                                | "../../../../g"                       | "http://a/g"
+        "http://a/b/c/d;p?q"                                                | "/./g"                                | "http://a/g"
+        "http://a/b/c/d;p?q"                                                | "/../g"                               | "http://a/g"
+        "http://a/b/c/d;p?q"                                                | "g."                                  | "http://a/b/c/g."
+        "http://a/b/c/d;p?q"                                                | ".g"                                  | "http://a/b/c/.g"
+        "http://a/b/c/d;p?q"                                                | "g.."                                 | "http://a/b/c/g.."
+        "http://a/b/c/d;p?q"                                                | "..g"                                 | "http://a/b/c/..g"
+        "http://a/b/c/d;p?q"                                                | "./../g"                              | "http://a/b/g"
+        "http://a/b/c/d;p?q"                                                | "./g/."                               | "http://a/b/c/g/"
+        "http://a/b/c/d;p?q"                                                | "g/./h"                               | "http://a/b/c/g/h"
+        "http://a/b/c/d;p?q"                                                | "g/../h"                              | "http://a/b/c/h"
+        "http://a/b/c/d;p?q"                                                | "g;x=1/./y"                           | "http://a/b/c/g;x=1/y"
+        "http://a/b/c/d;p?q"                                                | "g;x=1/../y"                          | "http://a/b/c/y"
+        "http://a/b/c/d;p?q"                                                | "g?y/./x"                             | "http://a/b/c/g?y/./x"
+        "http://a/b/c/d;p?q"                                                | "g?y/../x"                            | "http://a/b/c/g?y/../x"
+        "http://a/b/c/d;p?q"                                                | "g#s/./x"                             | "http://a/b/c/g#s/./x"
+        "http://a/b/c/d;p?q"                                                | "g#s/../x"                            | "http://a/b/c/g#s/../x"
+        "https://dev.nkod.opendata.cz/soubor/datové-sady.csv-metadata.json" | "datové-sady.csv"                     | "https://dev.nkod.opendata.cz/soubor/datové-sady.csv"
+        "http://example.com"                                                | "http://foo.com"                      | "http://foo.com"
+        "http://example.org/south-west/devon.csv "                          | "/.well-known/csvm "                  | "http://example.org/.well-known/csvm"
+        "file://example.com/test.csv"                                       | "g"                                   | "file://example.com/g"
+        "file:///c:/path/to/the%20file.txt"                                 | "../directory/test.txt"               | "file:///c:/path/directory/test.txt"
+        "file://c:/path/to/the%20file.txt"                                  | "file:///c:/path/to/other%20file.txt" | "file:///c:/path/to/other%20file.txt"
+        "http://example.com"                                                | "file:///c:/path/to/other%20file.txt" | "file:///c:/path/to/other%20file.txt"
     }
 
     @Unroll
@@ -205,6 +207,49 @@ class UriUtilsTest extends Specification {
         "foo:test"                                                                              | false
         "a:test"                                                                                | false
         "err:test"                                                                              | false
+    }
+
+    @Unroll
+    def "Expanding URI template '#template' and resolving against base URI"() {
+        when: "Expanding uri template with variables and resolve it againg base URI"
+        String baseUri = "http://example.org/south-west/devon.csv"
+        String expandedTemplate = UriUtils.expandAndResolveTemplate(baseUri, template, variables)
+
+        then: "Template is correctly expanded and resolved"
+        expandedTemplate == expectedUri
+
+        where:
+        template                                    | variables                                          | expectedUri
+        "{+url}.json"                               | ['url': 'http://example.org/south-west/devon.csv'] | "http://example.org/south-west/devon.csv.json"
+        "csvm.json"                                 | ['url': 'http://example.org/south-west/devon.csv'] | "http://example.org/south-west/csvm.json"
+        "/csvm?file={url}"                          | ['url': 'http://example.org/south-west/devon.csv'] | "http://example.org/csvm?file=http://example.org/south-west/devon.csv"
+        "{+url}-metadata.json"                      | ['url': 'http://example.org/south-west/devon.csv'] | "http://example.org/south-west/devon.csv-metadata.json"
+        "{+url}-metadata.json"                      | ['url': 'file:///c:/path/to/the%20file.csv']       | "file:///c/path/to/the%20file.csv-metadata.json"
+        "csv-metadata.json"                         | ['url': 'http://example.org/south-west/devon.csv'] | "http://example.org/south-west/csv-metadata.json"
+        "http://example.org/example.csv#row.{_row}" | ['_row': 3]                                        | "http://example.org/example.csv#row.3"
+        "http://example.org/tree/{on_street}/{GID}" | ['on_street': 'ADDISON AV', 'GID': 1]              | "http://example.org/tree/ADDISON%20AV/1"
+        "#row.{_row}"                               | ['_row': 1]                                        | "http://example.org/south-west/devon.csv#row.1"
+    }
+
+    @Unroll
+    def "Expanding URI template '#template'"() {
+        when: "Expanding uri template with variables"
+        String expandedTemplate = UriUtils.expandTemplate(template, variables)
+
+        then: "Template is correctly expanded"
+        expandedTemplate == expectedUri
+
+        where:
+        template                                    | variables                                          | expectedUri
+        "{+url}.json"                               | ['url': 'http://example.org/south-west/devon.csv'] | "http://example.org/south-west/devon.csv.json"
+        "csvm.json"                                 | ['url': 'http://example.org/south-west/devon.csv'] | "csvm.json"
+        "/csvm?file={url}"                          | ['url': 'http://example.org/south-west/devon.csv'] | "/csvm?file=http%3A%2F%2Fexample.org%2Fsouth-west%2Fdevon.csv"
+        "{+url}-metadata.json"                      | ['url': 'http://example.org/south-west/devon.csv'] | "http://example.org/south-west/devon.csv-metadata.json"
+        "{+url}-metadata.json"                      | ['url': 'file:///c:/path/to/the%20file.csv']       | "file:///c:/path/to/the%20file.csv-metadata.json"
+        "csv-metadata.json"                         | ['url': 'http://example.org/south-west/devon.csv'] | "csv-metadata.json"
+        "http://example.org/example.csv#row.{_row}" | ['_row': 3]                                        | "http://example.org/example.csv#row.3"
+        "http://example.org/tree/{on_street}/{GID}" | ['on_street': 'ADDISON AV', 'GID': 1]              | "http://example.org/tree/ADDISON%20AV/1"
+        "#row.{_row}"                               | ['_row': 1]                                        | "#row.1"
     }
 
 }

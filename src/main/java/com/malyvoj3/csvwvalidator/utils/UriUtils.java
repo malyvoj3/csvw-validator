@@ -1,5 +1,6 @@
 package com.malyvoj3.csvwvalidator.utils;
 
+import com.damnhandy.uri.template.UriTemplate;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import org.urllib.Url;
@@ -138,11 +139,39 @@ public class UriUtils {
      */
     public String resolveUri(String baseUri, String uri) {
         String normalizedBase = normalizeUri(baseUri);
-        String fileScheme = getFileScheme(normalizedBase);
-        normalizedBase = fileScheme != null ? StringUtils.replaceOnceIgnoreCase(normalizedBase, fileScheme, "http://") : normalizedBase;
+        String baseFileScheme = getFileScheme(normalizedBase);
+        normalizedBase = baseFileScheme != null ? StringUtils.replaceOnceIgnoreCase(normalizedBase, baseFileScheme, "http://") : normalizedBase;
+
+        String normalizedUri = normalizeUri(uri);
+        String resolvingFileScheme = null;
+        if (normalizedUri != null) {
+            // It is absolute URI.
+            resolvingFileScheme = getFileScheme(uri);
+            normalizedUri = resolvingFileScheme != null ? StringUtils.replaceOnceIgnoreCase(normalizedUri, resolvingFileScheme, "http://") : normalizedUri;
+        } else {
+            normalizedUri = uri;
+        }
+
         Url base = Urls.parse(normalizedBase);
-        Url resolved = base.resolve(uri);
-        return fileScheme != null ? StringUtils.replaceOnceIgnoreCase(resolved.toString(), "http://", fileScheme) : resolved.toString();
+        Url resolved = base.resolve(normalizedUri);
+
+        String resolvedString;
+        if (resolvingFileScheme != null) {
+            resolvedString = StringUtils.replaceOnceIgnoreCase(resolved.toString(), "http://", resolvingFileScheme);
+        } else if (baseFileScheme != null) {
+            resolvedString = StringUtils.replaceOnceIgnoreCase(resolved.toString(), "http://", baseFileScheme);
+        } else {
+            resolvedString = resolved.toString();
+        }
+        return resolvedString;
+    }
+
+    public String expandTemplate(String template, Map<String, Object> variables) {
+        return UriTemplate.expand(template, variables);
+    }
+
+    public String expandAndResolveTemplate(String baseUri, String template, Map<String, Object> variables) {
+        return resolveUri(baseUri, expandTemplate(template, variables));
     }
 
     private String getFileScheme(String fileUrl) {
