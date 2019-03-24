@@ -1,19 +1,17 @@
 package com.malyvoj3.csvwvalidator.validation;
 
-import java.io.InputStream;
+import com.malyvoj3.csvwvalidator.parser.csv.CsvParsingResult;
+import com.malyvoj3.csvwvalidator.parser.metadata.MetadataParsingResult;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Validator {
 
-    public void validateTabularData(InputStream tabular) {
+    public List<ValidationError> validate(CsvParsingResult tabular, MetadataParsingResult metadata) {
+        List<ValidationError> validationErrors = new ArrayList<>();
 
-    }
-
-    public void validateMetadata(InputStream metadataFile, InputStream... otherFiles) {
-
-    }
-
-    public void validate(InputStream tabular, InputStream metadataFile, InputStream... otherFiles) {
-
+        return validationErrors;
     }
 
 }

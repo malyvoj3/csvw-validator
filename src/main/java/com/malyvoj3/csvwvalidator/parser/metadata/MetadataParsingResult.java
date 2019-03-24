@@ -14,5 +14,6 @@ public class MetadataParsingResult {
     private TopLevelDescription topLevelDescription;
     private List<JsonParserError> parsingErrors = new ArrayList<>();
     private List<ValidationError> normalizationErrors = new ArrayList<>();
+    private TopLevelType topLevelType;
 
 }

@@ -4,6 +4,7 @@ import com.malyvoj3.csvwvalidator.domain.metadata.CompatibleDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.Context;
 import com.malyvoj3.csvwvalidator.domain.metadata.Normalizable;
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.ArrayProperty;
+import com.malyvoj3.csvwvalidator.utils.UriUtils;
 import com.malyvoj3.csvwvalidator.validation.ValidationError;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -35,5 +36,11 @@ public class TableGroupDescription extends TopLevelDescription implements Compat
         // TODO setni tabulkam schema nemaji-li ho
         normalizationErrors.addAll(normalizeProperty(tables, context));
         return normalizationErrors;
+    }
+
+    @Override
+    public boolean describesTabularData(String tabularUrl) {
+        return tables.getValue().stream()
+                .anyMatch(table -> UriUtils.uriEquals(table.getUrl().getValue(), tabularUrl));
     }
 }

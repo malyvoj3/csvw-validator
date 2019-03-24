@@ -25,6 +25,7 @@ public abstract class DefaultDescriptionParser<T extends ObjectDescription> impl
             PropertyParser<T> propertyParser = factory.createParser(entry.getKey());
             if (propertyParser != null) {
                 JsonProperty jsonProperty = new JsonProperty(entry.getKey(), entry.getValue());
+                jsonProperty.setParsingContext(jsonObject.getParsingContext());
                 propertyParser.parsePropertyToDescription(description, jsonProperty);
                 jsonProperty.getParsingErrors().forEach(error -> {
                     if (jsonObject.getName() != null) {
