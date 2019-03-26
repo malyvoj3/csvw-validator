@@ -4,7 +4,9 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Builder
 @Data
@@ -26,7 +28,7 @@ public class Column {
     private boolean suppressOutput;
     private Table table;
     private TextDirection textDirection;
-    private List<String> titles = new ArrayList<>();
+    private Map<String, List<String>> titles = new HashMap<>();
     private String valueUrl;
     private boolean virtual;
 }

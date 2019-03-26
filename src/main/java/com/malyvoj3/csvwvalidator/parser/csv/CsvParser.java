@@ -72,21 +72,26 @@ public class CsvParser {
     }
 
     private void createColumns(com.univocity.parsers.csv.CsvParser parser, Table table, List<Column> columns, List<ColumnDescription> columnDescriptions) {
+        int columnNumber = 1;
         for (String header : parser.getContext().headers()) {
-            List<String> titles = new ArrayList<>();
-            titles.add(header);
+            List<String> headerTitles = new ArrayList<>();
+            headerTitles.add(header);
+            Map<String, List<String>> titles = new HashMap<>();
+            titles.put(CsvwKeywords.NATURAL_LANGUAGE_CODE, headerTitles);
             columns.add(Column.builder()
                     .titles(titles)
                     .name(header)
                     .cells(new ArrayList<>())
+                    .number(columnNumber)
                     .table(table).build());
             columnDescriptions.add(createColumnDescription(header));
+            columnNumber++;
         }
     }
 
     private List<ValidationError> createRows(List<String[]> records, Table table, List<Column> columns) {
         List<ValidationError> parsingErrors = new ArrayList<>();
-        int rowNumber = 0;
+        int rowNumber = 1;
         for (String[] record : records) {
             if (record.length > 0) {
                 Row row = new Row();

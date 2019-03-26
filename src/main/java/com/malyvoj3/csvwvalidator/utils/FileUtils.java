@@ -41,7 +41,7 @@ public class FileUtils {
     }
 
     public FileResponse downloadFile(String stringUrl) {
-        FileResponse fileResponse;
+        FileResponse fileResponse = null;
         String normalizedUrl = UriUtils.normalizeUri(stringUrl);
         URL url;
         try {
@@ -64,9 +64,11 @@ public class FileUtils {
                 }
             }
         } catch (ProtocolException e) {
-            throw new IllegalArgumentException("Invalid request method.");
+            //throw new IllegalArgumentException("Invalid request method.");
+            // TODO log
         } catch (IOException e) {
-            throw new IllegalStateException("Connection exception.");
+            //throw new IllegalStateException("Connection exception.");
+            // TODO log
         } finally {
             if (connection != null) {
                 connection.disconnect();
@@ -86,7 +88,7 @@ public class FileUtils {
     private Link createLink(List<String> linkHeaders, String fileUrl) {
         Link link = null;
         String linkHeader = null;
-        if (linkHeaders.size() > 0) {
+        if (linkHeaders != null && linkHeaders.size() > 0) {
             linkHeader = linkHeaders.get(linkHeaders.size() - 1);
             Link tmp = new Link();
             String url = Optional.ofNullable(getHeaderValue(linkHeader))

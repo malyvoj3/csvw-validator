@@ -4,9 +4,6 @@ import com.malyvoj3.csvwvalidator.parser.metadata.MetadataParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.MetadataParsingResult;
 import com.malyvoj3.csvwvalidator.utils.FileResponse;
 import com.malyvoj3.csvwvalidator.utils.FileUtils;
-import com.malyvoj3.csvwvalidator.validation.JsonParserError;
-import com.malyvoj3.csvwvalidator.validation.JsonParserErrorDefaultFormatter;
-import com.malyvoj3.csvwvalidator.validation.ValidationErrorFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -31,9 +28,8 @@ public class CsvwController {
             String fileUrl = request.getMetadataFilesUrl().get(0);
             FileResponse file = FileUtils.downloadFile(request.getMetadataFilesUrl().get(0));
             if (file != null) {
-                ValidationErrorFormatter<JsonParserError> formatter = new JsonParserErrorDefaultFormatter();
                 MetadataParsingResult result = metadataParser.parseJson(new ByteArrayInputStream(file.getContent()), fileUrl);
-                result.getParsingErrors().forEach(error -> response.getValidationErrors().add(formatter.format(error)));
+                result.getParsingErrors().forEach(error -> response.getValidationErrors().add(error.format()));
             }
         }
         return ResponseEntity.ok(response);

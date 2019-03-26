@@ -1,0 +1,4 @@
+package com.malyvoj3.csvwvalidator.validation.model;
+
+public class ModelValidator {
+}

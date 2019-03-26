@@ -13,7 +13,7 @@ public class Table {
     private TableDirection tableDirection;
     // TODO foreignKeys
     private String id;
-    // TODO notes
+    private List<Note> notes = new ArrayList<>();
     private String schema;
     private boolean suppressOutput;
     // TODO transformations
