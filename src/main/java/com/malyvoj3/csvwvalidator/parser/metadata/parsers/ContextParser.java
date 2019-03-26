@@ -7,6 +7,8 @@ import com.malyvoj3.csvwvalidator.domain.metadata.Context;
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.StringAtomicProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;
 import com.malyvoj3.csvwvalidator.utils.CsvwKeywords;
+import com.malyvoj3.csvwvalidator.utils.LanguageUtils;
+import com.malyvoj3.csvwvalidator.utils.UriUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,8 +22,7 @@ public class ContextParser {
         if (jsonNode.isTextual()) {
             context = new Context();
             // Then string must be URL of CSVW Vocabulary
-            // TODO Normalize URL pred porovnani??
-            if (CsvwKeywords.CSVW_VOCABULARY_URL.equals(jsonNode.textValue())) {
+            if (UriUtils.uriEquals(CsvwKeywords.CSVW_VOCABULARY_URL, jsonNode.textValue())) {
                 context.setRefContext(new StringAtomicProperty(CsvwKeywords.CSVW_VOCABULARY_URL));
             }
         } else if (jsonNode.isArray()) {
@@ -34,7 +35,7 @@ public class ContextParser {
                     ObjectNode objectNode = (ObjectNode) second;
                     JsonNode base = objectNode.get(CsvwKeywords.BASE_PROPERTY);
                     JsonNode language = objectNode.get(CsvwKeywords.LANGUAGE_PROPERTY);
-                    addBase(context, base);
+                    addBase(context, base, jsonProperty.getParsingContext().getMetadataUrl());
                     addLanguage(context, language);
                 }
             }
@@ -42,25 +43,17 @@ public class ContextParser {
         return context;
     }
 
-    private void addBase(Context context, JsonNode base) {
-        if (base != null && base.isTextual() && isUrl(base.textValue())) {
-            context.setBase(new StringAtomicProperty(base.textValue()));
+    private void addBase(Context context, JsonNode base, String metadataUrl) {
+        if (base != null && base.isTextual()) {
+            String baseUrl = UriUtils.resolveUri(metadataUrl, base.textValue());
+            context.setBase(new StringAtomicProperty(baseUrl));
         }
     }
 
     private void addLanguage(Context context, JsonNode language) {
-        if (language != null && language.isTextual() && isLanguageCode(language.textValue())) {
+        if (language != null && language.isTextual() && LanguageUtils.isLanguageTag(language.textValue())) {
             context.setLanguage(new StringAtomicProperty(language.textValue()));
         }
     }
 
-    private boolean isLanguageCode(String textValue) {
-        // TODO
-        return true;
-    }
-
-    private boolean isUrl(String textValue) {
-        // TODO
-        return true;
-    }
 }

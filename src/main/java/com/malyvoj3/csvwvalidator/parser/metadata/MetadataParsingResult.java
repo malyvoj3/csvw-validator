@@ -11,6 +11,7 @@ import java.util.List;
 @Data
 public class MetadataParsingResult {
 
+    private String metadataUrl;
     private TopLevelDescription topLevelDescription;
     private List<JsonParserError> parsingErrors = new ArrayList<>();
     private List<ValidationError> normalizationErrors = new ArrayList<>();

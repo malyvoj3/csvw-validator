@@ -8,6 +8,7 @@ import com.malyvoj3.csvwvalidator.domain.metadata.ObjectDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.Property;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonObject;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;
+import com.malyvoj3.csvwvalidator.parser.metadata.ParsingContext;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.ContextParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.ObjectDescriptionParser;
 import com.malyvoj3.csvwvalidator.utils.FileResponse;
@@ -60,6 +61,7 @@ public class ObjectProperty<T extends ObjectDescription> extends Property<T> {
             if (node != null && node.isObject()) {
                 JsonObject jsonObject = new JsonObject(null, (ObjectNode) node);
                 JsonProperty jsonProperty = new JsonProperty(null, node);
+                jsonProperty.setParsingContext(new ParsingContext(normalizedUrl));
                 T parsedObject = objectParser.parse(jsonObject);
                 Context newContext = contextParser.parse(jsonProperty);
                 // TODO get errors from parsing.

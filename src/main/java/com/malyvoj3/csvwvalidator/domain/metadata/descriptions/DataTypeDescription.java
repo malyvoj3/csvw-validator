@@ -11,7 +11,6 @@ import java.util.List;
 public class DataTypeDescription extends CommonDescription {
 
     private StringAtomicProperty base;
-    // Format je string a nebo numberFormat.
     private StringAtomicProperty format;
     private ObjectProperty<NumberFormatDescription> numberFormat;
 
@@ -19,7 +18,7 @@ public class DataTypeDescription extends CommonDescription {
     private IntegerAtomicProperty minLength;
     private IntegerAtomicProperty maxLength;
 
-    // Muze byt string/cislo, zatim necham jako string a uvidime jak to vyresit.
+    // Saved as strings.
     private StringAtomicProperty minimum;
     private StringAtomicProperty minInclusive;
     private StringAtomicProperty minExclusive;

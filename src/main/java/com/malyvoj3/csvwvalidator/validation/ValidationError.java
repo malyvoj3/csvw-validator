@@ -22,4 +22,8 @@ public class ValidationError {
         return new ValidationError(Severity.FATAL, message);
     }
 
+    public String format() {
+        return String.format("%s: %s", severity.name(), message);
+    }
+
 }

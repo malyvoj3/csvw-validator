@@ -58,6 +58,8 @@ public class MetadataParser {
                 result.setTopLevelDescription(topLevelDescription);
                 result.setParsingErrors(jsonObject.getParsingErrors());
                 result.setNormalizationErrors(normalizationErrors);
+                result.setMetadataUrl(metadataUrl);
+                // TODO validation - urls of table group > 1, unique names in tableSchema.columns, virtual columns after  normal,... more
                 return result;
             } else {
                 throw new ParserException();
