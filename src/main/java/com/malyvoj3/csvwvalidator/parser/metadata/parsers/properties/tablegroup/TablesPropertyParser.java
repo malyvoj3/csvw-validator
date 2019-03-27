@@ -55,8 +55,6 @@ public class TablesPropertyParser<T extends TableGroupDescription> implements Pr
         }
         if (!tablesList.isEmpty()) {
             tables = new ArrayProperty<>(tablesList);
-        } else {
-            jsonProperty.addError(ErrorFactory.invalidPropertyType(jsonProperty.getName()));
         }
         description.setTables(tables);
     }

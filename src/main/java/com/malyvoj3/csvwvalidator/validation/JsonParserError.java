@@ -22,10 +22,8 @@ public class JsonParserError extends ValidationError {
     }
 
     @Override
-    public String format() {
-        StringBuilder stringBuilder = new StringBuilder(getSeverity().name());
-        stringBuilder.append(": ");
-        stringBuilder.append(getMessage());
+    public String getFormattedMessage() {
+        StringBuilder stringBuilder = new StringBuilder(getMessage());
         stringBuilder.append(" '");
         stringBuilder.append(createPropertyPath(jsonKeys));
         stringBuilder.append("'.");

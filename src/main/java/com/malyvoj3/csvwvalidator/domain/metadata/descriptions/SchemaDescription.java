@@ -27,10 +27,10 @@ public class SchemaDescription extends InheritanceDescription implements Compati
     @Override
     public boolean isCompatibleWith(@NonNull SchemaDescription other) {
         List<ColumnDescription> nonVirtualColumns = columns.getValue().stream()
-                .filter(column -> !column.getVirtual().getValue())
+                .filter(column -> column.getVirtual() == null || !column.getVirtual().getValue())
                 .collect(Collectors.toList());
         List<ColumnDescription> otherNonVirtualColumns = other.getColumns().getValue().stream()
-                .filter(column -> !column.getVirtual().getValue())
+                .filter(column -> column.getVirtual() == null ||!column.getVirtual().getValue())
                 .collect(Collectors.toList());
         boolean compatible = false;
         if (nonVirtualColumns.size() == otherNonVirtualColumns.size()) {

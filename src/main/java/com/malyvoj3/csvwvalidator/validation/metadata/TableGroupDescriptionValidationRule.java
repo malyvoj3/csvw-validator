@@ -1,10 +1,9 @@
 package com.malyvoj3.csvwvalidator.validation.metadata;
 
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.TableGroupDescription;
-import com.malyvoj3.csvwvalidator.validation.ValidationError;
+import com.malyvoj3.csvwvalidator.validation.ValidationRule;
 
-public interface TableGroupDescriptionValidationRule {
 
-    ValidationError validate(TableGroupDescription tableGroupDescription);
+public abstract class TableGroupDescriptionValidationRule implements ValidationRule<TableGroupDescription> {
 
 }

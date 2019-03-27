@@ -3,6 +3,7 @@ package com.malyvoj3.csvwvalidator.validation;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.TableDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.TableGroupDescription;
 import com.malyvoj3.csvwvalidator.domain.model.Table;
+import com.malyvoj3.csvwvalidator.domain.model.TableGroup;
 import com.malyvoj3.csvwvalidator.parser.csv.CsvParser;
 import com.malyvoj3.csvwvalidator.parser.csv.CsvParsingResult;
 import com.malyvoj3.csvwvalidator.parser.csv.Dialect;
@@ -13,6 +14,8 @@ import com.malyvoj3.csvwvalidator.utils.ContentType;
 import com.malyvoj3.csvwvalidator.utils.FileResponse;
 import com.malyvoj3.csvwvalidator.utils.FileUtils;
 import com.malyvoj3.csvwvalidator.utils.UriUtils;
+import com.malyvoj3.csvwvalidator.validation.metadata.MetadataValidator;
+import com.malyvoj3.csvwvalidator.validation.model.ModelValidator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,11 +50,11 @@ public class CsvwProcessor {
     @Autowired
     private AnnotationCreator annotationCreator;
 
-//    @Autowired
-//    private MetadataValidator metadataValidator;
+    @Autowired
+    private MetadataValidator metadataValidator;
 
-//    @Autowired
-//    private ModelValidator modelValidator;
+    @Autowired
+    private ModelValidator modelValidator;
 
     /**
      * Processing just upload tabular data file, which means that this file is validated without scheme.
@@ -81,22 +84,30 @@ public class CsvwProcessor {
     public List<? extends ValidationError> processMetadata(InputStream file, String fileName) {
         String metadataUrl = DEFAULT_URL + fileName;
         MetadataParsingResult metadataParsingResult = metadataParser.parseJson(file, metadataUrl);
-        // TODO metadataValidator.validate() and add errors
+        List<ValidationError> processingErrors = new ArrayList<>(metadataParsingResult.getErrors());
+        if (hasNoFatalError(processingErrors)) {
+            processingErrors.addAll(validateMetadata(metadataParsingResult));
+        }
         return metadataParsingResult.getParsingErrors();
     }
 
-    public void processTabularData(InputStream tabularFile, String tabularFileName, InputStream metadataFile, String metadataFileName) {
+    public List<? extends ValidationError> processTabularData(InputStream tabularFile, String tabularFileName, InputStream metadataFile, String metadataFileName) {
         String tabularUrl = DEFAULT_URL + tabularFileName;
         String metadataUrl = DEFAULT_URL + metadataFileName;
         Dialect dialect = Dialect.builder().header(true).build();
-        CsvParsingResult csvParsingResult = new CsvParsingResult();
+        CsvParsingResult csvParsingResult;
+        List<ValidationError> processingErrors = new ArrayList<>();
         try {
             csvParsingResult = csvParser.parse(dialect, tabularUrl, tabularFile);
+            processingErrors.addAll(csvParsingResult.getParsingErrors());
             MetadataParsingResult metadataParsingResult = metadataParser.parseJson(metadataFile, metadataUrl);
-            // TODO stejne jako processTabularData(String tabularUrl, String metadataUrl)
+            if (hasNoFatalError(processingErrors)) {
+                processingErrors.addAll(process(csvParsingResult, metadataParsingResult));
+            }
         } catch (IOException e) {
-            // TODO add fatal error
+            processingErrors.add(ValidationError.fatal(String.format("Cannot parse CSV file '%s'", tabularFileName)));
         }
+        return processingErrors;
     }
 
     /**
@@ -106,14 +117,18 @@ public class CsvwProcessor {
      * @param metadataFile
      * @param metadataFileName
      */
-    public void processTabularData(String tabularUrl, InputStream metadataFile, String metadataFileName) {
+    public List<? extends ValidationError> processTabularData(String tabularUrl, InputStream metadataFile, String metadataFileName) {
         FileResponse tabularResponse = FileUtils.downloadFile(tabularUrl);
-        List<ValidationError> validationErrors = validateCsvFileResponse(tabularResponse);
+        List<ValidationError> processingErrors = validateCsvFileResponse(tabularResponse);
         CsvParsingResult csvParsingResult = parseCsv(tabularResponse);
         String metadataUrl = UriUtils.resolveUri(tabularUrl, metadataFileName);
         MetadataParsingResult metadataParsingResult = metadataParser.parseJson(metadataFile, metadataUrl);
+        processingErrors.addAll(csvParsingResult.getParsingErrors());
 
-        // TODO stejne jako processTabularData(String tabularUrl, String metadataUrl)
+        if (hasNoFatalError(processingErrors)) {
+            processingErrors.addAll(process(csvParsingResult, metadataParsingResult));
+        }
+        return processingErrors;
     }
 
     /**
@@ -121,54 +136,134 @@ public class CsvwProcessor {
      *
      * @param metadataUrl
      */
-    public void processMetadata(String metadataUrl) {
+    public List<? extends ValidationError> processMetadata(String metadataUrl) {
         FileResponse metadataResponse = FileUtils.downloadFile(metadataUrl);
         InputStream inputStream = new ByteArrayInputStream(metadataResponse.getContent());
         MetadataParsingResult metadataParsingResult = metadataParser.parseJson(inputStream, metadataResponse.getUrl());
-
-        // TODO processing
-    }
-
-    public void processTabularData(String tabularUrl, String metadataUrl) {
-        FileResponse tabularResponse = FileUtils.downloadFile(tabularUrl);
-        List<ValidationError> validationErrors = validateCsvFileResponse(tabularResponse);
-        CsvParsingResult csvParsingResult = parseCsv(tabularResponse);
-        MetadataParsingResult metadataParsingResult = downloadAndParseMetadata(tabularResponse, metadataUrl);
-        TableDescription embeddedMetadata = csvParsingResult.getTableDescription();
+        List<ValidationError> processingErrors = new ArrayList<>();
 
         if (metadataParsingResult != null) {
-            // TODO to same co processTabularData(String tabularUrl)
+            processingErrors.addAll(metadataParsingResult.getErrors());
+            if (hasNoFatalError(processingErrors)) {
+                if (TopLevelType.TABLE == metadataParsingResult.getTopLevelType()) {
+                    TableDescription tableDesc = (TableDescription) metadataParsingResult.getTopLevelDescription();
+                    processingErrors.addAll(processMetadata(tableDesc));
+                } else {
+                    TableGroupDescription tableGrpDesc = (TableGroupDescription) metadataParsingResult.getTopLevelDescription();
+                    processingErrors.addAll(processMetadata(tableGrpDesc));
+                }
+            }
 
         } else {
-            validationErrors.add(ValidationError.fatal(String.format("Can't download metadata from url '%s'.", metadataUrl)));
+            processingErrors.add(ValidationError.fatal(String.format("Can't download metadata from url '%s'.", metadataUrl)));
         }
+        return processingErrors;
     }
 
-    public void processTabularData(String tabularUrl) {
+    private List<? extends ValidationError> processMetadata(TableDescription tableDescription) {
+        List<ValidationError> processingErrors = new ArrayList<>(metadataValidator.validateTable(tableDescription));
+        if (hasNoFatalError(processingErrors)) {
+            String tabularUrl = tableDescription.getUrl().getValue();
+            FileResponse tabularResponse = FileUtils.downloadFile(tabularUrl);
+            CsvParsingResult csvParsingResult = parseCsv(tabularResponse);
+            processingErrors.addAll(validateCsvFileResponse(tabularResponse));
+            processingErrors.addAll(csvParsingResult.getParsingErrors());
+            if (hasNoFatalError(processingErrors)) {
+                TableDescription embeddedMetadata = csvParsingResult.getTableDescription();
+                if (tableDescription.isCompatibleWith(embeddedMetadata)) {
+                    Table annotatedTable = annotationCreator.createAnnotations(csvParsingResult, tableDescription);
+                    processingErrors.addAll(modelValidator.validateTable(annotatedTable));
+                } else {
+                    processingErrors.add(ValidationError.fatal("Embedded metadata are not compatible with metadata."));
+                }
+            }
+        }
+        return processingErrors;
+    }
+
+    private List<? extends ValidationError> processMetadata(TableGroupDescription tableGroupDescription) {
+        List<ValidationError> processingErrors = new ArrayList<>(
+                metadataValidator.validateTableGroup(tableGroupDescription)
+        );
+        if (hasNoFatalError(processingErrors)) {
+            List<CsvParsingResult> csvParsingResults = new ArrayList<>();
+            for (TableDescription tableDesc : tableGroupDescription.getTables().getValue()) {
+                String tabularUrl = tableDesc.getUrl().getValue();
+                FileResponse tabularResponse = FileUtils.downloadFile(tabularUrl);
+                CsvParsingResult csvParsingResult = parseCsv(tabularResponse);
+                processingErrors.addAll(validateCsvFileResponse(tabularResponse));
+                processingErrors.addAll(csvParsingResult.getParsingErrors());
+                csvParsingResults.add(csvParsingResult);
+            }
+            if (hasNoFatalError(processingErrors)) {
+                TableGroup annotatedTableGroup = annotationCreator.createAnnotations(csvParsingResults, tableGroupDescription);
+                processingErrors.addAll(modelValidator.validateTableGroup(annotatedTableGroup));
+            }
+        }
+        return processingErrors;
+    }
+
+    public List<? extends ValidationError> processTabularData(String tabularUrl, String metadataUrl) {
         FileResponse tabularResponse = FileUtils.downloadFile(tabularUrl);
-        List<ValidationError> validationErrors = validateCsvFileResponse(tabularResponse);
+        List<ValidationError> processingErrors = validateCsvFileResponse(tabularResponse);
         CsvParsingResult csvParsingResult = parseCsv(tabularResponse);
-        MetadataParsingResult metadataParsingResult = locateMetadata(tabularResponse);
+        processingErrors.addAll(csvParsingResult.getParsingErrors());
+        MetadataParsingResult metadataParsingResult = downloadAndParseMetadata(tabularResponse, metadataUrl);
+
+        if (hasNoFatalError(processingErrors)) {
+            if (metadataParsingResult != null) {
+                processingErrors.addAll(process(csvParsingResult, metadataParsingResult));
+            } else {
+                processingErrors.add(ValidationError.fatal(String.format("Can't download metadata from url '%s'.", metadataUrl)));
+            }
+        }
+        return processingErrors;
+    }
+
+    public List<? extends ValidationError> processTabularData(String tabularUrl) {
+        FileResponse tabularResponse = FileUtils.downloadFile(tabularUrl);
+        System.out.println("DOWNLOADED");
+        List<ValidationError> processingErrors = validateCsvFileResponse(tabularResponse);
+        CsvParsingResult csvParsingResult = parseCsv(tabularResponse);
+        processingErrors.addAll(csvParsingResult.getParsingErrors());
+        System.out.println("PARSED CSV");
+
+        if (hasNoFatalError(processingErrors)) {
+            MetadataParsingResult metadataParsingResult = locateMetadata(tabularResponse, csvParsingResult.getTableDescription());
+            System.out.println("PARSED METADATA");
+            processingErrors.addAll(process(csvParsingResult, metadataParsingResult));
+        }
+        return processingErrors;
+    }
+
+    private List<ValidationError> process(CsvParsingResult csvParsingResult,
+                                          MetadataParsingResult metadataParsingResult) {
+        List<ValidationError> processingErrors = new ArrayList<>(metadataParsingResult.getErrors());
         TableDescription embeddedMetadata = csvParsingResult.getTableDescription();
-
-        // Embedded metadata used as metadata.
-        if (metadataParsingResult == null) {
-            validationErrors.add(ValidationError.warn("Missing schema for tabular data." +
-                    " Validating will continue using embedded metadata"));
-            metadataParsingResult = new MetadataParsingResult();
-            metadataParsingResult.setTopLevelDescription(csvParsingResult.getTableDescription());
-            metadataParsingResult.setTopLevelType(TopLevelType.TABLE);
+        if (hasNoFatalError(processingErrors)) {
+            processingErrors.addAll(validateMetadata(metadataParsingResult));
+            if (hasNoFatalError(processingErrors)) {
+                TableDescription tableDesc = getTableDescription(metadataParsingResult, csvParsingResult.getCsvUrl());
+                // Embedded metadata has to be compatible with metadata.
+                if (tableDesc != null && tableDesc.isCompatibleWith(embeddedMetadata)) {
+                    Table annotatedTable = annotationCreator.createAnnotations(csvParsingResult, tableDesc);
+                    processingErrors.addAll(modelValidator.validateTable(annotatedTable));
+                } else {
+                    processingErrors.add(ValidationError.fatal("Embedded metadata are not compatible with metadata."));
+                }
+            }
         }
+        return processingErrors;
+    }
 
-        // TODO validovat metadata - metadataValidator.validate()
-        TableDescription tableDesc = getTableDescription(metadataParsingResult, tabularResponse.getUrl());
-        // Embedded metadata has to be compatible with metadata.
-        if (tableDesc != null && tableDesc.isCompatibleWith(embeddedMetadata)) {
-            Table annotatedTable = annotationCreator.createAnnotations(csvParsingResult.getTable(), tableDesc);
-            // TODO validovat model - modelValidator.validate(table)
+    private List<? extends ValidationError> validateMetadata(MetadataParsingResult result) {
+        List<? extends ValidationError> metadataValidatingErrors;
+        if (TopLevelType.TABLE == result.getTopLevelType()) {
+            metadataValidatingErrors = metadataValidator.validateTable((TableDescription) result.getTopLevelDescription());
         } else {
-            // TODO not compatible metadata
+            metadataValidatingErrors = metadataValidator.validateTableGroup((TableGroupDescription) result.getTopLevelDescription());
         }
+        return metadataValidatingErrors;
     }
 
     private CsvParsingResult parseCsv(FileResponse tabularResponse) {
@@ -178,7 +273,7 @@ public class CsvwProcessor {
         return csvParser.parse(dialect, tabularResponse.getUrl(), tabularResponse.getContent());
     }
 
-    private MetadataParsingResult locateMetadata(FileResponse csvFileResponse) {
+    private MetadataParsingResult locateMetadata(FileResponse csvFileResponse, TableDescription embeddedMetadata) {
         MetadataParsingResult metadataParsingResult = null;
         // Link header metadata locations.
         if (csvFileResponse.getLink() != null) {
@@ -194,6 +289,15 @@ public class CsvwProcessor {
                     break;
                 }
             }
+        }
+
+        // Embedded metadata used as metadata.
+        if (metadataParsingResult == null) {
+            metadataParsingResult = new MetadataParsingResult();
+            metadataParsingResult.setTopLevelDescription(embeddedMetadata);
+            metadataParsingResult.setTopLevelType(TopLevelType.TABLE);
+            metadataParsingResult.getValidationErrors().add(ValidationError.warn("Missing schema for tabular data." +
+                    " Validating will continue using embedded metadata"));
         }
         return metadataParsingResult;
     }
@@ -244,5 +348,10 @@ public class CsvwProcessor {
                 .filter(desc -> desc.describesTabularData(tabularUrl))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Table group description does not describes tabular data."));
+    }
+
+    private boolean hasNoFatalError(List<? extends ValidationError> errors) {
+        return errors == null || errors.stream()
+                .noneMatch(error -> Severity.FATAL == error.getSeverity());
     }
 }

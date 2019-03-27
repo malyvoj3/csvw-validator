@@ -4,6 +4,7 @@ import com.malyvoj3.csvwvalidator.parser.metadata.MetadataParser;
 import com.malyvoj3.csvwvalidator.validation.CsvwProcessor;
 import com.malyvoj3.csvwvalidator.validation.ValidationError;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -16,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 @Route
@@ -65,7 +67,11 @@ public class MainView extends VerticalLayout {
 
     private void showResult(List<? extends ValidationError> errors) {
         removeAll();
-        errors.forEach(error -> add(new Label(error.format())));
+        Grid<ValidationError> grid = new Grid<>(ValidationError.class);
+        List<ValidationError> items = new ArrayList<>(errors);
+        grid.setItems(items);
+        grid.setColumns("severity", "formattedMessage");
+        add(grid);
         add(createBackButton());
     }
 
@@ -73,29 +79,35 @@ public class MainView extends VerticalLayout {
         Button validationButton = new Button("Validate");
 
         validationButton.addClickListener(e -> {
-            boolean isTabularUpload = tabularUpload != null && tabularDataFile != null;
-            boolean isMetadataUpload = metadataUpload != null && metadataFile != null;
-            boolean isTabularUrl = tabularTextfield != null && StringUtils.isNotBlank(tabularTextfield.getValue());
-            boolean isMetadataUrl = metadataTextfield != null && StringUtils.isNotBlank(metadataTextfield.getValue());
-            if (isTabularUpload && isMetadataUpload) {
-                csvwProcessor.processTabularData(tabularDataFile, tabularDataFileName, metadataFile, metadataFileName);
-            } else if (isTabularUrl && isMetadataUrl) {
-                csvwProcessor.processTabularData(tabularTextfield.getValue(), metadataTextfield.getValue());
-            } else if (isTabularUpload && isMetadataUrl) {
-                Notification.show("Unsupported combination: uploaded tabular data file and metadata url!");
-            } else if (isTabularUrl && isMetadataUpload) {
-                csvwProcessor.processTabularData(tabularTextfield.getValue(), metadataFile, metadataFileName);
-            } else if (isMetadataUrl) {
-                csvwProcessor.processMetadata(metadataTextfield.getValue());
-            } else if (isTabularUrl) {
-                csvwProcessor.processTabularData(tabularTextfield.getValue());
-            } else if (isTabularUpload) {
-                showResult(csvwProcessor.processTabularData(tabularDataFile, tabularDataFileName));
-            } else if (isMetadataUpload) {
-                showResult(csvwProcessor.processMetadata(metadataFile, metadataFileName));
-            } else {
-                Notification.show("Insert some files!");
+            try {
+                boolean isTabularUpload = tabularUpload != null && tabularDataFile != null;
+                boolean isMetadataUpload = metadataUpload != null && metadataFile != null;
+                boolean isTabularUrl = tabularTextfield != null && StringUtils.isNotBlank(tabularTextfield.getValue());
+                boolean isMetadataUrl = metadataTextfield != null && StringUtils.isNotBlank(metadataTextfield.getValue());
+                if (isTabularUpload && isMetadataUpload) {
+                    showResult(csvwProcessor.processTabularData(tabularDataFile, tabularDataFileName, metadataFile, metadataFileName));
+                } else if (isTabularUrl && isMetadataUrl) {
+                    showResult(csvwProcessor.processTabularData(tabularTextfield.getValue(), metadataTextfield.getValue()));
+                } else if (isTabularUpload && isMetadataUrl) {
+                    Notification.show("Unsupported combination: uploaded tabular data file and metadata url!");
+                } else if (isTabularUrl && isMetadataUpload) {
+                    showResult(csvwProcessor.processTabularData(tabularTextfield.getValue(), metadataFile, metadataFileName));
+                } else if (isMetadataUrl) {
+                    showResult(csvwProcessor.processMetadata(metadataTextfield.getValue()));
+                } else if (isTabularUrl) {
+                    showResult(csvwProcessor.processTabularData(tabularTextfield.getValue()));
+                } else if (isTabularUpload) {
+                    showResult(csvwProcessor.processTabularData(tabularDataFile, tabularDataFileName));
+                } else if (isMetadataUpload) {
+                    showResult(csvwProcessor.processMetadata(metadataFile, metadataFileName));
+                } else {
+                    Notification.show("Insert some files!");
+                }
+            } catch (Exception ex) {
+                Notification.show("Exception: " + ex.getMessage(), 5000, Notification.Position.TOP_END);
+                throw ex;
             }
+
         });
         return validationButton;
     }

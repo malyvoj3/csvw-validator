@@ -29,7 +29,7 @@ public class CsvwController {
             FileResponse file = FileUtils.downloadFile(request.getMetadataFilesUrl().get(0));
             if (file != null) {
                 MetadataParsingResult result = metadataParser.parseJson(new ByteArrayInputStream(file.getContent()), fileUrl);
-                result.getParsingErrors().forEach(error -> response.getValidationErrors().add(error.format()));
+                result.getParsingErrors().forEach(error -> response.getValidationErrors().add(error.getFormattedMessage()));
             }
         }
         return ResponseEntity.ok(response);
