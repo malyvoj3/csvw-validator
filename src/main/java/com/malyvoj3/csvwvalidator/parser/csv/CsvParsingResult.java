@@ -14,6 +14,7 @@ import java.util.List;
 @Data
 public class CsvParsingResult {
 
+    private String csvUrl;
     private List<ValidationError> parsingErrors;
     private Table table;
     private TableDescription tableDescription;

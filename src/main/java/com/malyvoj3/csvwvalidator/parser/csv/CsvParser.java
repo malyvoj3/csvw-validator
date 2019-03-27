@@ -28,7 +28,7 @@ import java.util.*;
 public class CsvParser {
 
     private static final String FIELD_DELIMITER_DEFAULT = ",";
-    private static final String LINE_SEPARATOR_DEFAULT = "\\r\\n";
+    private static final String LINE_SEPARATOR_DEFAULT = "\r\n";
     private static final char QUOTE_CHAR_DEFAULT = '"';
     private static final char QUOTE_ESCAPE_CHAR_DEFAULT = '"';
 
@@ -59,7 +59,7 @@ public class CsvParser {
             com.univocity.parsers.csv.CsvParser csvParser = new com.univocity.parsers.csv.CsvParser(defaultSettings(dialect));
             List<String[]> records = csvParser.parseAll(reader);
             createColumns(csvParser, table, columns, columnDescriptions);
-            parsingErrors.addAll(createRows(records, table, columns));
+            parsingErrors.addAll(createRows(records, table, columns, dialect.isHeader()));
             parsingErrors.addAll(validateColumns(columns));
             parsingErrors.addAll(validateCsvFormat(csvParser.getDetectedFormat()));
             table.setColumns(columns);
@@ -68,7 +68,7 @@ public class CsvParser {
             log.error(String.format("Error during CSV parsing of file '%s'.", url));
             parsingErrors.add(ValidationError.fatal(String.format("File '%s' is not valid CSV file.", url)));
         }
-        return new CsvParsingResult(parsingErrors, table, tableDescription);
+        return new CsvParsingResult(url, parsingErrors, table, tableDescription);
     }
 
     private void createColumns(com.univocity.parsers.csv.CsvParser parser, Table table, List<Column> columns, List<ColumnDescription> columnDescriptions) {
@@ -89,9 +89,9 @@ public class CsvParser {
         }
     }
 
-    private List<ValidationError> createRows(List<String[]> records, Table table, List<Column> columns) {
+    private List<ValidationError> createRows(List<String[]> records, Table table, List<Column> columns, boolean hasHeader) {
         List<ValidationError> parsingErrors = new ArrayList<>();
-        int rowNumber = 1;
+        int rowNumber = hasHeader ? 2 : 1;
         for (String[] record : records) {
             if (record.length > 0) {
                 Row row = new Row();
@@ -137,25 +137,41 @@ public class CsvParser {
             errors = Collections.emptyList();
         } else if (StringUtils.isWhitespace(value)) {
             errors = Collections.singletonList(ValidationError.warn(
-                    String.format("Value in row %d column %d is just whitespace.", rowNumber + 1, columnNumber
+                    String.format("Value in row %d column %d is just whitespace.", rowNumber, columnNumber
                     )));
         } else if ("null".equals(value)) {
             errors = Collections.singletonList(ValidationError.warn(
-                    String.format("Value in row %d column %d is equal to 'null', should be empty string.", rowNumber + 1, columnNumber
+                    String.format("Value in row %d column %d is equal to 'null', should be empty string.", rowNumber, columnNumber
                     )));
-        } else if (containsMultipleSpaces(value)) {
+        } else if (containsLeadingSpaces(value)) {
+            errors = Collections.singletonList(ValidationError.warn(
+                    String.format("Value in row %d column %d has leading spaces.", rowNumber, columnNumber
+                    )));
+        } else if (containsTrailingSpaces(value)) {
+            errors = Collections.singletonList(ValidationError.warn(
+                    String.format("Value in row %d column %d has trailing spaces.", rowNumber, columnNumber
+                    )));
+        } /*else if (containsMultipleSpaces(value)) {
             errors = Collections.singletonList(ValidationError.warn(
                     String.format("Value in row %d column %d has multiple consecutive whitespaces.", rowNumber + 1, columnNumber
                     )));
-        }
+        }*/
         return errors;
+    }
+
+    private boolean containsTrailingSpaces(String value) {
+        return StringUtils.isNotEmpty(value) && Character.isWhitespace(value.charAt(value.length() - 1));
+    }
+
+    private boolean containsLeadingSpaces(String value) {
+        return StringUtils.isNotEmpty(value) && Character.isWhitespace(value.charAt(0));
     }
 
     private List<ValidationError> validateCsvFormat(CsvFormat detectedFormat) {
         List<ValidationError> errorList = new ArrayList<>();
         if (!LINE_SEPARATOR_DEFAULT.equals(detectedFormat.getLineSeparatorString())) {
             errorList.add(ValidationError.warn(
-                    invalidMsg("line separator", escapeLineSeparator(detectedFormat.getLineSeparatorString()), LINE_SEPARATOR_DEFAULT)
+                    invalidMsg("line separator", escapeLineSeparator(detectedFormat.getLineSeparatorString()), escapeLineSeparator(LINE_SEPARATOR_DEFAULT))
             ));
         }
         if (!FIELD_DELIMITER_DEFAULT.equals(detectedFormat.getDelimiterString())) {

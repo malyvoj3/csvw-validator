@@ -35,7 +35,7 @@ public class ContextParser {
                     ObjectNode objectNode = (ObjectNode) second;
                     JsonNode base = objectNode.get(CsvwKeywords.BASE_PROPERTY);
                     JsonNode language = objectNode.get(CsvwKeywords.LANGUAGE_PROPERTY);
-                    addBase(context, base, jsonProperty.getParsingContext().getMetadataUrl());
+                    addBase(context, base);
                     addLanguage(context, language);
                 }
             }
@@ -43,10 +43,9 @@ public class ContextParser {
         return context;
     }
 
-    private void addBase(Context context, JsonNode base, String metadataUrl) {
+    private void addBase(Context context, JsonNode base) {
         if (base != null && base.isTextual()) {
-            String baseUrl = UriUtils.resolveUri(metadataUrl, base.textValue());
-            context.setBase(new StringAtomicProperty(baseUrl));
+            context.setBase(new StringAtomicProperty(base.textValue()));
         }
     }
 

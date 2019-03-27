@@ -16,7 +16,6 @@ public abstract class AbstractJsonProperty<T> {
 
     private String name;
     private T jsonValue;
-    private ParsingContext parsingContext;
     private List<JsonParserError> parsingErrors = new ArrayList<>();
 
     public void addError(JsonParserError error) {
