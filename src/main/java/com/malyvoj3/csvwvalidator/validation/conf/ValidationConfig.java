@@ -7,6 +7,7 @@ import com.malyvoj3.csvwvalidator.validation.metadata.MetadataValidator;
 import com.malyvoj3.csvwvalidator.validation.metadata.TablesRequiredRule;
 import com.malyvoj3.csvwvalidator.validation.metadata.UrlRequiredRule;
 import com.malyvoj3.csvwvalidator.validation.model.ModelValidator;
+import com.malyvoj3.csvwvalidator.validation.model.PrimaryKeyRule;
 import com.malyvoj3.csvwvalidator.validation.model.RequiredColumnRule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -52,5 +53,10 @@ public class ValidationConfig {
     @Bean
     public RequiredColumnRule requiredColumnRule() {
         return new RequiredColumnRule();
+    }
+
+    @Bean
+    public PrimaryKeyRule primaryKeyRule() {
+        return new PrimaryKeyRule();
     }
 }
