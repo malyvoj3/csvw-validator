@@ -1,4 +1,4 @@
-package com.malyvoj3.csvwvalidator.utils;
+package com.malyvoj3.csvwvalidator.domain;
 
 import lombok.Data;
 

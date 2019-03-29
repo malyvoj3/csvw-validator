@@ -1,5 +1,8 @@
 package com.malyvoj3.csvwvalidator.utils;
 
+import com.malyvoj3.csvwvalidator.domain.ContentType;
+import com.malyvoj3.csvwvalidator.domain.FileResponse;
+import com.malyvoj3.csvwvalidator.domain.Link;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.io.IOUtils;
