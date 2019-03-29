@@ -60,7 +60,7 @@ public class AnnotationCreator {
         extractedTable.setColumns(createColumns(extractedTable, tableDescription, baseLanguage, defaultProperties));
         // TODO transformations
         // TODO foreignKeys
-        // TODO rows/cells
+        addPrimaryKeys(extractedTable.getRows(), tableDescription.getTableSchema());
 
         return extractedTable;
     }
@@ -221,6 +221,32 @@ public class AnnotationCreator {
             column.setName(name);
         }
         return column;
+    }
+
+    private void addPrimaryKeys(List<Row> rows, ObjectProperty<SchemaDescription> schema) {
+        if (schema != null && schema.getValue() != null) {
+            SchemaDescription schemaDescription = schema.getValue();
+            if (schemaDescription.getPrimaryKey() != null && schemaDescription.getPrimaryKey().getValue() != null) {
+                List<String> columnNames = schemaDescription.getPrimaryKey().getValue();
+                for (Row row : rows) {
+                    row.setPrimaryKey(getPrimaryKeyCells(row, columnNames));
+                }
+            }
+
+        }
+    }
+
+    private List<Cell> getPrimaryKeyCells(Row row, List<String> primaryColumnNames) {
+        List<Cell> rowCells = row.getCells();
+        List<Cell> primaryKeyCells = new ArrayList<>();
+        for (String columnName : primaryColumnNames) {
+            for (Cell cell : rowCells) {
+                if (columnName.equals(cell.getColumn().getName())) {
+                    primaryKeyCells.add(cell);
+                }
+            }
+        }
+        return primaryKeyCells;
     }
 
     private Map<String, List<String>> getValue(NaturalLanguageProperty property) {
