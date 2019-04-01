@@ -11,12 +11,12 @@ import com.malyvoj3.csvwvalidator.utils.CsvwKeywords;
 public class ColumnParserFactory<T extends ColumnDescription> extends InheritedParserFactory<T> {
 
     @Override
-    public PropertyParser<T> createParser(String properyName) {
-        PropertyParser<T> parser = super.createParser(properyName);
+    public PropertyParser<T> createParser(String propertyName) {
+        PropertyParser<T> parser = super.createParser(propertyName);
         if (parser != null) {
             return parser;
         }
-        switch (properyName) {
+        switch (propertyName) {
             case CsvwKeywords.NAME_PROPERTY:
                 return new NamePropertyParser<>();
             case CsvwKeywords.SUPPRESS_OUTPUT_PROPERTY:

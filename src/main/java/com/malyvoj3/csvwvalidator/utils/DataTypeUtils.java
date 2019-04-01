@@ -11,6 +11,8 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalQueries;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @UtilityClass
 public class DataTypeUtils {
@@ -47,9 +49,15 @@ public class DataTypeUtils {
         try {
             duration = DatatypeFactory.newInstance().newDuration(durationString);
         } catch (DatatypeConfigurationException e) {
-            e.printStackTrace();
+            throw new IllegalArgumentException();
         }
         return duration;
+    }
+
+    public boolean matchFormat(String validatedString, String format) {
+        Pattern pattern = Pattern.compile(format);
+        Matcher matcher = pattern.matcher(format);
+        return matcher.matches();
     }
 
 }

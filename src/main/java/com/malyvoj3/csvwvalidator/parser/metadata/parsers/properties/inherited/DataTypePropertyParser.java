@@ -6,7 +6,7 @@ import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.PropertyParser;
 import lombok.NonNull;
 
-public class DatatypePropertyParser<T extends InheritanceDescription> implements PropertyParser<T> {
+public class DataTypePropertyParser<T extends InheritanceDescription> implements PropertyParser<T> {
 
     @Override
     public void parsePropertyToDescription(@NonNull T description,

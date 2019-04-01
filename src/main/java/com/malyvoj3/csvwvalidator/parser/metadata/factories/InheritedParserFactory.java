@@ -17,7 +17,7 @@ public class InheritedParserFactory<T extends InheritanceDescription> extends Co
             case CsvwKeywords.ABOUT_URL_PROPERTY:
                 return new AboutUrlPropertyParser<>();
             case CsvwKeywords.DATATYPE_PROPERTY:
-                return new DatatypePropertyParser<>();
+                return new DataTypePropertyParser<>();
             case CsvwKeywords.DEFAULT_PROPERTY:
                 return new DefaultPropertyParser<>();
             case CsvwKeywords.LANG_PROPERTY:

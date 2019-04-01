@@ -10,15 +10,15 @@ import lombok.NonNull;
 
 public class HeaderRowCountPropertyParser<T extends DialectDescription> implements PropertyParser<T> {
 
-    private static final Integer HEADER_ROW_COUNT_DEFAULT_VALUE = 0;
+    private static final Long HEADER_ROW_COUNT_DEFAULT_VALUE = 0L;
 
     @Override
     public void parsePropertyToDescription(@NonNull T description,
                                            @NonNull JsonProperty jsonProperty) {
         JsonNode property = jsonProperty.getJsonValue();
         IntegerAtomicProperty headerRowCount;
-        if (property.isInt() && property.intValue() > 0) {
-            headerRowCount = new IntegerAtomicProperty(property.intValue());
+        if (property.isIntegralNumber() && property.longValue() > 0) {
+            headerRowCount = new IntegerAtomicProperty(property.longValue());
         } else {
             jsonProperty.addError(ErrorFactory.invalidPropertyType(jsonProperty.getName()));
             headerRowCount = new IntegerAtomicProperty(HEADER_ROW_COUNT_DEFAULT_VALUE);

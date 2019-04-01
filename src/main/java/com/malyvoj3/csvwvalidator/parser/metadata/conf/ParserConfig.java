@@ -47,6 +47,16 @@ public class ParserConfig {
         return new TableParserFactory<>(schemaDescriptionParser(), dialectDescriptionParser());
     }
 
+    @Bean
+    public FormatParserFactory<FormatDescription> formatParserFactory() {
+        return new FormatParserFactory<>();
+    }
+
+    @Bean
+    public DataTypeParserFactory dataTypeParserFactory() {
+        return new DataTypeParserFactory(formatDescriptionParser());
+    }
+
     // DESCRIPTION PARSERS
     @Bean
     public MetadataParser metadataParser() {
@@ -91,5 +101,10 @@ public class ParserConfig {
     @Bean
     public TableGroupDescriptionParser tableGroupDescriptionParser() {
         return new TableGroupDescriptionParser(tableGroupParserFactory());
+    }
+
+    @Bean
+    public FormatDescriptionParser formatDescriptionParser() {
+        return new FormatDescriptionParser(formatParserFactory());
     }
 }
