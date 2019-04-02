@@ -109,7 +109,7 @@ public class CsvwKeywords {
     public final String DATE_DATA_TYPE = "date";
     public final String DATE_TIME_DATA_TYPE = "dateTime";
     public final String DATE_TIME_STAMP_DATA_TYPE = "dateTimeStamp";
-    public final String DATETIME__DATA_TYPE = "datetime";
+    public final String DATETIME_DATA_TYPE = "datetime";
     public final String DAY_TIME_DURATION_DATA_TYPE = "dayTimeDuration";
     public final String DECIMAL_DATA_TYPE = "decimal";
     public final String DOUBLE_DATA_TYPE = "double";
@@ -159,7 +159,7 @@ public class CsvwKeywords {
         DATA_TYPES.put(DATE_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#date");
         DATA_TYPES.put(DATE_TIME_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#dateTime");
         DATA_TYPES.put(DATE_TIME_STAMP_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#dateTimeStamp");
-        DATA_TYPES.put(DATETIME__DATA_TYPE, "http://www.w3.org/2001/XMLSchema#dateTime");
+        DATA_TYPES.put(DATETIME_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#dateTime");
         DATA_TYPES.put(DAY_TIME_DURATION_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#dayTimeDuration");
         DATA_TYPES.put(DECIMAL_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#decimal");
         DATA_TYPES.put(DOUBLE_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#double");

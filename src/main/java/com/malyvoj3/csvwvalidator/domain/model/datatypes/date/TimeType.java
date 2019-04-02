@@ -12,6 +12,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigDecimal;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
@@ -32,14 +33,17 @@ public class TimeType extends DataTypeDefinition {
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern(timePattern);
             TemporalAccessor temporalAccessor = formatter.parse(stringValue);
+            if (temporalAccessor.query(TemporalQueries.zone()) == null) {
+                temporalAccessor = formatter.withZone(ZoneId.systemDefault()).parse(stringValue);
+            }
             time = LocalTime.from(formatter.parse(stringValue));
             ZoneOffset offsetSeconds = temporalAccessor.query(TemporalQueries.offset());
-
+            BigDecimal fractionalSeconds = time.getNano() > 0 ? new BigDecimal(time.getNano()).movePointLeft(9) : null;
             zoneMinuteOffset = offsetSeconds != null ? offsetSeconds.getTotalSeconds() / 60 : 0;
             value = DatatypeFactory.newInstance().newXMLGregorianCalendar(
                     null, DatatypeConstants.FIELD_UNDEFINED, DatatypeConstants.FIELD_UNDEFINED,
                     time.getHour(), time.getMinute(), time.getSecond(),
-                    new BigDecimal(time.getNano()).movePointLeft(9), zoneMinuteOffset);
+                    fractionalSeconds, zoneMinuteOffset);
         } catch (Exception ex) {
             throw new DataTypeFormatException();
         }

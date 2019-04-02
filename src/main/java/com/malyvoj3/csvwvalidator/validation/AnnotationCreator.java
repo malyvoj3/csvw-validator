@@ -1,9 +1,12 @@
 package com.malyvoj3.csvwvalidator.validation;
 
+import com.malyvoj3.csvwvalidator.domain.DataTypeFactory;
 import com.malyvoj3.csvwvalidator.domain.metadata.Context;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.*;
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.*;
 import com.malyvoj3.csvwvalidator.domain.model.*;
+import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeDefinition;
+import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeFormatException;
 import com.malyvoj3.csvwvalidator.parser.csv.CsvParsingResult;
 import com.malyvoj3.csvwvalidator.utils.CsvwKeywords;
 import lombok.Data;
@@ -82,7 +85,9 @@ public class AnnotationCreator {
                     createInheritedProperties(tmpDescription),
                     defaultProperties
             );
-            columns.add(createColumn(tmpColumn, tmpDescription, baseLanguage, inheritedProperties));
+            Column annotatedColumn = createColumn(tmpColumn, tmpDescription, baseLanguage, inheritedProperties);
+            annotatedColumn.setCells(createCells(annotatedColumn));
+            columns.add(annotatedColumn);
         }
         // Add virtual columns.
         for (int i = extractedColumns.size(); i < columnDescriptions.size(); i++) {
@@ -94,6 +99,22 @@ public class AnnotationCreator {
             columns.add(createColumn(tmpDescription, baseLanguage, inheritedProperties));
         }
         return columns;
+    }
+
+    private List<Cell> createCells(Column annotatedColumn) {
+        List<Cell> cells = annotatedColumn.getCells();
+        DataType dataType = annotatedColumn.getDatatype();
+        for (Cell cell : cells) {
+            DataTypeDefinition value = null;
+            try {
+                value = DataTypeFactory.createDataType(cell.getStringValue(), dataType);
+            } catch (DataTypeFormatException e) {
+                e.printStackTrace();
+                // TODO add error to cell errors.
+            }
+            cell.setValue(value);
+        }
+        return cells;
     }
 
     private InheritedProperties createInheritedProperties(InheritanceDescription description) {

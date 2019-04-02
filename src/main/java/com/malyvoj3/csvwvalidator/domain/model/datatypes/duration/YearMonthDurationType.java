@@ -13,7 +13,7 @@ public class YearMonthDurationType extends DurationType {
     public YearMonthDurationType(String stringValue) throws DataTypeFormatException {
         super(stringValue);
         try {
-            value = DatatypeFactory.newInstance().newDurationDayTime(stringValue);
+            value = DatatypeFactory.newInstance().newDurationYearMonth(stringValue);
         } catch (Exception ex) {
             throw new DataTypeFormatException();
         }

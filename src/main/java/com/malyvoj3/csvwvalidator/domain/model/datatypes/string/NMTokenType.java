@@ -4,7 +4,7 @@ import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeFormatException
 
 public class NMTokenType extends NormalizedStringType {
 
-    private static final String NM_TOKEN_TYPE_PATTERN = "/^[a-zA-Z0-9._-:]*$/";
+    private static final String NM_TOKEN_TYPE_PATTERN = "[a-zA-Z0-9._:\\-]*";
 
     public NMTokenType(String stringValue) throws DataTypeFormatException {
         super(stringValue);

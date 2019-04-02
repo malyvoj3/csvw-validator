@@ -1,22 +1,23 @@
 package com.malyvoj3.csvwvalidator.domain.model;
 
+import lombok.Builder;
 import lombok.Data;
 
 @Data
-public class Datatype {
+@Builder
+public class DataType {
 
     private String id;
     private String base;
+    private Format format;
 
-    // TODO format
-
-    private Integer length;
-    private Integer minimumLength;
-    private Integer maximumLength;
+    private Long length;
+    private Long minLength;
+    private Long maxLength;
 
     private String minimum;
     private String maximum;
-    private String minimumExclusive;
-    private String maximumExclusive;
+    private String minExclusive;
+    private String maxExclusive;
 
 }

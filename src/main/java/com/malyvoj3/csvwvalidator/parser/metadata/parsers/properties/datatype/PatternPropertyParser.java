@@ -15,7 +15,7 @@ public class PatternPropertyParser<T extends FormatDescription> implements Prope
                                            @NonNull JsonProperty jsonProperty) {
         JsonNode property = jsonProperty.getJsonValue();
         if (property.isTextual()) {
-            description.setGroupChar(new StringAtomicProperty(property.textValue()));
+            description.setPattern(new StringAtomicProperty(property.textValue()));
         } else if (!property.isNull()) {
             jsonProperty.addError(ErrorFactory.invalidPropertyType(jsonProperty.getName()));
         }

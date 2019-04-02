@@ -36,10 +36,11 @@ public class DateTimeType extends DataTypeDefinition {
             }
             zonedDateTime = ZonedDateTime.from(temporalAccessor);
             int zoneMinuteOffset = zonedDateTime.getOffset().getTotalSeconds() / 60;
+            BigDecimal fractionalSeconds = zonedDateTime.getNano() > 0 ? new BigDecimal(zonedDateTime.getNano()).movePointLeft(9) : null;
             value = DatatypeFactory.newInstance().newXMLGregorianCalendar(
                     BigInteger.valueOf(zonedDateTime.getYear()), zonedDateTime.getMonthValue(), zonedDateTime.getDayOfMonth(),
                     zonedDateTime.getHour(), zonedDateTime.getMinute(), zonedDateTime.getSecond(),
-                    new BigDecimal(zonedDateTime.getNano()).movePointLeft(9), zoneMinuteOffset);
+                    fractionalSeconds, zoneMinuteOffset);
         } catch (Exception ex) {
             throw new DataTypeFormatException();
         }

@@ -206,8 +206,12 @@ public class CsvParser {
     }
 
     private static CsvParserSettings defaultSettings(Dialect dialect) {
+        CsvFormat csvFormat = new CsvFormat();
+        csvFormat.setDelimiter(FIELD_DELIMITER_DEFAULT);
+        // TODO disabled another delimiter
         CsvParserSettings settings = new CsvParserSettings();
-        settings.setDelimiterDetectionEnabled(true);
+        settings.setFormat(csvFormat);
+        settings.setDelimiterDetectionEnabled(false);
         settings.setLineSeparatorDetectionEnabled(true);
         settings.setQuoteDetectionEnabled(true);
         settings.setSkipEmptyLines(false);

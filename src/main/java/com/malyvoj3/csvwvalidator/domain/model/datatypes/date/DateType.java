@@ -12,6 +12,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
@@ -32,6 +33,9 @@ public class DateType extends DataTypeDefinition {
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern(datePattern);
             TemporalAccessor temporalAccessor = formatter.parse(stringValue);
+            if (temporalAccessor.query(TemporalQueries.zone()) == null) {
+                temporalAccessor = formatter.withZone(ZoneId.systemDefault()).parse(stringValue);
+            }
             localDate = LocalDate.from(formatter.parse(stringValue));
             ZoneOffset zoneOffset = temporalAccessor.query(TemporalQueries.offset());
 
