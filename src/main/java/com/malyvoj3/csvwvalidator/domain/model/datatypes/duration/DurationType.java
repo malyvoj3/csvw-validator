@@ -1,5 +1,8 @@
-package com.malyvoj3.csvwvalidator.domain.model.datatypes;
+package com.malyvoj3.csvwvalidator.domain.model.datatypes.duration;
 
+import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataType;
+import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeFormatException;
+import com.malyvoj3.csvwvalidator.domain.model.datatypes.IncomparableDataTypeException;
 import lombok.Data;
 
 import javax.xml.datatype.DatatypeFactory;

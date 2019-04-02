@@ -1,4 +1,6 @@
-package com.malyvoj3.csvwvalidator.domain.model.datatypes;
+package com.malyvoj3.csvwvalidator.domain.model.datatypes.date;
+
+import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeFormatException;
 
 public class DateTimeStampType extends DateTimeType {
 

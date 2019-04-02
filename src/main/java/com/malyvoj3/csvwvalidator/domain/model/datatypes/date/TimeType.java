@@ -1,9 +1,16 @@
-package com.malyvoj3.csvwvalidator.domain.model.datatypes;
+package com.malyvoj3.csvwvalidator.domain.model.datatypes.date;
 
+import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataType;
+import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeFormatException;
+import com.malyvoj3.csvwvalidator.domain.model.datatypes.IncomparableDataTypeException;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 
+import javax.xml.datatype.DatatypeConstants;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -14,10 +21,10 @@ import java.time.temporal.TemporalQueries;
 @EqualsAndHashCode(callSuper = true)
 public class TimeType extends DataType {
 
+    private XMLGregorianCalendar value;
     private String timePattern;
     private LocalTime time;
-    // Zone offset in seconds
-    private int zoneOffset;
+    private int zoneMinuteOffset;
 
     public TimeType(String stringValue, String timePattern) throws DataTypeFormatException {
         super(stringValue);
@@ -27,14 +34,15 @@ public class TimeType extends DataType {
             TemporalAccessor temporalAccessor = formatter.parse(stringValue);
             time = LocalTime.from(formatter.parse(stringValue));
             ZoneOffset offsetSeconds = temporalAccessor.query(TemporalQueries.offset());
-            zoneOffset = offsetSeconds != null ? offsetSeconds.getTotalSeconds() : 0;
+
+            zoneMinuteOffset = offsetSeconds != null ? offsetSeconds.getTotalSeconds() / 60 : 0;
+            value = DatatypeFactory.newInstance().newXMLGregorianCalendar(
+                    null, DatatypeConstants.FIELD_UNDEFINED, DatatypeConstants.FIELD_UNDEFINED,
+                    time.getHour(), time.getMinute(), time.getSecond(),
+                    new BigDecimal(time.getNano()).movePointLeft(9), zoneMinuteOffset);
         } catch (Exception ex) {
             throw new DataTypeFormatException();
         }
-    }
-
-    public int getSeconds() {
-        return time.toSecondOfDay() + zoneOffset;
     }
 
     @Override
@@ -48,12 +56,17 @@ public class TimeType extends DataType {
     }
 
     @Override
+    public String getCanonicalForm() {
+        return value.normalize().toString();
+    }
+
+    @Override
     public int compareTo(@NonNull DataType other) throws IncomparableDataTypeException {
         if (other == null || getClass() != other.getClass()) {
             throw new IncomparableDataTypeException();
         }
         TimeType that = (TimeType) other;
-        return getSeconds() - that.getSeconds();
+        return value.compare(that.getValue());
     }
 
 }

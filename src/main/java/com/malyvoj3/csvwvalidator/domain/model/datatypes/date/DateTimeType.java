@@ -1,9 +1,16 @@
-package com.malyvoj3.csvwvalidator.domain.model.datatypes;
+package com.malyvoj3.csvwvalidator.domain.model.datatypes.date;
 
+import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataType;
+import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeFormatException;
+import com.malyvoj3.csvwvalidator.domain.model.datatypes.IncomparableDataTypeException;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -14,8 +21,9 @@ import java.time.temporal.TemporalQueries;
 @EqualsAndHashCode(callSuper = true)
 public class DateTimeType extends DataType {
 
+    private XMLGregorianCalendar value;
     private String dateTimePattern;
-    private ZonedDateTime value;
+    private ZonedDateTime zonedDateTime;
 
     public DateTimeType(String stringValue, String dateTimePattern) throws DataTypeFormatException {
         super(stringValue);
@@ -26,7 +34,12 @@ public class DateTimeType extends DataType {
             if (temporalAccessor.query(TemporalQueries.zone()) == null) {
                 temporalAccessor = formatter.withZone(ZoneId.systemDefault()).parse(stringValue);
             }
-            value = ZonedDateTime.from(temporalAccessor);
+            zonedDateTime = ZonedDateTime.from(temporalAccessor);
+            int zoneMinuteOffset = zonedDateTime.getOffset().getTotalSeconds() / 60;
+            value = DatatypeFactory.newInstance().newXMLGregorianCalendar(
+                    BigInteger.valueOf(zonedDateTime.getYear()), zonedDateTime.getMonthValue(), zonedDateTime.getDayOfMonth(),
+                    zonedDateTime.getHour(), zonedDateTime.getMinute(), zonedDateTime.getSecond(),
+                    new BigDecimal(zonedDateTime.getNano()).movePointLeft(9), zoneMinuteOffset);
         } catch (Exception ex) {
             throw new DataTypeFormatException();
         }
@@ -43,12 +56,17 @@ public class DateTimeType extends DataType {
     }
 
     @Override
+    public String getCanonicalForm() {
+        return value.normalize().toString();
+    }
+
+    @Override
     public int compareTo(@NonNull DataType other) throws IncomparableDataTypeException {
         if (other == null || getClass() != other.getClass()) {
             throw new IncomparableDataTypeException();
         }
         DateTimeType that = (DateTimeType) other;
-        return value.compareTo(that.getValue());
+        return value.compare(that.getValue());
     }
 
 }

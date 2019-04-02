@@ -1,13 +1,16 @@
-package com.malyvoj3.csvwvalidator.domain.model.datatypes;
+package com.malyvoj3.csvwvalidator.domain.model.datatypes.duration;
 
+import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataType;
+import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeFormatException;
+import com.malyvoj3.csvwvalidator.domain.model.datatypes.IncomparableDataTypeException;
 import lombok.Data;
 
 import javax.xml.datatype.DatatypeFactory;
 
 @Data
-public class YearMonthDurationType extends DurationType {
+public class DayTimeDurationType extends DurationType {
 
-    public YearMonthDurationType(String stringValue) throws DataTypeFormatException {
+    public DayTimeDurationType(String stringValue) throws DataTypeFormatException {
         super(stringValue);
         try {
             value = DatatypeFactory.newInstance().newDurationDayTime(stringValue);
@@ -16,7 +19,7 @@ public class YearMonthDurationType extends DurationType {
         }
     }
 
-    public YearMonthDurationType(String stringValue, String format) throws DataTypeFormatException {
+    public DayTimeDurationType(String stringValue, String format) throws DataTypeFormatException {
         this(stringValue);
         matchPattern(stringValue, format);
         this.format = format;
@@ -27,7 +30,7 @@ public class YearMonthDurationType extends DurationType {
         if (other == null || getClass() != other.getClass()) {
             throw new IncomparableDataTypeException();
         }
-        YearMonthDurationType that = (YearMonthDurationType) other;
+        DayTimeDurationType that = (DayTimeDurationType) other;
         return value.compare(that.getValue());
     }
 

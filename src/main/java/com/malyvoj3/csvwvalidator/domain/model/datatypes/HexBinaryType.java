@@ -1,5 +1,7 @@
 package com.malyvoj3.csvwvalidator.domain.model.datatypes;
 
+import com.malyvoj3.csvwvalidator.domain.model.datatypes.string.StringType;
+
 public class HexBinaryType extends StringType {
 
     private static final String HEX_BINARY_PATTERN = "([0-9a-fA-F]{2})*";

@@ -4,8 +4,8 @@ import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.DataTypeDescripti
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.FormatDescription;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataType;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeFormatException;
-import com.malyvoj3.csvwvalidator.domain.model.datatypes.DateTimeType;
-import com.malyvoj3.csvwvalidator.domain.model.datatypes.TimeType;
+import com.malyvoj3.csvwvalidator.domain.model.datatypes.date.DateTimeType;
+import com.malyvoj3.csvwvalidator.domain.model.datatypes.date.TimeType;
 import com.malyvoj3.csvwvalidator.utils.CsvwKeywords;
 
 public class DataTypeCreator {
