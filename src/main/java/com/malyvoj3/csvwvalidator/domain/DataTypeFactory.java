@@ -1,4 +1,4 @@
-package com.malyvoj3.csvwvalidator.validation;
+package com.malyvoj3.csvwvalidator.domain;
 
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.DataTypeDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.FormatDescription;
@@ -17,7 +17,7 @@ public class DataTypeFactory {
     private final static String DATE_FORMAT_DEFAULT = "yyyy-MM-dd";
     private final static String TIME_FORMAT_DEFAULT = "HH:mm:ss";
 
-    public DataType createDataType(String stringValue, DataTypeDescription dataTypeDescription) throws DataTypeFormatException {
+    public DataTypeDefinition createDataType(String stringValue, DataTypeDescription dataTypeDescription) throws DataTypeFormatException {
         String base = dataTypeDescription.getBase() != null ? dataTypeDescription.getBase().getValue() : DATA_TYPE_BASE_DEFAULT;
         FormatDescription format = dataTypeDescription.getFormat() != null ? dataTypeDescription.getFormat().getValue() : null;
         if (CsvwKeywords.STRING_DATA_TYPE.equals(base) || CsvwKeywords.ANY_URI_DATA_TYPE.equals(base)
@@ -71,8 +71,8 @@ public class DataTypeFactory {
         }
     }
 
-    private DataType createGDay(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
-        DataType result;
+    private DataTypeDefinition createGDay(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
+        DataTypeDefinition result;
         String format = getFormat(formatDesc);
         if (format != null) {
             result = new GDayType(stringValue, format);
@@ -82,8 +82,8 @@ public class DataTypeFactory {
         return result;
     }
 
-    private DataType createGMonthDay(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
-        DataType result;
+    private DataTypeDefinition createGMonthDay(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
+        DataTypeDefinition result;
         String format = getFormat(formatDesc);
         if (format != null) {
             result = new GMonthDayType(stringValue, format);
@@ -93,8 +93,8 @@ public class DataTypeFactory {
         return result;
     }
 
-    private DataType createGMonth(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
-        DataType result;
+    private DataTypeDefinition createGMonth(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
+        DataTypeDefinition result;
         String format = getFormat(formatDesc);
         if (format != null) {
             result = new GMonthType(stringValue, format);
@@ -104,8 +104,8 @@ public class DataTypeFactory {
         return result;
     }
 
-    private DataType createGYear(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
-        DataType result;
+    private DataTypeDefinition createGYear(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
+        DataTypeDefinition result;
         String format = getFormat(formatDesc);
         if (format != null) {
             result = new GYearType(stringValue, format);
@@ -115,8 +115,8 @@ public class DataTypeFactory {
         return result;
     }
 
-    private DataType createGYearMonth(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
-        DataType result;
+    private DataTypeDefinition createGYearMonth(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
+        DataTypeDefinition result;
         String format = getFormat(formatDesc);
         if (format != null) {
             result = new GYearMonthType(stringValue, format);
@@ -126,8 +126,8 @@ public class DataTypeFactory {
         return result;
     }
 
-    private DataType createDuration(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
-        DataType result;
+    private DataTypeDefinition createDuration(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
+        DataTypeDefinition result;
         String format = getFormat(formatDesc);
         if (format != null) {
             result = new DurationType(stringValue, format);
@@ -137,8 +137,8 @@ public class DataTypeFactory {
         return result;
     }
 
-    private DataType createDayTimeDuration(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
-        DataType result;
+    private DataTypeDefinition createDayTimeDuration(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
+        DataTypeDefinition result;
         String format = getFormat(formatDesc);
         if (format != null) {
             result = new DayTimeDurationType(stringValue, format);
@@ -148,8 +148,8 @@ public class DataTypeFactory {
         return result;
     }
 
-    private DataType createYearMonthDuration(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
-        DataType result;
+    private DataTypeDefinition createYearMonthDuration(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
+        DataTypeDefinition result;
         String format = getFormat(formatDesc);
         if (format != null) {
             result = new YearMonthDurationType(stringValue, format);
@@ -159,8 +159,8 @@ public class DataTypeFactory {
         return result;
     }
 
-    private DataType createNormalizedString(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
-        DataType result;
+    private DataTypeDefinition createNormalizedString(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
+        DataTypeDefinition result;
         String format = getFormat(formatDesc);
         if (format != null) {
             result = new NormalizedStringType(stringValue, format);
@@ -170,8 +170,8 @@ public class DataTypeFactory {
         return result;
     }
 
-    private DataType createToken(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
-        DataType result;
+    private DataTypeDefinition createToken(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
+        DataTypeDefinition result;
         String format = getFormat(formatDesc);
         if (format != null) {
             result = new TokenType(stringValue, format);
@@ -181,8 +181,8 @@ public class DataTypeFactory {
         return result;
     }
 
-    private DataType createLanguage(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
-        DataType result;
+    private DataTypeDefinition createLanguage(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
+        DataTypeDefinition result;
         String format = getFormat(formatDesc);
         if (format != null) {
             result = new LanguageType(stringValue, format);
@@ -192,8 +192,8 @@ public class DataTypeFactory {
         return result;
     }
 
-    private DataType createName(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
-        DataType result;
+    private DataTypeDefinition createName(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
+        DataTypeDefinition result;
         String format = getFormat(formatDesc);
         if (format != null) {
             result = new NameType(stringValue, format);
@@ -203,8 +203,8 @@ public class DataTypeFactory {
         return result;
     }
 
-    private DataType createNMToken(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
-        DataType result;
+    private DataTypeDefinition createNMToken(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
+        DataTypeDefinition result;
         String format = getFormat(formatDesc);
         if (format != null) {
             result = new NMTokenType(stringValue, format);
@@ -214,8 +214,8 @@ public class DataTypeFactory {
         return result;
     }
 
-    private DataType createQName(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
-        DataType result;
+    private DataTypeDefinition createQName(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
+        DataTypeDefinition result;
         String format = getFormat(formatDesc);
         if (format != null) {
             result = new QNameType(stringValue, format);
@@ -225,8 +225,8 @@ public class DataTypeFactory {
         return result;
     }
 
-    private DataType createHexBinary(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
-        DataType result;
+    private DataTypeDefinition createHexBinary(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
+        DataTypeDefinition result;
         String format = getFormat(formatDesc);
         if (format != null) {
             result = new HexBinaryType(stringValue, format);
@@ -236,8 +236,8 @@ public class DataTypeFactory {
         return result;
     }
 
-    private DataType createBoolean(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
-        DataType result;
+    private DataTypeDefinition createBoolean(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
+        DataTypeDefinition result;
         String format = getFormat(formatDesc);
         if (format != null) {
             result = new BooleanType(stringValue, format);
@@ -247,8 +247,8 @@ public class DataTypeFactory {
         return result;
     }
 
-    private DataType createBinary(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
-        DataType result;
+    private DataTypeDefinition createBinary(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
+        DataTypeDefinition result;
         String format = getFormat(formatDesc);
         if (format != null) {
             result = new BinaryType(stringValue, format);
@@ -258,27 +258,27 @@ public class DataTypeFactory {
         return result;
     }
 
-    private DataType createTime(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
+    private DataTypeDefinition createTime(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
         String timeFormat = getFormat(formatDesc);
         timeFormat = timeFormat != null ? timeFormat : addFractionalSeconds(stringValue, TIME_FORMAT_DEFAULT);
         return new TimeType(stringValue, timeFormat);
     }
 
-    private DataType createDateTime(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
+    private DataTypeDefinition createDateTime(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
         String dateTimeFormat = getFormat(formatDesc);
         dateTimeFormat = dateTimeFormat != null ? dateTimeFormat : addFractionalSeconds(stringValue, DATE_TIME_FORMAT_DEFAULT);
         return new DateTimeType(stringValue, dateTimeFormat);
     }
 
-    private DataType createDate(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
+    private DataTypeDefinition createDate(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
         String dateFormat = getFormat(formatDesc);
         dateFormat = dateFormat != null ? dateFormat : addFractionalSeconds(stringValue, DATE_FORMAT_DEFAULT);
         return new DateType(stringValue, dateFormat);
     }
 
-    private DataType createString(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
+    private DataTypeDefinition createString(String stringValue, FormatDescription formatDesc) throws DataTypeFormatException {
         String format = getFormat(formatDesc);
-        DataType result;
+        DataTypeDefinition result;
         if (format != null) {
             result = new StringType(stringValue, format);
         } else {

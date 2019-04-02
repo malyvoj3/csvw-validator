@@ -2,17 +2,24 @@ package com.malyvoj3.csvwvalidator.parser.metadata.factories;
 
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.TopLevelDescription;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.PropertyParser;
+import com.malyvoj3.csvwvalidator.parser.metadata.parsers.descriptions.DataTypeDescriptionParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.descriptions.DialectDescriptionParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.descriptions.SchemaDescriptionParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.properties.toplevel.*;
 import com.malyvoj3.csvwvalidator.utils.CsvwKeywords;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
 public class TopLevelParserFactory<T extends TopLevelDescription> extends InheritedParserFactory<T> {
 
     private final SchemaDescriptionParser schemaDescriptionParser;
     private final DialectDescriptionParser dialectDescriptionParser;
+
+    public TopLevelParserFactory(DataTypeDescriptionParser dataTypeDescriptionParser,
+                                 SchemaDescriptionParser schemaDescriptionParser,
+                                 DialectDescriptionParser dialectDescriptionParser) {
+        super(dataTypeDescriptionParser);
+        this.schemaDescriptionParser = schemaDescriptionParser;
+        this.dialectDescriptionParser = dialectDescriptionParser;
+    }
 
     @Override
     public PropertyParser<T> createParser(String propertyName) {

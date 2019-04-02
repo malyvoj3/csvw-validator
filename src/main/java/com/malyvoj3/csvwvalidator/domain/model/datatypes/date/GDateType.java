@@ -1,6 +1,6 @@
 package com.malyvoj3.csvwvalidator.domain.model.datatypes.date;
 
-import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataType;
+import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeDefinition;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeFormatException;
 import lombok.Data;
 
@@ -8,7 +8,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 @Data
-public abstract class GDateType extends DataType {
+public abstract class GDateType extends DataTypeDefinition {
 
     protected XMLGregorianCalendar value;
     protected String format;

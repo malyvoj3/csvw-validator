@@ -6,11 +6,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Data
-public abstract class DataType {
+public abstract class DataTypeDefinition {
 
     protected String stringValue;
 
-    public DataType(String stringValue) {
+    public DataTypeDefinition(String stringValue) {
         this.stringValue = stringValue;
     }
 
@@ -29,7 +29,7 @@ public abstract class DataType {
         return stringValue;
     }
 
-    public int compareTo(DataType other) throws IncomparableDataTypeException {
+    public int compareTo(DataTypeDefinition other) throws IncomparableDataTypeException {
         throw new UnsupportedOperationException();
     }
 
@@ -37,23 +37,23 @@ public abstract class DataType {
         throw new UnsupportedOperationException();
     }
 
-    public boolean isGreater(DataType other) throws IncomparableDataTypeException {
+    public boolean isGreater(DataTypeDefinition other) throws IncomparableDataTypeException {
         return compareTo(other) > 0;
     }
 
-    public boolean isGreaterEq(DataType other) throws IncomparableDataTypeException {
+    public boolean isGreaterEq(DataTypeDefinition other) throws IncomparableDataTypeException {
         return compareTo(other) >= 0;
     }
 
-    public boolean isLower(DataType other) throws IncomparableDataTypeException {
+    public boolean isLower(DataTypeDefinition other) throws IncomparableDataTypeException {
         return compareTo(other) < 0;
     }
 
-    public boolean isLowerEq(DataType other) throws IncomparableDataTypeException {
+    public boolean isLowerEq(DataTypeDefinition other) throws IncomparableDataTypeException {
         return compareTo(other) <= 0;
     }
 
-    public boolean isEquals(DataType other) throws IncomparableDataTypeException {
+    public boolean isEquals(DataTypeDefinition other) throws IncomparableDataTypeException {
         return compareTo(other) == 0;
     }
 

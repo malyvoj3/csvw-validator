@@ -100,8 +100,7 @@ public class AnnotationCreator {
         InheritedProperties inheritedProperties = new InheritedProperties();
         if (description != null) {
             inheritedProperties.setAboutUrl(getValue(description.getAboutUrl()));
-            // TODO datatype
-            inheritedProperties.setDatatype(null);
+            inheritedProperties.setDatatype(createDataType(description.getDataType()));
             inheritedProperties.setDefaultValue(getValue(description.getDefaultValue()));
             inheritedProperties.setLang(getValue(description.getLang()));
             inheritedProperties.setNullValue(description.getNullValue() != null ? description.getNullValue().getValue() : new ArrayList<>());
@@ -143,6 +142,42 @@ public class AnnotationCreator {
             }
         }
         return result;
+    }
+
+    private DataType createDataType(AtomicProperty<DataTypeDescription> dataTypeProp) {
+        DataType dataType = null;
+        if (dataTypeProp != null && dataTypeProp.getValue() != null) {
+            DataTypeDescription desc = dataTypeProp.getValue();
+            String base = getValue(desc.getBase());
+            dataType = DataType.builder()
+                    .id(base != null ? CsvwKeywords.DATA_TYPES.get(base) : null)
+                    .base(base)
+                    .format(createFormat(desc.getFormat()))
+                    .length(getValue(desc.getLength()))
+                    .minLength(getValue(desc.getMinLength()))
+                    .maxLength(getValue(desc.getMaxLength()))
+                    .minimum(getValue(desc.getMinimum()) != null ? getValue(desc.getMinimum()) : getValue(desc.getMinInclusive()))
+                    .maximum(getValue(desc.getMaximum()) != null ? getValue(desc.getMaximum()) : getValue(desc.getMaxInclusive()))
+                    .minExclusive(getValue(desc.getMinExclusive()))
+                    .maxExclusive(getValue(desc.getMaxExclusive()))
+                    .build();
+
+        }
+        return dataType;
+    }
+
+    private Format createFormat(AtomicProperty<FormatDescription> formatProp) {
+        Format format = null;
+        if (formatProp != null && formatProp.getValue() != null) {
+            FormatDescription desc = formatProp.getValue();
+            format = Format.builder()
+                    .decimalChar(getValue(desc.getDecimalChar()))
+                    .groupChar(getValue(desc.getGroupChar()))
+                    .pattern(getValue(desc.getPattern()))
+                    .build();
+
+        }
+        return format;
     }
 
     private List<Note> createNotes(ArrayProperty<NoteDescription> noteDescriptions) {
@@ -289,6 +324,14 @@ public class AnnotationCreator {
         return value;
     }
 
+    private Long getValue(IntegerAtomicProperty property) {
+        Long value = null;
+        if (property != null) {
+            value = property.getValue();
+        }
+        return value;
+    }
+
     private InheritedProperties mergeInheritedProperties(InheritedProperties main, InheritedProperties... toMerge) {
         if (main.getAboutUrl() == null) {
             main.setAboutUrl(Arrays.stream(toMerge)
@@ -368,7 +411,7 @@ public class AnnotationCreator {
     @Data
     class InheritedProperties {
         private String aboutUrl;
-        private Datatype datatype;
+        private DataType datatype;
         private String defaultValue;
         private String lang;
         private List<String> nullValue = new ArrayList<>();

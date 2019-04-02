@@ -19,7 +19,7 @@ public class DataTypeParserFactory<T extends DataTypeDescription> extends Common
             return parser;
         }
         switch (propertyName) {
-            case CsvwKeywords.BASE_PROPERTY:
+            case CsvwKeywords.DATA_TYPE_BASE_PROPERTY:
                 return new BasePropertyParser<>();
             case CsvwKeywords.FORMAT_PROPERTY:
                 return new FormatPropertyParser<>(formatDescriptionParser);

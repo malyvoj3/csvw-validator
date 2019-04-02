@@ -1,6 +1,6 @@
 package com.malyvoj3.csvwvalidator.domain.model.datatypes.date;
 
-import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataType;
+import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeDefinition;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeFormatException;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.IncomparableDataTypeException;
 import lombok.Data;
@@ -19,7 +19,7 @@ import java.time.temporal.TemporalQueries;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class DateType extends DataType {
+public class DateType extends DataTypeDefinition {
 
     private XMLGregorianCalendar value;
     private String datePattern;
@@ -61,7 +61,7 @@ public class DateType extends DataType {
     }
 
     @Override
-    public int compareTo(@NonNull DataType other) throws IncomparableDataTypeException {
+    public int compareTo(@NonNull DataTypeDefinition other) throws IncomparableDataTypeException {
         if (other == null || getClass() != other.getClass()) {
             throw new IncomparableDataTypeException();
         }

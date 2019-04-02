@@ -3,19 +3,26 @@ package com.malyvoj3.csvwvalidator.parser.metadata.factories;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.SchemaDescription;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.PropertyParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.descriptions.ColumnDescriptionParser;
+import com.malyvoj3.csvwvalidator.parser.metadata.parsers.descriptions.DataTypeDescriptionParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.descriptions.ForeignKeyDescriptionParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.properties.schema.ColumnsPropertyParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.properties.schema.ForeignKeysPropertyParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.properties.schema.PrimaryKeyPropertyParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.properties.schema.RowTitlesPropertyParser;
 import com.malyvoj3.csvwvalidator.utils.CsvwKeywords;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
 public class SchemaParserFactory<T extends SchemaDescription> extends InheritedParserFactory<T> {
 
     private final ColumnDescriptionParser columnDescriptionParser;
     private final ForeignKeyDescriptionParser foreignKeyDescriptionParser;
+
+    public SchemaParserFactory(DataTypeDescriptionParser dataTypeDescriptionParser,
+                               ColumnDescriptionParser columnDescriptionParser,
+                               ForeignKeyDescriptionParser foreignKeyDescriptionParser) {
+        super(dataTypeDescriptionParser);
+        this.columnDescriptionParser = columnDescriptionParser;
+        this.foreignKeyDescriptionParser = foreignKeyDescriptionParser;
+    }
 
     @Override
     public PropertyParser<T> createParser(String key) {

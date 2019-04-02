@@ -1,6 +1,6 @@
 package com.malyvoj3.csvwvalidator.domain.model.datatypes.numeric;
 
-import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataType;
+import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeDefinition;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeFormatException;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.IncomparableDataTypeException;
 import lombok.Data;
@@ -9,7 +9,7 @@ import lombok.NonNull;
 import java.math.BigDecimal;
 
 @Data
-public class DecimalType extends DataType {
+public class DecimalType extends DataTypeDefinition {
 
     private static final String DECIMAL_PATTERN = "(\\+|-)?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)";
 
@@ -44,7 +44,7 @@ public class DecimalType extends DataType {
     }
 
     @Override
-    public int compareTo(@NonNull DataType other) throws IncomparableDataTypeException {
+    public int compareTo(@NonNull DataTypeDefinition other) throws IncomparableDataTypeException {
         if (other == null || getClass() != other.getClass()) {
             throw new IncomparableDataTypeException();
         }
