@@ -10,12 +10,16 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class GMonthType extends GDateType {
 
+    private static final String G_MONTH_PATTERN = "--(0[1-9]|1[0-2])(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?";
+
     public GMonthType(String stringValue) throws DataTypeFormatException {
         super(stringValue);
+        matchPattern(stringValue, G_MONTH_PATTERN);
     }
 
     public GMonthType(String stringValue, String format) throws DataTypeFormatException {
         super(stringValue, format);
+        matchPattern(stringValue, G_MONTH_PATTERN);
     }
 
     @Override
