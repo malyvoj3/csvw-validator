@@ -25,6 +25,10 @@ public abstract class DataType {
     public abstract boolean isLengthDataType();
     public abstract boolean isValueDataType();
 
+    public String getCanonicalForm() {
+        return stringValue;
+    }
+
     public int compareTo(DataType other) throws IncomparableDataTypeException {
         throw new UnsupportedOperationException();
     }
@@ -37,8 +41,20 @@ public abstract class DataType {
         return compareTo(other) > 0;
     }
 
+    public boolean isGreaterEq(DataType other) throws IncomparableDataTypeException {
+        return compareTo(other) >= 0;
+    }
+
     public boolean isLower(DataType other) throws IncomparableDataTypeException {
         return compareTo(other) < 0;
+    }
+
+    public boolean isLowerEq(DataType other) throws IncomparableDataTypeException {
+        return compareTo(other) <= 0;
+    }
+
+    public boolean isEquals(DataType other) throws IncomparableDataTypeException {
+        return compareTo(other) == 0;
     }
 
 }
