@@ -13,13 +13,15 @@ public class UnsignedByteType extends LongType {
 
     public UnsignedByteType(String stringValue) throws DataTypeFormatException {
         super(stringValue);
-        if (getValue() < MIN_UNSIGNED_BYTE && getValue() > MAX_UNSIGNED_BYTE) {
-            throw new DataTypeFormatException();
-        }
+        construct();
     }
 
     public UnsignedByteType(String stringValue, Format format) throws DataTypeFormatException {
         super(stringValue, format);
+        construct();
+    }
+
+    private void construct() throws DataTypeFormatException {
         if (getValue() < MIN_UNSIGNED_BYTE && getValue() > MAX_UNSIGNED_BYTE) {
             throw new DataTypeFormatException();
         }

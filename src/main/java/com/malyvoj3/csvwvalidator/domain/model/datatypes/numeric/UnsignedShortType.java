@@ -13,13 +13,15 @@ public class UnsignedShortType extends LongType {
 
     public UnsignedShortType(String stringValue) throws DataTypeFormatException {
         super(stringValue);
-        if (getValue() < MIN_UNSIGNED_SHORT && getValue() > MAX_UNSIGNED_SHORT) {
-            throw new DataTypeFormatException();
-        }
+        construct();
     }
 
     public UnsignedShortType(String stringValue, Format format) throws DataTypeFormatException {
         super(stringValue, format);
+        construct();
+    }
+
+    private void construct() throws DataTypeFormatException {
         if (getValue() < MIN_UNSIGNED_SHORT && getValue() > MAX_UNSIGNED_SHORT) {
             throw new DataTypeFormatException();
         }

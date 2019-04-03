@@ -20,14 +20,17 @@ public class DecimalType extends NumericType {
 
     public DecimalType(String stringValue) throws DataTypeFormatException {
         super(stringValue);
-        matchPattern(stringValue, DECIMAL_PATTERN);
-        this.value = parseNumber(stringValue, null);
+        construct(stringValue, null);
     }
 
     public DecimalType(String stringValue, Format format) throws DataTypeFormatException {
         super(stringValue);
+        construct(stringValue, format);
+    }
+
+    private void construct(String stringValue, Format format) throws DataTypeFormatException {
         matchPattern(stringValue, DECIMAL_PATTERN);
-        this.value = parseNumber(stringValue, format);
+        this.value = parseBigDecimal(stringValue, format);
     }
 
     @Override

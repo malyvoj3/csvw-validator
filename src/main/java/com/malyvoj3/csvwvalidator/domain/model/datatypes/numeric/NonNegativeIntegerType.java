@@ -16,13 +16,15 @@ public class NonNegativeIntegerType extends IntegerType {
 
     public NonNegativeIntegerType(String stringValue) throws DataTypeFormatException {
         super(stringValue);
-        if (getValue().compareTo(new BigDecimal(0)) < 0) {
-            throw new DataTypeFormatException();
-        }
+        construct();
     }
 
     public NonNegativeIntegerType(String stringValue, Format format) throws DataTypeFormatException {
         super(stringValue, format);
+        construct();
+    }
+
+    private void construct() throws DataTypeFormatException {
         if (getValue().compareTo(new BigDecimal(0)) < 0) {
             throw new DataTypeFormatException();
         }

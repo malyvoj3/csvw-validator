@@ -18,19 +18,18 @@ public class IntType extends NumericType {
 
     public IntType(String stringValue) throws DataTypeFormatException {
         super(stringValue);
-        matchPattern(stringValue, INT_PATTERN);
-        try {
-            this.value = parseNumber(stringValue, null).intValueExact();
-        } catch (AssertionError ex) {
-            throw new DataTypeFormatException();
-        }
+        construct(stringValue, null);
     }
 
     public IntType(String stringValue, Format format) throws DataTypeFormatException {
         super(stringValue);
+        construct(stringValue, format);
+    }
+
+    private void construct(String stringValue, Format format) throws DataTypeFormatException {
         matchPattern(stringValue, INT_PATTERN);
         try {
-            this.value = parseNumber(stringValue, format).intValueExact();
+            this.value = parseBigDecimal(stringValue, format).intValueExact();
         } catch (AssertionError ex) {
             throw new DataTypeFormatException();
         }

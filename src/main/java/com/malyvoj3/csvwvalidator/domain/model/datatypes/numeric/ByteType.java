@@ -12,25 +12,24 @@ import lombok.NonNull;
 @EqualsAndHashCode(callSuper = true)
 public class ByteType extends NumericType {
 
-    private static final String SHORT_PATTERN = "[\\-+]?[0-9]+";
+    private static final String BYTE_PATTERN = "[\\-+]?[0-9]+";
 
     private Byte value;
 
     public ByteType(String stringValue) throws DataTypeFormatException {
         super(stringValue);
-        matchPattern(stringValue, SHORT_PATTERN);
-        try {
-            this.value = parseNumber(stringValue, null).byteValueExact();
-        } catch (AssertionError ex) {
-            throw new DataTypeFormatException();
-        }
+        construct(stringValue, null);
     }
 
     public ByteType(String stringValue, Format format) throws DataTypeFormatException {
         super(stringValue);
-        matchPattern(stringValue, SHORT_PATTERN);
+        construct(stringValue, format);
+    }
+
+    private void construct(String stringValue, Format format) throws DataTypeFormatException {
+        matchPattern(stringValue, BYTE_PATTERN);
         try {
-            this.value = parseNumber(stringValue, format).byteValueExact();
+            this.value = parseBigDecimal(stringValue, format).byteValueExact();
         } catch (AssertionError ex) {
             throw new DataTypeFormatException();
         }

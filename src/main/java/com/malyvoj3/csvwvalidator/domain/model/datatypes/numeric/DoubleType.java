@@ -1,5 +1,6 @@
 package com.malyvoj3.csvwvalidator.domain.model.datatypes.numeric;
 
+import com.malyvoj3.csvwvalidator.domain.FormatParsingResult;
 import com.malyvoj3.csvwvalidator.domain.model.Format;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeDefinition;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeFormatException;
@@ -18,14 +19,26 @@ public class DoubleType extends NumericType {
 
     public DoubleType(String stringValue) throws DataTypeFormatException {
         super(stringValue);
-        matchPattern(stringValue, DOUBLE_PATTERN);
-        this.value = parseNumber(stringValue, null).doubleValue();
+        construct(stringValue, null);
     }
 
     public DoubleType(String stringValue, Format format) throws DataTypeFormatException {
         super(stringValue);
+        construct(stringValue, format);
+    }
+
+    private void construct(String stringValue, Format format) throws DataTypeFormatException {
         matchPattern(stringValue, DOUBLE_PATTERN);
-        this.value = parseNumber(stringValue, format).doubleValue();
+        FormatParsingResult result = parseNumber(stringValue, format);
+        if (result.isNegInf()) {
+            this.value = Double.NEGATIVE_INFINITY;
+        } else if (result.isPosInf()) {
+            this.value = Double.POSITIVE_INFINITY;
+        } else if (result.isNan()) {
+            this.value = Double.NaN;
+        } else {
+            this.value = result.getValue().doubleValue();
+        }
     }
 
     @Override

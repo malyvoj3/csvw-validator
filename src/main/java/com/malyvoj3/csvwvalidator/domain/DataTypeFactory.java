@@ -75,7 +75,8 @@ public class DataTypeFactory {
             return createGYearMonth(stringValue, format);
         } else if (CsvwKeywords.DECIMAL_DATA_TYPE.equals(base)) {
             return createDecimal(stringValue, format);
-        } else if (CsvwKeywords.DOUBLE_DATA_TYPE.equals(base)) {
+        } else if (CsvwKeywords.DOUBLE_DATA_TYPE.equals(base)
+                || CsvwKeywords.NUMBER_DATA_TYPE.equals(base)) {
             return createDouble(stringValue, format);
         } else if (CsvwKeywords.FLOAT_DATA_TYPE.equals(base)) {
             return createFloat(stringValue, format);

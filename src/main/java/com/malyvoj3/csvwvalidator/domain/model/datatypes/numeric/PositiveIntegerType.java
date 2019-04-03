@@ -16,13 +16,15 @@ public class PositiveIntegerType extends IntegerType {
 
     public PositiveIntegerType(String stringValue) throws DataTypeFormatException {
         super(stringValue);
-        if (getValue().compareTo(new BigDecimal(0)) <= 0) {
-            throw new DataTypeFormatException();
-        }
+        construct();
     }
 
     public PositiveIntegerType(String stringValue, Format format) throws DataTypeFormatException {
         super(stringValue, format);
+        construct();
+    }
+
+    private void construct() throws DataTypeFormatException {
         if (getValue().compareTo(new BigDecimal(0)) <= 0) {
             throw new DataTypeFormatException();
         }

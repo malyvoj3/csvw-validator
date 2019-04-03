@@ -16,13 +16,15 @@ public class NegativeIntegerType extends IntegerType {
 
     public NegativeIntegerType(String stringValue) throws DataTypeFormatException {
         super(stringValue);
-        if (getValue().compareTo(new BigDecimal(0)) >= 0) {
-            throw new DataTypeFormatException();
-        }
+        construct();
     }
 
     public NegativeIntegerType(String stringValue, Format format) throws DataTypeFormatException {
         super(stringValue, format);
+        construct();
+    }
+
+    private void construct() throws DataTypeFormatException {
         if (getValue().compareTo(new BigDecimal(0)) >= 0) {
             throw new DataTypeFormatException();
         }

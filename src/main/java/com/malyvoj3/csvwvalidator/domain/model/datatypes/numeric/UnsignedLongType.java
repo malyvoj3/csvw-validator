@@ -19,13 +19,15 @@ public class UnsignedLongType extends IntegerType {
 
     public UnsignedLongType(String stringValue) throws DataTypeFormatException {
         super(stringValue);
-        if (getValue().compareTo(new BigDecimal(MIN_UNSIGNED_LONG)) < 0 && getValue().compareTo(new BigDecimal(MAX_UNSIGNED_LONG)) > 0) {
-            throw new DataTypeFormatException();
-        }
+        construct();
     }
 
     public UnsignedLongType(String stringValue, Format format) throws DataTypeFormatException {
         super(stringValue, format);
+        construct();
+    }
+
+    private void construct() throws DataTypeFormatException {
         if (getValue().compareTo(new BigDecimal(MIN_UNSIGNED_LONG)) < 0 && getValue().compareTo(new BigDecimal(MAX_UNSIGNED_LONG)) > 0) {
             throw new DataTypeFormatException();
         }

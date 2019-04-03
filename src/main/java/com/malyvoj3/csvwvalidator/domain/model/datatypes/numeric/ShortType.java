@@ -18,19 +18,18 @@ public class ShortType extends NumericType {
 
     public ShortType(String stringValue) throws DataTypeFormatException {
         super(stringValue);
-        matchPattern(stringValue, SHORT_PATTERN);
-        try {
-            this.value = parseNumber(stringValue, null).shortValueExact();
-        } catch (AssertionError ex) {
-            throw new DataTypeFormatException();
-        }
+        construct(stringValue, null);
     }
 
     public ShortType(String stringValue, Format format) throws DataTypeFormatException {
         super(stringValue);
+        construct(stringValue, format);
+    }
+
+    private void construct(String stringValue, Format format) throws DataTypeFormatException {
         matchPattern(stringValue, SHORT_PATTERN);
         try {
-            this.value = parseNumber(stringValue, format).shortValueExact();
+            this.value = parseBigDecimal(stringValue, format).shortValueExact();
         } catch (AssertionError ex) {
             throw new DataTypeFormatException();
         }

@@ -18,19 +18,18 @@ public class LongType extends NumericType {
 
     public LongType(String stringValue) throws DataTypeFormatException {
         super(stringValue);
-        matchPattern(stringValue, LONG_PATTERN);
-        try {
-            this.value = parseNumber(stringValue, null).longValueExact();
-        } catch (AssertionError ex) {
-            throw new DataTypeFormatException();
-        }
+        construct(stringValue, null);
     }
 
     public LongType(String stringValue, Format format) throws DataTypeFormatException {
         super(stringValue);
+        construct(stringValue, format);
+    }
+
+    private void construct(String stringValue, Format format) throws DataTypeFormatException {
         matchPattern(stringValue, LONG_PATTERN);
         try {
-            this.value = parseNumber(stringValue, format).longValueExact();
+            this.value = parseBigDecimal(stringValue, format).longValueExact();
         } catch (AssertionError ex) {
             throw new DataTypeFormatException();
         }

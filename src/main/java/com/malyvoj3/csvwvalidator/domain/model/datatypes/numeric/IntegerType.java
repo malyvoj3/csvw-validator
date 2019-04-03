@@ -20,17 +20,17 @@ public class IntegerType extends NumericType {
 
     public IntegerType(String stringValue) throws DataTypeFormatException {
         super(stringValue);
-        matchPattern(stringValue, INTEGER_PATTERN);
-        this.value = parseNumber(stringValue, null);
-        if (!isInteger(this.value)) {
-            throw new DataTypeFormatException();
-        }
+        construct(stringValue, null);
     }
 
     public IntegerType(String stringValue, Format format) throws DataTypeFormatException {
         super(stringValue);
+        construct(stringValue, format);
+    }
+
+    private void construct(String stringValue, Format format) throws DataTypeFormatException {
         matchPattern(stringValue, INTEGER_PATTERN);
-        this.value = parseNumber(stringValue, format);
+        this.value = parseBigDecimal(stringValue, format);
         if (!isInteger(this.value)) {
             throw new DataTypeFormatException();
         }

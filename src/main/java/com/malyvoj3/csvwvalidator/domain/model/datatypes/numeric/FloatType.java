@@ -1,5 +1,6 @@
 package com.malyvoj3.csvwvalidator.domain.model.datatypes.numeric;
 
+import com.malyvoj3.csvwvalidator.domain.FormatParsingResult;
 import com.malyvoj3.csvwvalidator.domain.model.Format;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeDefinition;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeFormatException;
@@ -18,14 +19,26 @@ public class FloatType extends NumericType {
 
     public FloatType(String stringValue) throws DataTypeFormatException {
         super(stringValue);
-        matchPattern(stringValue, FLOAT_PATTERN);
-        this.value = parseNumber(stringValue, null).floatValue();
+        construct(stringValue, null);
     }
 
     public FloatType(String stringValue, Format format) throws DataTypeFormatException {
         super(stringValue);
+        construct(stringValue, format);
+    }
+
+    private void construct(String stringValue, Format format) throws DataTypeFormatException {
         matchPattern(stringValue, FLOAT_PATTERN);
-        this.value = parseNumber(stringValue, format).floatValue();
+        FormatParsingResult result = parseNumber(stringValue, format);
+        if (result.isNegInf()) {
+            this.value = Float.NEGATIVE_INFINITY;
+        } else if (result.isPosInf()) {
+            this.value = Float.POSITIVE_INFINITY;
+        } else if (result.isNan()) {
+            this.value = Float.NaN;
+        } else {
+            this.value = result.getValue().floatValue();
+        }
     }
 
     @Override

@@ -13,13 +13,15 @@ public class UnsignedIntType extends LongType {
 
     public UnsignedIntType(String stringValue) throws DataTypeFormatException {
         super(stringValue);
-        if (getValue() < MIN_UNSIGNED_INT && getValue() > MAX_UNSIGNED_INT) {
-            throw new DataTypeFormatException();
-        }
+        construct();
     }
 
     public UnsignedIntType(String stringValue, Format format) throws DataTypeFormatException {
         super(stringValue, format);
+        construct();
+    }
+
+    private void construct() throws DataTypeFormatException {
         if (getValue() < MIN_UNSIGNED_INT && getValue() > MAX_UNSIGNED_INT) {
             throw new DataTypeFormatException();
         }
