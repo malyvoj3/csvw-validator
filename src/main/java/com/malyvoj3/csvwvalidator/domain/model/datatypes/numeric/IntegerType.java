@@ -12,27 +12,28 @@ import java.math.BigDecimal;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class DecimalType extends NumericType {
+public class IntegerType extends NumericType {
 
-    private static final String DECIMAL_PATTERN = "(\\+|-)?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)";
+    private static final String INTEGER_PATTERN = "[\\-+]?[0-9]+";
 
     private BigDecimal value;
 
-    public DecimalType(String stringValue) throws DataTypeFormatException {
+    public IntegerType(String stringValue) throws DataTypeFormatException {
         super(stringValue);
-        matchPattern(stringValue, DECIMAL_PATTERN);
+        matchPattern(stringValue, INTEGER_PATTERN);
         this.value = parseNumber(stringValue, null);
+        if (!isInteger(this.value)) {
+            throw new DataTypeFormatException();
+        }
     }
 
-    public DecimalType(String stringValue, Format format) throws DataTypeFormatException {
+    public IntegerType(String stringValue, Format format) throws DataTypeFormatException {
         super(stringValue);
-        matchPattern(stringValue, DECIMAL_PATTERN);
+        matchPattern(stringValue, INTEGER_PATTERN);
         this.value = parseNumber(stringValue, format);
-    }
-
-    @Override
-    public String getCanonicalForm() {
-        return value.toString();
+        if (!isInteger(this.value)) {
+            throw new DataTypeFormatException();
+        }
     }
 
     @Override
@@ -40,7 +41,7 @@ public class DecimalType extends NumericType {
         if (other == null || getClass() != other.getClass()) {
             throw new IncomparableDataTypeException();
         }
-        DecimalType that = (DecimalType) other;
+        IntegerType that = (IntegerType) other;
         return value.compareTo(that.getValue());
     }
 }

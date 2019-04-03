@@ -8,31 +8,24 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 
-import java.math.BigDecimal;
-
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class DecimalType extends NumericType {
+public class FloatType extends NumericType {
 
-    private static final String DECIMAL_PATTERN = "(\\+|-)?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)";
+    private static final String FLOAT_PATTERN = "(\\+|-)?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)([Ee](\\+|-)?[0-9]+)?|(\\+|-)?INF|NaN";
 
-    private BigDecimal value;
+    private Float value;
 
-    public DecimalType(String stringValue) throws DataTypeFormatException {
+    public FloatType(String stringValue) throws DataTypeFormatException {
         super(stringValue);
-        matchPattern(stringValue, DECIMAL_PATTERN);
-        this.value = parseNumber(stringValue, null);
+        matchPattern(stringValue, FLOAT_PATTERN);
+        this.value = parseNumber(stringValue, null).floatValue();
     }
 
-    public DecimalType(String stringValue, Format format) throws DataTypeFormatException {
+    public FloatType(String stringValue, Format format) throws DataTypeFormatException {
         super(stringValue);
-        matchPattern(stringValue, DECIMAL_PATTERN);
-        this.value = parseNumber(stringValue, format);
-    }
-
-    @Override
-    public String getCanonicalForm() {
-        return value.toString();
+        matchPattern(stringValue, FLOAT_PATTERN);
+        this.value = parseNumber(stringValue, format).floatValue();
     }
 
     @Override
@@ -40,7 +33,7 @@ public class DecimalType extends NumericType {
         if (other == null || getClass() != other.getClass()) {
             throw new IncomparableDataTypeException();
         }
-        DecimalType that = (DecimalType) other;
+        FloatType that = (FloatType) other;
         return value.compareTo(that.getValue());
     }
 }

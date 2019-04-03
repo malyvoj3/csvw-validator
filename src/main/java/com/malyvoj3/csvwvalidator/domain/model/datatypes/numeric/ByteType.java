@@ -8,31 +8,32 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 
-import java.math.BigDecimal;
-
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class DecimalType extends NumericType {
+public class ByteType extends NumericType {
 
-    private static final String DECIMAL_PATTERN = "(\\+|-)?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)";
+    private static final String SHORT_PATTERN = "[\\-+]?[0-9]+";
 
-    private BigDecimal value;
+    private Byte value;
 
-    public DecimalType(String stringValue) throws DataTypeFormatException {
+    public ByteType(String stringValue) throws DataTypeFormatException {
         super(stringValue);
-        matchPattern(stringValue, DECIMAL_PATTERN);
-        this.value = parseNumber(stringValue, null);
+        matchPattern(stringValue, SHORT_PATTERN);
+        try {
+            this.value = parseNumber(stringValue, null).byteValueExact();
+        } catch (AssertionError ex) {
+            throw new DataTypeFormatException();
+        }
     }
 
-    public DecimalType(String stringValue, Format format) throws DataTypeFormatException {
+    public ByteType(String stringValue, Format format) throws DataTypeFormatException {
         super(stringValue);
-        matchPattern(stringValue, DECIMAL_PATTERN);
-        this.value = parseNumber(stringValue, format);
-    }
-
-    @Override
-    public String getCanonicalForm() {
-        return value.toString();
+        matchPattern(stringValue, SHORT_PATTERN);
+        try {
+            this.value = parseNumber(stringValue, format).byteValueExact();
+        } catch (AssertionError ex) {
+            throw new DataTypeFormatException();
+        }
     }
 
     @Override
@@ -40,7 +41,7 @@ public class DecimalType extends NumericType {
         if (other == null || getClass() != other.getClass()) {
             throw new IncomparableDataTypeException();
         }
-        DecimalType that = (DecimalType) other;
+        ByteType that = (ByteType) other;
         return value.compareTo(that.getValue());
     }
 }

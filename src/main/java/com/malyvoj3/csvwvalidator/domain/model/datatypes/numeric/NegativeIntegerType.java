@@ -12,27 +12,20 @@ import java.math.BigDecimal;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class DecimalType extends NumericType {
+public class NegativeIntegerType extends IntegerType {
 
-    private static final String DECIMAL_PATTERN = "(\\+|-)?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)";
-
-    private BigDecimal value;
-
-    public DecimalType(String stringValue) throws DataTypeFormatException {
+    public NegativeIntegerType(String stringValue) throws DataTypeFormatException {
         super(stringValue);
-        matchPattern(stringValue, DECIMAL_PATTERN);
-        this.value = parseNumber(stringValue, null);
+        if (getValue().compareTo(new BigDecimal(0)) >= 0) {
+            throw new DataTypeFormatException();
+        }
     }
 
-    public DecimalType(String stringValue, Format format) throws DataTypeFormatException {
-        super(stringValue);
-        matchPattern(stringValue, DECIMAL_PATTERN);
-        this.value = parseNumber(stringValue, format);
-    }
-
-    @Override
-    public String getCanonicalForm() {
-        return value.toString();
+    public NegativeIntegerType(String stringValue, Format format) throws DataTypeFormatException {
+        super(stringValue, format);
+        if (getValue().compareTo(new BigDecimal(0)) >= 0) {
+            throw new DataTypeFormatException();
+        }
     }
 
     @Override
@@ -40,7 +33,7 @@ public class DecimalType extends NumericType {
         if (other == null || getClass() != other.getClass()) {
             throw new IncomparableDataTypeException();
         }
-        DecimalType that = (DecimalType) other;
-        return value.compareTo(that.getValue());
+        NegativeIntegerType that = (NegativeIntegerType) other;
+        return getValue().compareTo(that.getValue());
     }
 }

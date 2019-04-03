@@ -7,6 +7,7 @@ import com.malyvoj3.csvwvalidator.domain.model.datatypes.date.*;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.duration.DayTimeDurationType;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.duration.DurationType;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.duration.YearMonthDurationType;
+import com.malyvoj3.csvwvalidator.domain.model.datatypes.numeric.*;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.string.*;
 import com.malyvoj3.csvwvalidator.utils.CsvwKeywords;
 import lombok.experimental.UtilityClass;
@@ -15,6 +16,7 @@ import lombok.experimental.UtilityClass;
 public class DataTypeFactory {
 
     private final static String DATA_TYPE_BASE_DEFAULT = "string";
+
     private final static String DATE_TIME_FORMAT_DEFAULT = "yyyy-MM-ddTHH:mm:ss";
     private final static String DATE_FORMAT_DEFAULT = "yyyy-MM-dd";
     private final static String TIME_FORMAT_DEFAULT = "HH:mm:ss";
@@ -71,9 +73,105 @@ public class DataTypeFactory {
             return createGYear(stringValue, format);
         } else if (CsvwKeywords.G_YEAR_MONTH_DATA_TYPE.equals(base)) {
             return createGYearMonth(stringValue, format);
+        } else if (CsvwKeywords.DECIMAL_DATA_TYPE.equals(base)) {
+            return createDecimal(stringValue, format);
+        } else if (CsvwKeywords.DOUBLE_DATA_TYPE.equals(base)) {
+            return createDouble(stringValue, format);
+        } else if (CsvwKeywords.FLOAT_DATA_TYPE.equals(base)) {
+            return createFloat(stringValue, format);
+        } else if (CsvwKeywords.INTEGER_DATA_TYPE.equals(base)) {
+            return createInteger(stringValue, format);
+        } else if (CsvwKeywords.LONG_DATA_TYPE.equals(base)) {
+            return createLong(stringValue, format);
+        } else if (CsvwKeywords.INT_DATA_TYPE.equals(base)) {
+            return createInt(stringValue, format);
+        } else if (CsvwKeywords.SHORT_DATA_TYPE.equals(base)) {
+            return createShort(stringValue, format);
+        } else if (CsvwKeywords.BYTE_DATA_TYPE.equals(base)) {
+            return createByte(stringValue, format);
+        } else if (CsvwKeywords.NEGATIVE_INTEGER_DATA_TYPE.equals(base)) {
+            return createNegativeInt(stringValue, format);
+        } else if (CsvwKeywords.NON_NEGATIVE_INTEGER_DATA_TYPE.equals(base)) {
+            return createNonNegativeInt(stringValue, format);
+        } else if (CsvwKeywords.NON_POSITIVE_INTEGER_DATA_TYPE.equals(base)) {
+            return createNonPositiveInt(stringValue, format);
+        } else if (CsvwKeywords.POSITIVE_INTEGER_DATA_TYPE.equals(base)) {
+            return createPositiveInt(stringValue, format);
+        } else if (CsvwKeywords.UNSIGNED_LONG_DATA_TYPE.equals(base)) {
+            return createUnsignedLong(stringValue, format);
+        } else if (CsvwKeywords.UNSIGNED_INT_DATA_TYPE.equals(base)) {
+            return createUnsignedInt(stringValue, format);
+        } else if (CsvwKeywords.UNSIGNED_SHORT_DATA_TYPE.equals(base)) {
+            return createUnsignedShort(stringValue, format);
+        } else if (CsvwKeywords.UNSIGNED_BYTE_DATA_TYPE.equals(base)) {
+            return createUnsignedByte(stringValue, format);
         } else {
             throw new RuntimeException();
         }
+    }
+
+    private static DataTypeDefinition createUnsignedLong(String stringValue, Format format) throws DataTypeFormatException {
+        return new UnsignedLongType(stringValue, format);
+    }
+
+    private static DataTypeDefinition createUnsignedInt(String stringValue, Format format) throws DataTypeFormatException {
+        return new UnsignedIntType(stringValue, format);
+    }
+
+    private static DataTypeDefinition createUnsignedShort(String stringValue, Format format) throws DataTypeFormatException {
+        return new UnsignedShortType(stringValue, format);
+    }
+
+    private static DataTypeDefinition createUnsignedByte(String stringValue, Format format) throws DataTypeFormatException {
+        return new UnsignedByteType(stringValue, format);
+    }
+
+    private static DataTypeDefinition createNegativeInt(String stringValue, Format format) throws DataTypeFormatException {
+        return new NegativeIntegerType(stringValue, format);
+    }
+
+    private static DataTypeDefinition createNonNegativeInt(String stringValue, Format format) throws DataTypeFormatException {
+        return new NonNegativeIntegerType(stringValue, format);
+    }
+
+    private static DataTypeDefinition createNonPositiveInt(String stringValue, Format format) throws DataTypeFormatException {
+        return new NonPositiveIntegerType(stringValue, format);
+    }
+
+    private static DataTypeDefinition createPositiveInt(String stringValue, Format format) throws DataTypeFormatException {
+        return new PositiveIntegerType(stringValue, format);
+    }
+
+    private static DataTypeDefinition createInteger(String stringValue, Format format) throws DataTypeFormatException {
+        return new IntegerType(stringValue, format);
+    }
+
+    private static DataTypeDefinition createLong(String stringValue, Format format) throws DataTypeFormatException {
+        return new LongType(stringValue, format);
+    }
+
+    private static DataTypeDefinition createInt(String stringValue, Format format) throws DataTypeFormatException {
+        return new IntType(stringValue, format);
+    }
+
+    private static DataTypeDefinition createShort(String stringValue, Format format) throws DataTypeFormatException {
+        return new ShortType(stringValue, format);
+    }
+
+    private static DataTypeDefinition createByte(String stringValue, Format format) throws DataTypeFormatException {
+        return new ByteType(stringValue, format);
+    }
+
+    private static DataTypeDefinition createFloat(String stringValue, Format format) throws DataTypeFormatException {
+        return new FloatType(stringValue, format);
+    }
+
+    private static DataTypeDefinition createDouble(String stringValue, Format format) throws DataTypeFormatException {
+        return new DoubleType(stringValue, format);
+    }
+
+    private static DataTypeDefinition createDecimal(String stringValue, Format format) throws DataTypeFormatException {
+        return new DecimalType(stringValue, format);
     }
 
     private DataTypeDefinition createGDay(String stringValue, Format formatObj) throws DataTypeFormatException {
