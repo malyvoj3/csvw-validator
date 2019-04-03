@@ -89,7 +89,164 @@ public abstract class NumericType extends DataTypeDefinition {
         }
     }
 
-    protected String resolvePattern(String pattern, Format format) {
+    protected void validateFormatPattern(String stringValue, Format format) throws DataTypeFormatException {
+        char decimalChar = Optional.ofNullable(format)
+                .map(Format::getDecimalChar)
+                .map(string -> string.charAt(0))
+                .orElse(DECIMAL_SEPARATOR_DEFAULT);
+
+        char groupChar = Optional.ofNullable(format)
+                .map(Format::getGroupChar)
+                .map(string -> string.charAt(0))
+                .orElse(GROUP_CHAR_DEFAULT);
+
+        String pattern = format.getPattern();
+        String formatPattern = "(\\-|\\+)?[#0]+(\\${groupChar}[#0]+)*(\\${decimalChar}[#0]+(\\${groupChar}[#0]+)*(E[\\+\\-]?[#0]+(\\${groupChar}[#0]+)*)?)?(%|\u2030)?";
+        matchPattern(pattern, resolveNumberPattern(formatPattern, format));
+
+        boolean isPercent = false;
+        boolean isPerMill = false;
+
+        if (pattern.charAt(pattern.length() - 1) == '%') {
+            pattern = pattern.substring(0, pattern.length() - 1);
+            isPercent = true;
+        } else if (pattern.charAt(pattern.length() - 1) == '\u2030') {
+            pattern = pattern.substring(0, pattern.length() - 1);
+            isPerMill = true;
+        }
+
+        String integerRegexp = null;
+        String fractRegexp = null;
+        String exponentRegexp = null;
+
+        // Rozdelit na integer, fractional, exponent
+        String integerPart = null;
+        String fractionalPart = null;
+        String exponentPart = null;
+
+        String[] exponentDivide = pattern.split("E");
+        if (exponentDivide.length > 1) {
+            exponentPart = exponentDivide[1];
+        }
+        integerPart = exponentDivide[0];
+        String[] fracDivide = integerPart.split(String.valueOf("\\" + decimalChar));
+        if (fracDivide.length > 1) {
+            integerPart = fracDivide[0];
+            fractionalPart = fracDivide[1];
+        }
+
+        String escapedGroupChar = String.valueOf("\\" + groupChar);
+        String optionalGroupCharRegex = String.format("(\\%s)?", groupChar);
+        int optionalCounter = 0;
+        int mandatoryCounter = 0;
+
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < integerPart.length(); i++) {
+            char tmp = integerPart.charAt(i);
+            if (tmp == groupChar) {
+                builder.append(getDigitGroup(optionalCounter, mandatoryCounter));
+                if (mandatoryCounter > 0) {
+                    builder.append(escapedGroupChar);
+                } else {
+                    builder.append(optionalGroupCharRegex);
+                }
+                optionalCounter = 0;
+                mandatoryCounter = 0;
+            } else if (tmp == '#') {
+                optionalCounter++;
+            } else if (tmp == '0') {
+                mandatoryCounter++;
+            } else if (tmp == '-') {
+                builder.append("\\-");
+            } else if (tmp == '+') {
+                builder.append("\\+");
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+        builder.append(getDigitGroup(optionalCounter, mandatoryCounter));
+        integerRegexp = builder.toString();
+
+        if (fractionalPart != null) {
+            optionalCounter = 0;
+            mandatoryCounter = 0;
+            builder = new StringBuilder();
+            for (int i = 0; i < fractionalPart.length(); i++) {
+                char tmp = fractionalPart.charAt(i);
+                if (tmp == groupChar) {
+                    builder.append(getDigitGroup(optionalCounter, mandatoryCounter));
+                    if (mandatoryCounter > 0) {
+                        builder.append(escapedGroupChar);
+                    } else {
+                        builder.append(optionalGroupCharRegex);
+                    }
+                    optionalCounter = 0;
+                    mandatoryCounter = 0;
+                } else if (tmp == '#') {
+                    optionalCounter++;
+                } else if (tmp == '0') {
+                    mandatoryCounter++;
+                } else {
+                    throw new IllegalStateException();
+                }
+            }
+            builder.append(getDigitGroup(optionalCounter, mandatoryCounter));
+            fractRegexp = builder.toString();
+        }
+
+        if (exponentPart != null) {
+            optionalCounter = 0;
+            mandatoryCounter = 0;
+            builder = new StringBuilder();
+            for (int i = 0; i < exponentPart.length(); i++) {
+                char tmp = exponentPart.charAt(i);
+                if (tmp == groupChar) {
+                    builder.append(getDigitGroup(optionalCounter, mandatoryCounter));
+                    if (mandatoryCounter > 0) {
+                        builder.append(escapedGroupChar);
+                    } else {
+                        builder.append(optionalGroupCharRegex);
+                    }
+                    optionalCounter = 0;
+                    mandatoryCounter = 0;
+                } else if (tmp == '#') {
+                    optionalCounter++;
+                } else if (tmp == '0') {
+                    mandatoryCounter++;
+                } else if (tmp == '-') {
+                    builder.append("\\-");
+                } else if (tmp == '+') {
+                    builder.append("\\+");
+                } else {
+                    throw new IllegalStateException();
+                }
+            }
+            builder.append(getDigitGroup(optionalCounter, mandatoryCounter));
+            exponentRegexp = builder.toString();
+        }
+
+        String resultRegexp;
+        if (integerRegexp != null && fractRegexp != null && exponentRegexp != null) {
+            resultRegexp = integerRegexp + decimalChar + fractRegexp + "E" + exponentRegexp;
+        } else if (integerRegexp != null && fractRegexp != null) {
+            resultRegexp = integerRegexp + decimalChar + fractRegexp;
+        } else {
+            resultRegexp = integerRegexp;
+        }
+        if (isPercent) {
+            resultRegexp = resultRegexp + "%";
+        } else if (isPerMill) {
+            resultRegexp = resultRegexp + "\u2030";
+        }
+
+        matchPattern(stringValue, resultRegexp);
+    }
+
+    private String getDigitGroup(int optionalCounter, int mandatoryCounter) {
+        return String.format("[0-9]{%d,%d}", mandatoryCounter, mandatoryCounter + optionalCounter);
+    }
+
+    protected String resolveNumberPattern(String pattern, Format format) {
         String groupChar = Optional.ofNullable(format)
                 .map(Format::getGroupChar)
                 .orElse(String.valueOf(GROUP_CHAR_DEFAULT));

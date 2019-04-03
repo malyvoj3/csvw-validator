@@ -29,7 +29,7 @@ public class DecimalType extends NumericType {
     }
 
     private void construct(String stringValue, Format format) throws DataTypeFormatException {
-        matchPattern(stringValue, resolvePattern(DECIMAL_PATTERN, format));
+        matchPattern(stringValue, resolveNumberPattern(DECIMAL_PATTERN, format));
         this.value = parseBigDecimal(stringValue, format);
     }
 

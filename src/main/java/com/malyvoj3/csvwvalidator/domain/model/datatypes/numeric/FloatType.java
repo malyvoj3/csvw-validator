@@ -28,7 +28,7 @@ public class FloatType extends NumericType {
     }
 
     private void construct(String stringValue, Format format) throws DataTypeFormatException {
-        matchPattern(stringValue, resolvePattern(FLOAT_PATTERN, format));
+        matchPattern(stringValue, resolveNumberPattern(FLOAT_PATTERN, format));
         FormatParsingResult result = parseNumber(stringValue, format);
         if (result.isNegInf()) {
             this.value = Float.NEGATIVE_INFINITY;

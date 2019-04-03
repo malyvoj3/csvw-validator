@@ -27,7 +27,7 @@ public class ByteType extends NumericType {
     }
 
     private void construct(String stringValue, Format format) throws DataTypeFormatException {
-        matchPattern(stringValue, resolvePattern(BYTE_PATTERN, format));
+        matchPattern(stringValue, resolveNumberPattern(BYTE_PATTERN, format));
         try {
             this.value = parseBigDecimal(stringValue, format).byteValueExact();
         } catch (ArithmeticException ex) {

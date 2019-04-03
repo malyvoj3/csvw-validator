@@ -208,6 +208,7 @@ public class CsvParser {
     private static CsvParserSettings defaultSettings(Dialect dialect) {
         CsvFormat csvFormat = new CsvFormat();
         csvFormat.setDelimiter(FIELD_DELIMITER_DEFAULT);
+        csvFormat.setComment('\0');
         // TODO disabled another delimiter
         CsvParserSettings settings = new CsvParserSettings();
         settings.setFormat(csvFormat);

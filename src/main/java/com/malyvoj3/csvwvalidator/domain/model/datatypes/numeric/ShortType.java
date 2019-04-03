@@ -27,7 +27,7 @@ public class ShortType extends NumericType {
     }
 
     private void construct(String stringValue, Format format) throws DataTypeFormatException {
-        matchPattern(stringValue, resolvePattern(SHORT_PATTERN, format));
+        matchPattern(stringValue, resolveNumberPattern(SHORT_PATTERN, format));
         try {
             this.value = parseBigDecimal(stringValue, format).shortValueExact();
         } catch (ArithmeticException ex) {

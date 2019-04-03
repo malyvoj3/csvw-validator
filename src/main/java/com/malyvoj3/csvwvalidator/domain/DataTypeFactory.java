@@ -33,7 +33,7 @@ public class DataTypeFactory {
         } else if (CsvwKeywords.DATE_TIME_DATA_TYPE.equals(base) || CsvwKeywords.DATETIME_DATA_TYPE.equals(base)) {
             return createDateTime(stringValue, format);
         } else if (CsvwKeywords.DATE_TIME_STAMP_DATA_TYPE.equals(base)) {
-            return createDateTime(stringValue, format);
+            return createDateTimeStamp(stringValue, format);
         } else if (CsvwKeywords.TIME_DATA_TYPE.equals(base)) {
             return createTime(stringValue, format);
         } else if (CsvwKeywords.DATE_DATA_TYPE.equals(base)) {

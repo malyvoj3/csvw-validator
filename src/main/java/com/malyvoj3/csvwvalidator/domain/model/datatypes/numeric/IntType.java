@@ -27,7 +27,7 @@ public class IntType extends NumericType {
     }
 
     private void construct(String stringValue, Format format) throws DataTypeFormatException {
-        matchPattern(stringValue, resolvePattern(INT_PATTERN, format));
+        matchPattern(stringValue, resolveNumberPattern(INT_PATTERN, format));
         try {
             this.value = parseBigDecimal(stringValue, format).intValueExact();
         } catch (ArithmeticException ex) {

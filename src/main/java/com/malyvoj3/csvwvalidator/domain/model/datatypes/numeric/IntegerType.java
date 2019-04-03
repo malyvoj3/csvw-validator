@@ -29,7 +29,7 @@ public class IntegerType extends NumericType {
     }
 
     private void construct(String stringValue, Format format) throws DataTypeFormatException {
-        matchPattern(stringValue, resolvePattern(INTEGER_PATTERN, format));
+        matchPattern(stringValue, resolveNumberPattern(INTEGER_PATTERN, format));
         this.value = parseBigDecimal(stringValue, format);
         if (!isInteger(this.value)) {
             throw new DataTypeFormatException();

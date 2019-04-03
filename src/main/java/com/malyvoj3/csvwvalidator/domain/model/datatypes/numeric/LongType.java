@@ -27,7 +27,7 @@ public class LongType extends NumericType {
     }
 
     private void construct(String stringValue, Format format) throws DataTypeFormatException {
-        matchPattern(stringValue, resolvePattern(LONG_PATTERN, format));
+        matchPattern(stringValue, resolveNumberPattern(LONG_PATTERN, format));
         try {
             this.value = parseBigDecimal(stringValue, format).longValueExact();
         } catch (ArithmeticException ex) {

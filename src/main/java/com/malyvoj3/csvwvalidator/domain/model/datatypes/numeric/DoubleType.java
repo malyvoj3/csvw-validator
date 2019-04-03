@@ -28,7 +28,7 @@ public class DoubleType extends NumericType {
     }
 
     private void construct(String stringValue, Format format) throws DataTypeFormatException {
-        matchPattern(stringValue, resolvePattern(DOUBLE_PATTERN, format));
+        matchPattern(stringValue, resolveNumberPattern(DOUBLE_PATTERN, format));
         FormatParsingResult result = parseNumber(stringValue, format);
         if (result.isNegInf()) {
             this.value = Double.NEGATIVE_INFINITY;
