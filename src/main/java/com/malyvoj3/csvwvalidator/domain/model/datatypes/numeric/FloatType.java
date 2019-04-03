@@ -13,7 +13,7 @@ import lombok.NonNull;
 @EqualsAndHashCode(callSuper = true)
 public class FloatType extends NumericType {
 
-    private static final String FLOAT_PATTERN = "(\\+|-)?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)([Ee](\\+|-)?[0-9]+)?|(\\+|-)?INF|NaN";
+    private static final String FLOAT_PATTERN = "(\\+|-)?(([0-9]+(\\${groupChar}[0-9]+)?)(\\${decimalChar})?(\\${decimalChar}[0-9]+(\\${groupChar}[0-9]+)?)?)([Ee](\\+|-)?[0-9]+)?|(\\+|-)?INF|NaN";
 
     private Float value;
 
@@ -28,7 +28,7 @@ public class FloatType extends NumericType {
     }
 
     private void construct(String stringValue, Format format) throws DataTypeFormatException {
-        matchPattern(stringValue, FLOAT_PATTERN);
+        matchPattern(stringValue, resolvePattern(FLOAT_PATTERN, format));
         FormatParsingResult result = parseNumber(stringValue, format);
         if (result.isNegInf()) {
             this.value = Float.NEGATIVE_INFINITY;

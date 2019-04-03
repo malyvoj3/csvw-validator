@@ -13,7 +13,7 @@ import lombok.NonNull;
 @EqualsAndHashCode(callSuper = true)
 public class DoubleType extends NumericType {
 
-    private static final String DOUBLE_PATTERN = "(\\+|-)?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)([Ee](\\+|-)?[0-9]+)?|(\\+|-)?INF|NaN";
+    private static final String DOUBLE_PATTERN = "(\\+|-)?(([0-9]+(\\${groupChar}[0-9]+)?)(\\${decimalChar})?(\\${decimalChar}[0-9]+(\\${groupChar}[0-9]+)?)?)([Ee](\\+|-)?[0-9]+)?|(\\+|-)?INF|NaN";
 
     private Double value;
 
@@ -28,7 +28,7 @@ public class DoubleType extends NumericType {
     }
 
     private void construct(String stringValue, Format format) throws DataTypeFormatException {
-        matchPattern(stringValue, DOUBLE_PATTERN);
+        matchPattern(stringValue, resolvePattern(DOUBLE_PATTERN, format));
         FormatParsingResult result = parseNumber(stringValue, format);
         if (result.isNegInf()) {
             this.value = Double.NEGATIVE_INFINITY;

@@ -28,7 +28,7 @@ public class UnsignedLongType extends IntegerType {
     }
 
     private void construct() throws DataTypeFormatException {
-        if (getValue().compareTo(new BigDecimal(MIN_UNSIGNED_LONG)) < 0 && getValue().compareTo(new BigDecimal(MAX_UNSIGNED_LONG)) > 0) {
+        if (getValue().compareTo(new BigDecimal(MIN_UNSIGNED_LONG)) < 0 || getValue().compareTo(new BigDecimal(MAX_UNSIGNED_LONG)) > 0) {
             throw new DataTypeFormatException();
         }
     }

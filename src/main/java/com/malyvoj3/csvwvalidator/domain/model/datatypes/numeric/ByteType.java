@@ -12,7 +12,7 @@ import lombok.NonNull;
 @EqualsAndHashCode(callSuper = true)
 public class ByteType extends NumericType {
 
-    private static final String BYTE_PATTERN = "[\\-+]?[0-9]+";
+    private static final String BYTE_PATTERN = "[\\-+]?[0-9]+(\\${groupChar}[0-9]+)*";
 
     private Byte value;
 
@@ -27,10 +27,10 @@ public class ByteType extends NumericType {
     }
 
     private void construct(String stringValue, Format format) throws DataTypeFormatException {
-        matchPattern(stringValue, BYTE_PATTERN);
+        matchPattern(stringValue, resolvePattern(BYTE_PATTERN, format));
         try {
             this.value = parseBigDecimal(stringValue, format).byteValueExact();
-        } catch (AssertionError ex) {
+        } catch (ArithmeticException ex) {
             throw new DataTypeFormatException();
         }
     }

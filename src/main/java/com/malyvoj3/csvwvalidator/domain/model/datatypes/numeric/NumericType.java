@@ -5,16 +5,20 @@ import com.malyvoj3.csvwvalidator.domain.model.Format;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeDefinition;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeFormatException;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.PropertyPlaceholderHelper;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.Optional;
+import java.util.Properties;
 
 public abstract class NumericType extends DataTypeDefinition {
 
-    private final static char PER_MILL_SIGN = '\u2030';
-    private final static char POSITIVE_SIGN = '+';
-    private final static char DECIMAL_SEPARATOR_DEFAULT = '.';
+    protected final static char PER_MILL_SIGN = '\u2030';
+    protected final static char POSITIVE_SIGN = '+';
+    protected final static char DECIMAL_SEPARATOR_DEFAULT = '.';
+    protected final static char GROUP_CHAR_DEFAULT = ',';
 
     private final static String POSITIVE_INF = "INF";
     private final static String NEGATIVE_INF = "-INF";
@@ -60,6 +64,8 @@ public abstract class NumericType extends DataTypeDefinition {
 
                 if (StringUtils.isNotEmpty(format.getGroupChar())) {
                     symbols.setGroupingSeparator(format.getGroupChar().charAt(0));
+                } else {
+                    symbols.setGroupingSeparator(GROUP_CHAR_DEFAULT);
                 }
 
                 if (StringUtils.isNotEmpty(format.getDecimalChar())) {
@@ -69,7 +75,7 @@ public abstract class NumericType extends DataTypeDefinition {
                 }
 
                 if (StringUtils.isNotEmpty(pattern)) {
-                    decimalFormat = new DecimalFormat(pattern, symbols);
+                    decimalFormat = new DecimalFormat(setDigitAfterExponent(pattern), symbols);
                 } else {
                     decimalFormat = new DecimalFormat();
                     decimalFormat.setDecimalFormatSymbols(symbols);
@@ -83,7 +89,33 @@ public abstract class NumericType extends DataTypeDefinition {
         }
     }
 
-    protected BigDecimal parseBigDecimal(String stringValue, Format numberFormat) throws DataTypeFormatException  {
+    protected String resolvePattern(String pattern, Format format) {
+        String groupChar = Optional.ofNullable(format)
+                .map(Format::getGroupChar)
+                .orElse(String.valueOf(GROUP_CHAR_DEFAULT));
+
+        String decimalChar = Optional.ofNullable(format)
+                .map(Format::getDecimalChar)
+                .orElse(String.valueOf(DECIMAL_SEPARATOR_DEFAULT));
+
+        PropertyPlaceholderHelper helper = new PropertyPlaceholderHelper("${", "}");
+        Properties properties = new Properties();
+        properties.setProperty("groupChar", groupChar);
+        properties.setProperty("decimalChar", decimalChar);
+        properties.setProperty("perMill", String.valueOf(PER_MILL_SIGN));
+        return helper.replacePlaceholders(pattern, properties);
+    }
+
+    private String setDigitAfterExponent(String pattern) {
+        String result = pattern;
+        int index = pattern.indexOf("E");
+        if (index > 0 && pattern.length() > index + 1 && pattern.charAt(index + 1) == '#') {
+            result = pattern.substring(0, index) + "E0" + pattern.substring(index + 2);
+        }
+        return result;
+    }
+
+    protected BigDecimal parseBigDecimal(String stringValue, Format numberFormat) throws DataTypeFormatException {
         FormatParsingResult result = parseNumber(stringValue, numberFormat);
         if (result.getValue() == null) {
             throw new DataTypeFormatException();

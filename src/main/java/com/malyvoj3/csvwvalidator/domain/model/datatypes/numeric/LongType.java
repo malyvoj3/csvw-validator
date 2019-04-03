@@ -12,7 +12,7 @@ import lombok.NonNull;
 @EqualsAndHashCode(callSuper = true)
 public class LongType extends NumericType {
 
-    private static final String LONG_PATTERN = "[\\-+]?[0-9]+";
+    private static final String LONG_PATTERN = "[\\-+]?[0-9]+(\\${groupChar}[0-9]+)*";
 
     private Long value;
 
@@ -27,10 +27,10 @@ public class LongType extends NumericType {
     }
 
     private void construct(String stringValue, Format format) throws DataTypeFormatException {
-        matchPattern(stringValue, LONG_PATTERN);
+        matchPattern(stringValue, resolvePattern(LONG_PATTERN, format));
         try {
             this.value = parseBigDecimal(stringValue, format).longValueExact();
-        } catch (AssertionError ex) {
+        } catch (ArithmeticException ex) {
             throw new DataTypeFormatException();
         }
     }

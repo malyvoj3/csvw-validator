@@ -22,7 +22,7 @@ public class UnsignedByteType extends LongType {
     }
 
     private void construct() throws DataTypeFormatException {
-        if (getValue() < MIN_UNSIGNED_BYTE && getValue() > MAX_UNSIGNED_BYTE) {
+        if (getValue() < MIN_UNSIGNED_BYTE || getValue() > MAX_UNSIGNED_BYTE) {
             throw new DataTypeFormatException();
         }
     }

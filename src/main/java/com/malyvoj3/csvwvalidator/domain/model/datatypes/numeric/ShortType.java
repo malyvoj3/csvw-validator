@@ -12,7 +12,7 @@ import lombok.NonNull;
 @EqualsAndHashCode(callSuper = true)
 public class ShortType extends NumericType {
 
-    private static final String SHORT_PATTERN = "[\\-+]?[0-9]+";
+    private static final String SHORT_PATTERN = "[\\-+]?[0-9]+(\\${groupChar}[0-9]+)*";
 
     private Short value;
 
@@ -27,10 +27,10 @@ public class ShortType extends NumericType {
     }
 
     private void construct(String stringValue, Format format) throws DataTypeFormatException {
-        matchPattern(stringValue, SHORT_PATTERN);
+        matchPattern(stringValue, resolvePattern(SHORT_PATTERN, format));
         try {
             this.value = parseBigDecimal(stringValue, format).shortValueExact();
-        } catch (AssertionError ex) {
+        } catch (ArithmeticException ex) {
             throw new DataTypeFormatException();
         }
     }

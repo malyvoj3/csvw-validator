@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 @EqualsAndHashCode(callSuper = true)
 public class IntegerType extends NumericType {
 
-    private static final String INTEGER_PATTERN = "[\\-+]?[0-9]+";
+    private static final String INTEGER_PATTERN = "[\\-+]?[0-9]+(\\${groupChar}[0-9]+)*";
 
     private BigDecimal value;
 
@@ -29,7 +29,7 @@ public class IntegerType extends NumericType {
     }
 
     private void construct(String stringValue, Format format) throws DataTypeFormatException {
-        matchPattern(stringValue, INTEGER_PATTERN);
+        matchPattern(stringValue, resolvePattern(INTEGER_PATTERN, format));
         this.value = parseBigDecimal(stringValue, format);
         if (!isInteger(this.value)) {
             throw new DataTypeFormatException();

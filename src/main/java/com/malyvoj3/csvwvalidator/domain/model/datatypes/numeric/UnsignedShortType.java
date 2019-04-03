@@ -22,7 +22,7 @@ public class UnsignedShortType extends LongType {
     }
 
     private void construct() throws DataTypeFormatException {
-        if (getValue() < MIN_UNSIGNED_SHORT && getValue() > MAX_UNSIGNED_SHORT) {
+        if (getValue() < MIN_UNSIGNED_SHORT || getValue() > MAX_UNSIGNED_SHORT) {
             throw new DataTypeFormatException();
         }
     }

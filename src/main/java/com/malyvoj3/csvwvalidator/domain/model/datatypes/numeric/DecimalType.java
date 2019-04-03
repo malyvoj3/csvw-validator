@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 @EqualsAndHashCode(callSuper = true)
 public class DecimalType extends NumericType {
 
-    private static final String DECIMAL_PATTERN = "(\\+|-)?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)";
+    private static final String DECIMAL_PATTERN = "(\\+|-)?(([0-9]+(\\${groupChar}[0-9]+)?)(\\${decimalChar})?(\\${decimalChar}[0-9]+(\\${groupChar}[0-9]+)?)?)( ?[%${perMill}])?";
 
     private BigDecimal value;
 
@@ -29,7 +29,7 @@ public class DecimalType extends NumericType {
     }
 
     private void construct(String stringValue, Format format) throws DataTypeFormatException {
-        matchPattern(stringValue, DECIMAL_PATTERN);
+        matchPattern(stringValue, resolvePattern(DECIMAL_PATTERN, format));
         this.value = parseBigDecimal(stringValue, format);
     }
 
