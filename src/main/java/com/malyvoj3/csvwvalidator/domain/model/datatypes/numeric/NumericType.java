@@ -4,19 +4,21 @@ import com.malyvoj3.csvwvalidator.domain.FormatParsingResult;
 import com.malyvoj3.csvwvalidator.domain.model.Format;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeDefinition;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeFormatException;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.PropertyPlaceholderHelper;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.Optional;
 import java.util.Properties;
 
 public abstract class NumericType extends DataTypeDefinition {
 
+    protected final static char PERCENT_SIGN = '%';
     protected final static char PER_MILL_SIGN = '\u2030';
     protected final static char POSITIVE_SIGN = '+';
+    protected final static char NEGATIVE_SIGN = '-';
+    protected final static char EXPONENT_SIGN = 'E';
+    protected final static char HASH_DIGIT = '#';
+    protected final static char ZERO_DIGIT = '0';
     protected final static char DECIMAL_SEPARATOR_DEFAULT = '.';
     protected final static char GROUP_CHAR_DEFAULT = ',';
 
@@ -49,39 +51,39 @@ public abstract class NumericType extends DataTypeDefinition {
                 result.setNan(true);
             } else {
                 Format format = numberFormat != null ? numberFormat : Format.builder().build();
-                String pattern = format.getPattern();
-                String toParse = stringValue;
-                if (stringValue.charAt(0) == POSITIVE_SIGN) {
-                    toParse = stringValue.substring(1);
-                    if (StringUtils.isNotEmpty(pattern) && pattern.charAt(0) == POSITIVE_SIGN) {
-                        pattern = pattern.substring(1);
-                    }
+                char decimalChar = Optional.of(format)
+                        .map(Format::getDecimalChar)
+                        .map(string -> string.charAt(0))
+                        .orElse(DECIMAL_SEPARATOR_DEFAULT);
+                char groupChar = Optional.of(format)
+                        .map(Format::getGroupChar)
+                        .map(string -> string.charAt(0))
+                        .orElse(GROUP_CHAR_DEFAULT);
+                String toParse = stringValue.toUpperCase(); // Have E instead e.
+                if (format.getPattern() != null) {
+                    validateFormatPattern(toParse, format);
+                }
+                toParse = toParse.replaceAll(String.valueOf("\\") + groupChar, "");
+                toParse = toParse.replace(decimalChar, '.');
+
+                // Remove percent/perMill.
+                boolean isPercent = false;
+                boolean isPerMill = false;
+                if (toParse.charAt(toParse.length() - 1) == PERCENT_SIGN) {
+                    toParse = toParse.substring(0, toParse.length() - 1);
+                    isPercent = true;
+                } else if (toParse.charAt(toParse.length() - 1) == PER_MILL_SIGN) {
+                    toParse = toParse.substring(0, toParse.length() - 1);
+                    isPerMill = true;
                 }
 
-                DecimalFormatSymbols symbols = new DecimalFormatSymbols();
-                symbols.setPerMill(PER_MILL_SIGN);
-                DecimalFormat decimalFormat;
-
-                if (StringUtils.isNotEmpty(format.getGroupChar())) {
-                    symbols.setGroupingSeparator(format.getGroupChar().charAt(0));
-                } else {
-                    symbols.setGroupingSeparator(GROUP_CHAR_DEFAULT);
+                BigDecimal bigDecimal = new BigDecimal(toParse);
+                if (isPercent) {
+                    bigDecimal = bigDecimal.movePointLeft(2);
+                } else if (isPerMill) {
+                    bigDecimal = bigDecimal.movePointLeft(3);
                 }
-
-                if (StringUtils.isNotEmpty(format.getDecimalChar())) {
-                    symbols.setDecimalSeparator(format.getDecimalChar().charAt(0));
-                } else {
-                    symbols.setDecimalSeparator(DECIMAL_SEPARATOR_DEFAULT);
-                }
-
-                if (StringUtils.isNotEmpty(pattern)) {
-                    decimalFormat = new DecimalFormat(setDigitAfterExponent(pattern), symbols);
-                } else {
-                    decimalFormat = new DecimalFormat();
-                    decimalFormat.setDecimalFormatSymbols(symbols);
-                }
-                decimalFormat.setParseBigDecimal(true);
-                result.setValue((BigDecimal) decimalFormat.parse(toParse));
+                result.setValue(bigDecimal);
             }
             return result;
         } catch (Exception ex) {
@@ -89,7 +91,7 @@ public abstract class NumericType extends DataTypeDefinition {
         }
     }
 
-    protected void validateFormatPattern(String stringValue, Format format) throws DataTypeFormatException {
+    private void validateFormatPattern(String stringValue, Format format) throws DataTypeFormatException {
         char decimalChar = Optional.ofNullable(format)
                 .map(Format::getDecimalChar)
                 .map(string -> string.charAt(0))
@@ -101,16 +103,16 @@ public abstract class NumericType extends DataTypeDefinition {
                 .orElse(GROUP_CHAR_DEFAULT);
 
         String pattern = format.getPattern();
-        String formatPattern = "(\\-|\\+)?[#0]+(\\${groupChar}[#0]+)*(\\${decimalChar}[#0]+(\\${groupChar}[#0]+)*(E[\\+\\-]?[#0]+(\\${groupChar}[#0]+)*)?)?(%|\u2030)?";
+        String formatPattern = "(\\-|\\+)?[#0]+(\\${groupChar}[#0]+)*(\\${decimalChar}[#0]+(\\${groupChar}[#0]+)*(E[\\+\\-]?[#0]+(\\${groupChar}[#0]+)*)?)?(${percent}|${perMill})?";
         matchPattern(pattern, resolveNumberPattern(formatPattern, format));
 
         boolean isPercent = false;
         boolean isPerMill = false;
 
-        if (pattern.charAt(pattern.length() - 1) == '%') {
+        if (pattern.charAt(pattern.length() - 1) == PERCENT_SIGN) {
             pattern = pattern.substring(0, pattern.length() - 1);
             isPercent = true;
-        } else if (pattern.charAt(pattern.length() - 1) == '\u2030') {
+        } else if (pattern.charAt(pattern.length() - 1) == PER_MILL_SIGN) {
             pattern = pattern.substring(0, pattern.length() - 1);
             isPerMill = true;
         }
@@ -124,7 +126,7 @@ public abstract class NumericType extends DataTypeDefinition {
         String fractionalPart = null;
         String exponentPart = null;
 
-        String[] exponentDivide = pattern.split("E");
+        String[] exponentDivide = pattern.split(String.valueOf(EXPONENT_SIGN));
         if (exponentDivide.length > 1) {
             exponentPart = exponentDivide[1];
         }
@@ -152,13 +154,13 @@ public abstract class NumericType extends DataTypeDefinition {
                 }
                 optionalCounter = 0;
                 mandatoryCounter = 0;
-            } else if (tmp == '#') {
+            } else if (tmp == HASH_DIGIT) {
                 optionalCounter++;
-            } else if (tmp == '0') {
+            } else if (tmp == ZERO_DIGIT) {
                 mandatoryCounter++;
-            } else if (tmp == '-') {
+            } else if (tmp == NEGATIVE_SIGN) {
                 builder.append("\\-");
-            } else if (tmp == '+') {
+            } else if (tmp == POSITIVE_SIGN) {
                 builder.append("\\+");
             } else {
                 throw new IllegalStateException();
@@ -167,31 +169,33 @@ public abstract class NumericType extends DataTypeDefinition {
         builder.append(getDigitGroup(optionalCounter, mandatoryCounter));
         integerRegexp = builder.toString();
 
+        boolean fractPartMandatory = false;
         if (fractionalPart != null) {
             optionalCounter = 0;
             mandatoryCounter = 0;
             builder = new StringBuilder();
-            for (int i = 0; i < fractionalPart.length(); i++) {
+            for (int i = fractionalPart.length() - 1; i >= 0; i--) {
                 char tmp = fractionalPart.charAt(i);
                 if (tmp == groupChar) {
-                    builder.append(getDigitGroup(optionalCounter, mandatoryCounter));
+                    builder.append(reverse(getDigitGroup(optionalCounter, mandatoryCounter)));
                     if (mandatoryCounter > 0) {
-                        builder.append(escapedGroupChar);
+                        builder.append(reverse(escapedGroupChar));
                     } else {
-                        builder.append(optionalGroupCharRegex);
+                        builder.append(reverse(optionalGroupCharRegex));
                     }
                     optionalCounter = 0;
                     mandatoryCounter = 0;
-                } else if (tmp == '#') {
+                } else if (tmp == HASH_DIGIT) {
                     optionalCounter++;
-                } else if (tmp == '0') {
+                } else if (tmp == ZERO_DIGIT) {
+                    fractPartMandatory = true;
                     mandatoryCounter++;
                 } else {
                     throw new IllegalStateException();
                 }
             }
-            builder.append(getDigitGroup(optionalCounter, mandatoryCounter));
-            fractRegexp = builder.toString();
+            builder.append(reverse(getDigitGroup(optionalCounter, mandatoryCounter)));
+            fractRegexp = builder.reverse().toString();
         }
 
         if (exponentPart != null) {
@@ -209,13 +213,13 @@ public abstract class NumericType extends DataTypeDefinition {
                     }
                     optionalCounter = 0;
                     mandatoryCounter = 0;
-                } else if (tmp == '#') {
+                } else if (tmp == HASH_DIGIT) {
                     optionalCounter++;
-                } else if (tmp == '0') {
+                } else if (tmp == ZERO_DIGIT) {
                     mandatoryCounter++;
-                } else if (tmp == '-') {
+                } else if (tmp == NEGATIVE_SIGN) {
                     builder.append("\\-");
-                } else if (tmp == '+') {
+                } else if (tmp == POSITIVE_SIGN) {
                     builder.append("\\+");
                 } else {
                     throw new IllegalStateException();
@@ -225,25 +229,36 @@ public abstract class NumericType extends DataTypeDefinition {
             exponentRegexp = builder.toString();
         }
 
+        if (fractPartMandatory) {
+            fractRegexp = decimalChar + fractRegexp;
+        } else {
+            fractRegexp = "(\\" + decimalChar + fractRegexp + ")?";
+        }
+
         String resultRegexp;
         if (integerRegexp != null && fractRegexp != null && exponentRegexp != null) {
-            resultRegexp = integerRegexp + decimalChar + fractRegexp + "E" + exponentRegexp;
+            resultRegexp = integerRegexp + fractRegexp + EXPONENT_SIGN + exponentRegexp;
         } else if (integerRegexp != null && fractRegexp != null) {
-            resultRegexp = integerRegexp + decimalChar + fractRegexp;
+            resultRegexp = integerRegexp + fractRegexp;
         } else {
             resultRegexp = integerRegexp;
         }
         if (isPercent) {
-            resultRegexp = resultRegexp + "%";
+            resultRegexp = resultRegexp + PERCENT_SIGN;
         } else if (isPerMill) {
-            resultRegexp = resultRegexp + "\u2030";
+            resultRegexp = resultRegexp + PER_MILL_SIGN;
         }
 
         matchPattern(stringValue, resultRegexp);
     }
 
     private String getDigitGroup(int optionalCounter, int mandatoryCounter) {
-        return String.format("[0-9]{%d,%d}", mandatoryCounter, mandatoryCounter + optionalCounter);
+        //return String.format("[0-9]{%d,%d}", mandatoryCounter, mandatoryCounter + optionalCounter);
+        return String.format("[0-9]{%d,}", mandatoryCounter);
+    }
+
+    private String reverse(String string) {
+        return new StringBuilder(string).reverse().toString();
     }
 
     protected String resolveNumberPattern(String pattern, Format format) {
@@ -260,16 +275,8 @@ public abstract class NumericType extends DataTypeDefinition {
         properties.setProperty("groupChar", groupChar);
         properties.setProperty("decimalChar", decimalChar);
         properties.setProperty("perMill", String.valueOf(PER_MILL_SIGN));
+        properties.setProperty("percent", String.valueOf(PERCENT_SIGN));
         return helper.replacePlaceholders(pattern, properties);
-    }
-
-    private String setDigitAfterExponent(String pattern) {
-        String result = pattern;
-        int index = pattern.indexOf("E");
-        if (index > 0 && pattern.length() > index + 1 && pattern.charAt(index + 1) == '#') {
-            result = pattern.substring(0, index) + "E0" + pattern.substring(index + 2);
-        }
-        return result;
     }
 
     protected BigDecimal parseBigDecimal(String stringValue, Format numberFormat) throws DataTypeFormatException {
