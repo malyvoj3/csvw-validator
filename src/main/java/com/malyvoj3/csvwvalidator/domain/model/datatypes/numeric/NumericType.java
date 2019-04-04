@@ -14,11 +14,7 @@ public abstract class NumericType extends DataTypeDefinition {
 
     protected final static char PERCENT_SIGN = '%';
     protected final static char PER_MILL_SIGN = '\u2030';
-    protected final static char POSITIVE_SIGN = '+';
-    protected final static char NEGATIVE_SIGN = '-';
     protected final static char EXPONENT_SIGN = 'E';
-    protected final static char HASH_DIGIT = '#';
-    protected final static char ZERO_DIGIT = '0';
     protected final static char DECIMAL_SEPARATOR_DEFAULT = '.';
     protected final static char GROUP_CHAR_DEFAULT = ',';
 
@@ -60,22 +56,31 @@ public abstract class NumericType extends DataTypeDefinition {
                         .map(string -> string.charAt(0))
                         .orElse(GROUP_CHAR_DEFAULT);
                 String toParse = stringValue.toUpperCase(); // Have E instead e.
+                String pattern = format.getPattern();
+
+                // Remove percent/perMill.
+                boolean isPercent = false;
+                boolean isPerMill = false;
+                int indexOfPercent = toParse.indexOf(PERCENT_SIGN);
+                int indexOfPerMill = toParse.indexOf(PER_MILL_SIGN);
+                if (indexOfPercent == 0 || indexOfPercent == toParse.length() - 1) {
+                    isPercent = true;
+                    toParse = toParse.replace(String.valueOf(PERCENT_SIGN), "");
+                    if (pattern != null && pattern.indexOf(PERCENT_SIGN) == indexOfPercent) {
+                        format.setPattern(pattern.replace(String.valueOf(PERCENT_SIGN), ""));
+                    }
+                } else if (indexOfPerMill == 0 || indexOfPerMill == toParse.length() - 1) {
+                    isPerMill = true;
+                    toParse = toParse.replace(String.valueOf(PER_MILL_SIGN), "");
+                    if (pattern != null && pattern.indexOf(PER_MILL_SIGN) == indexOfPerMill) {
+                        format.setPattern(pattern.replace(String.valueOf(PER_MILL_SIGN), ""));
+                    }
+                }
                 if (format.getPattern() != null) {
                     validateFormatPattern(toParse, format);
                 }
                 toParse = toParse.replaceAll(String.valueOf("\\") + groupChar, "");
                 toParse = toParse.replace(decimalChar, '.');
-
-                // Remove percent/perMill.
-                boolean isPercent = false;
-                boolean isPerMill = false;
-                if (toParse.charAt(toParse.length() - 1) == PERCENT_SIGN) {
-                    toParse = toParse.substring(0, toParse.length() - 1);
-                    isPercent = true;
-                } else if (toParse.charAt(toParse.length() - 1) == PER_MILL_SIGN) {
-                    toParse = toParse.substring(0, toParse.length() - 1);
-                    isPerMill = true;
-                }
 
                 BigDecimal bigDecimal = new BigDecimal(toParse);
                 if (isPercent) {
@@ -106,17 +111,6 @@ public abstract class NumericType extends DataTypeDefinition {
         String formatPattern = "(\\-|\\+)?[#0]+(\\${groupChar}[#0]+)*(\\${decimalChar}[#0]+(\\${groupChar}[#0]+)*(E[\\+\\-]?[#0]+(\\${groupChar}[#0]+)*)?)?(${percent}|${perMill})?";
         matchPattern(pattern, resolveNumberPattern(formatPattern, format));
 
-        boolean isPercent = false;
-        boolean isPerMill = false;
-
-        if (pattern.charAt(pattern.length() - 1) == PERCENT_SIGN) {
-            pattern = pattern.substring(0, pattern.length() - 1);
-            isPercent = true;
-        } else if (pattern.charAt(pattern.length() - 1) == PER_MILL_SIGN) {
-            pattern = pattern.substring(0, pattern.length() - 1);
-            isPerMill = true;
-        }
-
         // Rozdelit na integer, fractional, exponent
         String integerPart = null;
         String fractionalPart = null;
@@ -135,6 +129,17 @@ public abstract class NumericType extends DataTypeDefinition {
 
         String escapedGroupChar = String.valueOf("\\" + groupChar);
         String escapedDecimalChar = String.valueOf("\\" + decimalChar);
+
+        String integerSign = getEscapedSign(integerPart);
+        if (StringUtils.isNotEmpty(integerSign)) {
+            integerPart = integerPart.substring(1);
+        }
+        String prefix;
+        if (StringUtils.isNotEmpty(integerSign)) {
+            prefix = integerSign;
+        } else {
+            prefix = "(\\+|\\-)?";
+        }
 
         int minIntegerDigits = integerPart.replaceAll(String.valueOf("[\\#\\") + groupChar + "]", "").length();
         int allIntegerDigits = integerPart.replaceAll(String.valueOf("\\") + groupChar, "").length();
@@ -246,12 +251,7 @@ public abstract class NumericType extends DataTypeDefinition {
 
         String finalExponent = null;
         if (exponentPart != null) {
-            String escapedExponentSign = "";
-            if (exponentPart.charAt(0) == '+') {
-                escapedExponentSign = "\\+";
-            } else if (exponentPart.charAt(0) == '-') {
-                escapedExponentSign = "\\-";
-            }
+            String escapedExponentSign = getEscapedSign(exponentPart);
             int minExponentDigits = exponentPart.replaceAll(String.valueOf("[#\\-\\+\\") + groupChar + "]", "").length();
             int maxExponentDigits = exponentPart.replaceAll("[+\\-]", "").length();
             if (maxExponentDigits > 0 && maxExponentDigits == minExponentDigits) {
@@ -263,8 +263,6 @@ public abstract class NumericType extends DataTypeDefinition {
             }
         }
 
-        String prefix = "(\\-|\\+)?";
-
         String resultRegexp;
         if (finalInteger != null && finalFractional != null && finalExponent != null) {
             resultRegexp = prefix + finalInteger + finalFractional + finalExponent;
@@ -273,14 +271,17 @@ public abstract class NumericType extends DataTypeDefinition {
         } else {
             resultRegexp = prefix + finalInteger;
         }
-
-        if (isPercent) {
-            resultRegexp = resultRegexp + PERCENT_SIGN;
-        } else if (isPerMill) {
-            resultRegexp = resultRegexp + PER_MILL_SIGN;
-        }
-
         matchPattern(stringValue, resultRegexp);
+    }
+
+    private String getEscapedSign(String string) {
+        String escapedSign = "";
+        if (string.charAt(0) == '+') {
+            escapedSign = "\\+";
+        } else if (string.charAt(0) == '-') {
+            escapedSign = "\\-";
+        }
+        return escapedSign;
     }
 
     private List<String> slice(List<String> listToSlice, int startIndex, int endIndex) {
