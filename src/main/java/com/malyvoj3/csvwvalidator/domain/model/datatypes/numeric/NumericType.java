@@ -4,11 +4,11 @@ import com.malyvoj3.csvwvalidator.domain.FormatParsingResult;
 import com.malyvoj3.csvwvalidator.domain.model.Format;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeDefinition;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeFormatException;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.PropertyPlaceholderHelper;
 
 import java.math.BigDecimal;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
 
 public abstract class NumericType extends DataTypeDefinition {
 
@@ -117,10 +117,6 @@ public abstract class NumericType extends DataTypeDefinition {
             isPerMill = true;
         }
 
-        String integerRegexp = null;
-        String fractRegexp = null;
-        String exponentRegexp = null;
-
         // Rozdelit na integer, fractional, exponent
         String integerPart = null;
         String fractionalPart = null;
@@ -138,111 +134,146 @@ public abstract class NumericType extends DataTypeDefinition {
         }
 
         String escapedGroupChar = String.valueOf("\\" + groupChar);
-        String optionalGroupCharRegex = String.format("(\\%s)?", groupChar);
-        int optionalCounter = 0;
-        int mandatoryCounter = 0;
+        String escapedDecimalChar = String.valueOf("\\" + decimalChar);
 
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < integerPart.length(); i++) {
-            char tmp = integerPart.charAt(i);
-            if (tmp == groupChar) {
-                builder.append(getDigitGroup(optionalCounter, mandatoryCounter));
-                if (mandatoryCounter > 0) {
-                    builder.append(escapedGroupChar);
-                } else {
-                    builder.append(optionalGroupCharRegex);
-                }
-                optionalCounter = 0;
-                mandatoryCounter = 0;
-            } else if (tmp == HASH_DIGIT) {
-                optionalCounter++;
-            } else if (tmp == ZERO_DIGIT) {
-                mandatoryCounter++;
-            } else if (tmp == NEGATIVE_SIGN) {
-                builder.append("\\-");
-            } else if (tmp == POSITIVE_SIGN) {
-                builder.append("\\+");
-            } else {
-                throw new IllegalStateException();
-            }
-        }
-        builder.append(getDigitGroup(optionalCounter, mandatoryCounter));
-        integerRegexp = builder.toString();
+        int minIntegerDigits = integerPart.replaceAll(String.valueOf("[\\#\\") + groupChar + "]", "").length();
+        int allIntegerDigits = integerPart.replaceAll(String.valueOf("\\") + groupChar, "").length();
+        List<String> integerParts = Arrays.asList(integerPart.split(String.valueOf(groupChar)));
+        integerParts = slice(integerParts, 1, integerParts.size() - 1);
+        int primaryGroupingSize = integerParts.size() > 0 ? integerParts.get(integerParts.size() - 1).length() : 0;
+        int secondaryGroupingSize = integerParts.size() <= 1 ? primaryGroupingSize : integerParts.get(integerParts.size() - 2).length();
 
-        boolean fractPartMandatory = false;
-        if (fractionalPart != null) {
-            optionalCounter = 0;
-            mandatoryCounter = 0;
-            builder = new StringBuilder();
-            for (int i = fractionalPart.length() - 1; i >= 0; i--) {
-                char tmp = fractionalPart.charAt(i);
-                if (tmp == groupChar) {
-                    builder.append(reverse(getDigitGroup(optionalCounter, mandatoryCounter)));
-                    if (mandatoryCounter > 0) {
-                        builder.append(reverse(escapedGroupChar));
-                    } else {
-                        builder.append(reverse(optionalGroupCharRegex));
-                    }
-                    optionalCounter = 0;
-                    mandatoryCounter = 0;
-                } else if (tmp == HASH_DIGIT) {
-                    optionalCounter++;
-                } else if (tmp == ZERO_DIGIT) {
-                    fractPartMandatory = true;
-                    mandatoryCounter++;
-                } else {
-                    throw new IllegalStateException();
-                }
-            }
-            builder.append(reverse(getDigitGroup(optionalCounter, mandatoryCounter)));
-            fractRegexp = builder.reverse().toString();
-        }
+        String requiredDigits = null;
+        String optionalDigits = null;
 
-        if (exponentPart != null) {
-            optionalCounter = 0;
-            mandatoryCounter = 0;
-            builder = new StringBuilder();
-            for (int i = 0; i < exponentPart.length(); i++) {
-                char tmp = exponentPart.charAt(i);
-                if (tmp == groupChar) {
-                    builder.append(getDigitGroup(optionalCounter, mandatoryCounter));
-                    if (mandatoryCounter > 0) {
-                        builder.append(escapedGroupChar);
-                    } else {
-                        builder.append(optionalGroupCharRegex);
-                    }
-                    optionalCounter = 0;
-                    mandatoryCounter = 0;
-                } else if (tmp == HASH_DIGIT) {
-                    optionalCounter++;
-                } else if (tmp == ZERO_DIGIT) {
-                    mandatoryCounter++;
-                } else if (tmp == NEGATIVE_SIGN) {
-                    builder.append("\\-");
-                } else if (tmp == POSITIVE_SIGN) {
-                    builder.append("\\+");
-                } else {
-                    throw new IllegalStateException();
-                }
-            }
-            builder.append(getDigitGroup(optionalCounter, mandatoryCounter));
-            exponentRegexp = builder.toString();
-        }
-
-        if (fractPartMandatory) {
-            fractRegexp = decimalChar + fractRegexp;
+        List<String> integerParts2 = new ArrayList<>();
+        String finalInteger;
+        if (primaryGroupingSize == 0) {
+            finalInteger = getUnlimitedDigitGroup(minIntegerDigits);
         } else {
-            fractRegexp = "(\\" + decimalChar + fractRegexp + ")?";
+            int integerRem = 0;
+            while (minIntegerDigits > 0) {
+                int sz = Math.min(primaryGroupingSize, minIntegerDigits);
+                integerRem = primaryGroupingSize - sz;
+                integerParts2.add(getExactDigitGroup(sz));
+                minIntegerDigits -= sz;
+                allIntegerDigits -= sz;
+                primaryGroupingSize = secondaryGroupingSize;
+            }
+            Collections.reverse(integerParts2);
+            requiredDigits = StringUtils.join(integerParts2, escapedGroupChar);
+            if (allIntegerDigits > 0) {
+                integerParts2 = new ArrayList<>();
+                while (integerRem > 0) {
+                    integerParts2.add("[0-9]");
+                    integerRem--;
+                }
+                if (secondaryGroupingSize != primaryGroupingSize) {
+                    primaryGroupingSize = secondaryGroupingSize;
+                    integerRem = primaryGroupingSize - 1;
+                    integerParts2.add("[0-9]" + escapedGroupChar);
+                    while (integerRem > 0) {
+                        integerParts2.add("[0-9]");
+                        integerRem--;
+                    }
+                }
+                if (integerParts2.isEmpty()) {
+                    optionalDigits = "(?:" + getDigitGroup(1, primaryGroupingSize) + escapedGroupChar +
+                            ")?(?:" + getExactDigitGroup(primaryGroupingSize) + escapedGroupChar + ")*";
+                } else {
+                    int lastIndex = integerParts2.size() - 1;
+                    integerParts2.set(lastIndex, "(?:" + getDigitGroup(1, primaryGroupingSize) + escapedGroupChar +
+                            ")?(?:" + getExactDigitGroup(primaryGroupingSize) + escapedGroupChar + ")*"
+                            + integerParts2.get(lastIndex));
+                    Collections.reverse(integerParts2);
+                    StringBuilder tmpBuilder = new StringBuilder();
+                    for (String string : integerParts2) {
+                        tmpBuilder = new StringBuilder("(?:" + tmpBuilder + string + ")?");
+                    }
+                    optionalDigits = tmpBuilder.toString();
+                }
+                finalInteger = optionalDigits + requiredDigits;
+            } else {
+                finalInteger = requiredDigits;
+            }
         }
+
+        requiredDigits = null;
+        optionalDigits = null;
+
+        String finalFractional = null;
+        if (fractionalPart != null) {
+            List<String> fractionalParts = Arrays.asList(fractionalPart.split(String.valueOf(groupChar)));
+            fractionalParts = slice(fractionalParts, 0, fractionalParts.size() - 2);
+            int fractionalGroupingSize = fractionalParts.size() > 0 ? fractionalParts.get(0).length() : 0;
+            int minFractionalDigits = fractionalPart.replaceAll(String.valueOf("[\\#\\") + groupChar + "]", "").length();
+            int maxFractionalDigits = fractionalPart.replaceAll(String.valueOf("\\") + groupChar, "").length();
+            if (fractionalGroupingSize == 0) {
+                finalFractional = minFractionalDigits == maxFractionalDigits ?
+                        getExactDigitGroup(maxFractionalDigits) : getDigitGroup(minFractionalDigits, maxFractionalDigits);
+            } else {
+                fractionalParts = new ArrayList<>();
+                int fractionalRem = 0;
+                while (minFractionalDigits > 0) {
+                    int sz = Math.min(fractionalGroupingSize, minFractionalDigits);
+                    fractionalRem = fractionalGroupingSize - sz;
+                    fractionalParts.add(getExactDigitGroup(sz));
+                    maxFractionalDigits -= sz;
+                    minFractionalDigits -= sz;
+                }
+                requiredDigits = StringUtils.join(fractionalParts, escapedGroupChar);
+                fractionalParts = new ArrayList<>();
+                while (maxFractionalDigits > 0) {
+                    fractionalParts.add(fractionalRem == 0 ? escapedGroupChar + "[0-9]" : "[0-9]");
+                    maxFractionalDigits--;
+                    fractionalRem = (fractionalRem - 1) % fractionalGroupingSize;
+                }
+                Collections.reverse(fractionalParts);
+                StringBuilder tmpBuilder = new StringBuilder();
+                for (String string : fractionalParts) {
+                    tmpBuilder = new StringBuilder("(?:" + string + tmpBuilder + ")?");
+                }
+                optionalDigits = tmpBuilder.toString();
+                finalFractional = requiredDigits + optionalDigits;
+            }
+            if (StringUtils.isNotEmpty(finalFractional)) {
+                finalFractional = escapedDecimalChar + finalFractional;
+                if (maxFractionalDigits > 0 && minFractionalDigits == 0) {
+                    finalFractional = "(?:" + finalFractional + ")?";
+                }
+            }
+        }
+
+        String finalExponent = null;
+        if (exponentPart != null) {
+            String escapedExponentSign = "";
+            if (exponentPart.charAt(0) == '+') {
+                escapedExponentSign = "\\+";
+            } else if (exponentPart.charAt(0) == '-') {
+                escapedExponentSign = "\\-";
+            }
+            int minExponentDigits = exponentPart.replaceAll(String.valueOf("[#\\-\\+\\") + groupChar + "]", "").length();
+            int maxExponentDigits = exponentPart.replaceAll("[+\\-]", "").length();
+            if (maxExponentDigits > 0 && maxExponentDigits == minExponentDigits) {
+                finalExponent = "E" + escapedExponentSign + getExactDigitGroup(maxExponentDigits);
+            } else if (maxExponentDigits > 0) {
+                finalExponent = "E" + escapedExponentSign + getDigitGroup(minExponentDigits, maxExponentDigits);
+            } else if (minExponentDigits > 0) {
+                finalExponent = "E" + escapedExponentSign + getDigitGroup(minExponentDigits, maxExponentDigits);
+            }
+        }
+
+        String prefix = "(\\-|\\+)?";
 
         String resultRegexp;
-        if (integerRegexp != null && fractRegexp != null && exponentRegexp != null) {
-            resultRegexp = integerRegexp + fractRegexp + EXPONENT_SIGN + exponentRegexp;
-        } else if (integerRegexp != null && fractRegexp != null) {
-            resultRegexp = integerRegexp + fractRegexp;
+        if (finalInteger != null && finalFractional != null && finalExponent != null) {
+            resultRegexp = prefix + finalInteger + finalFractional + finalExponent;
+        } else if (finalInteger != null && finalFractional != null) {
+            resultRegexp = prefix + finalInteger + finalFractional;
         } else {
-            resultRegexp = integerRegexp;
+            resultRegexp = prefix + finalInteger;
         }
+
         if (isPercent) {
             resultRegexp = resultRegexp + PERCENT_SIGN;
         } else if (isPerMill) {
@@ -252,9 +283,27 @@ public abstract class NumericType extends DataTypeDefinition {
         matchPattern(stringValue, resultRegexp);
     }
 
-    private String getDigitGroup(int optionalCounter, int mandatoryCounter) {
-        //return String.format("[0-9]{%d,%d}", mandatoryCounter, mandatoryCounter + optionalCounter);
+    private List<String> slice(List<String> listToSlice, int startIndex, int endIndex) {
+        int length = listToSlice.size();
+        List<String> result;
+        if (startIndex > length - 1 || endIndex > length - 1 || startIndex > endIndex) {
+            result = new ArrayList<>();
+        } else {
+            result = listToSlice.subList(startIndex, endIndex + 1);
+        }
+        return result;
+    }
+
+    private String getUnlimitedDigitGroup(int mandatoryCounter) {
         return String.format("[0-9]{%d,}", mandatoryCounter);
+    }
+
+    private String getDigitGroup(int mandatoryCounter, int optionalCounter) {
+        return String.format("[0-9]{%d,%d}", mandatoryCounter, optionalCounter);
+    }
+
+    private String getExactDigitGroup(int mandatoryCounter) {
+        return String.format("[0-9]{%d}", mandatoryCounter);
     }
 
     private String reverse(String string) {
