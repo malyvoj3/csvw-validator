@@ -15,7 +15,7 @@ public class Column {
     private String aboutUrl;
     private List<Cell> cells = new ArrayList<>();
     private DataType datatype;
-    private Object defaultValue;
+    private String defaultValue;
     private String lang;
     private String name;
     private List<String> nullValues = new ArrayList<>();

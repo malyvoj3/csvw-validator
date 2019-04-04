@@ -18,7 +18,13 @@ public class HexBinaryType extends StringType {
     }
 
     @Override
-    public int getLength() {
-        return stringValue.length() / 2;
+    public Long getLength() {
+        long length;
+        if (stringValue != null) {
+            length = (long) (stringValue.length() / 2);
+        } else {
+            length = 0L;
+        }
+        return length;
     }
 }

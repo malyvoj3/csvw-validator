@@ -222,15 +222,12 @@ public class CsvwProcessor {
 
     public List<? extends ValidationError> processTabularData(String tabularUrl) {
         FileResponse tabularResponse = FileUtils.downloadFile(tabularUrl);
-        System.out.println("DOWNLOADED");
         List<ValidationError> processingErrors = validateCsvFileResponse(tabularResponse);
         CsvParsingResult csvParsingResult = parseCsv(tabularResponse);
         processingErrors.addAll(csvParsingResult.getParsingErrors());
-        System.out.println("PARSED CSV");
 
         if (hasNoFatalError(processingErrors)) {
             MetadataParsingResult metadataParsingResult = locateMetadata(tabularResponse, csvParsingResult.getTableDescription());
-            System.out.println("PARSED METADATA");
             processingErrors.addAll(process(csvParsingResult, metadataParsingResult));
         }
         return processingErrors;

@@ -27,7 +27,13 @@ public class BinaryType extends StringType {
     }
 
     @Override
-    public int getLength() {
-        return byteArray.length;
+    public Long getLength() {
+        long length;
+        if (byteArray != null) {
+            length = (long) byteArray.length;
+        } else {
+            length = 0L;
+        }
+        return length;
     }
 }

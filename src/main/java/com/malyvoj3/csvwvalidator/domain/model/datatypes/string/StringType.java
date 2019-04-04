@@ -32,7 +32,13 @@ public class StringType extends DataTypeDefinition {
     }
 
     @Override
-    public int getLength() {
-        return stringValue.length();
+    public Long getLength() {
+        long length;
+        if (stringValue != null) {
+            length = (long) stringValue.length();
+        } else {
+            length = 0L;
+        }
+        return length;
     }
 }

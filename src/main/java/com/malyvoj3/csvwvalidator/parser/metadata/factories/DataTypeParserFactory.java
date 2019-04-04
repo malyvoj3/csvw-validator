@@ -39,6 +39,8 @@ public class DataTypeParserFactory<T extends DataTypeDescription> extends Common
                 return new MinInclusivePropertyParser<>();
             case CsvwKeywords.MIN_LENGTH_PROPERTY:
                 return new MinLengthPropertyParser<>();
+            case CsvwKeywords.MAX_INCLUSIVE_PROPERTY:
+                return new MaxInclusivePropertyParser<>();
             default:
                 return null;
         }

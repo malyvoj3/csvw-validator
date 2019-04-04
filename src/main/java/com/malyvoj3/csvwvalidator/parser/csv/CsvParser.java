@@ -104,6 +104,7 @@ public class CsvParser {
                             .row(row)
                             .table(table)
                             .stringValue(value)
+                            .errors(new ArrayList<>())
                             .build();
                     row.getCells().add(cell);
                     columns.get(i).getCells().add(cell);

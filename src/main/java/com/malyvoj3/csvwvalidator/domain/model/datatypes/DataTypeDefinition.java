@@ -33,7 +33,7 @@ public abstract class DataTypeDefinition {
         throw new UnsupportedOperationException();
     }
 
-    public int getLength() {
+    public Long getLength() {
         throw new UnsupportedOperationException();
     }
 
