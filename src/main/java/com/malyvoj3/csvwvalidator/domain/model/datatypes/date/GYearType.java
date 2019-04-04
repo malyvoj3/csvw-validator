@@ -1,8 +1,8 @@
 package com.malyvoj3.csvwvalidator.domain.model.datatypes.date;
 
-import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeDefinition;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeFormatException;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.IncomparableDataTypeException;
+import com.malyvoj3.csvwvalidator.domain.model.datatypes.ValueType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -23,7 +23,7 @@ public class GYearType extends GDateType {
     }
 
     @Override
-    public int compareTo(DataTypeDefinition other) throws IncomparableDataTypeException {
+    public int compareTo(ValueType other) throws IncomparableDataTypeException {
         if (other == null || getClass() != other.getClass()) {
             throw new IncomparableDataTypeException();
         }

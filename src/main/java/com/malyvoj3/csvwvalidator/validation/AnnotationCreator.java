@@ -5,9 +5,9 @@ import com.malyvoj3.csvwvalidator.domain.metadata.Context;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.*;
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.*;
 import com.malyvoj3.csvwvalidator.domain.model.*;
-import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeDefinition;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeFormatException;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.IncomparableDataTypeException;
+import com.malyvoj3.csvwvalidator.domain.model.datatypes.ValueType;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.string.StringType;
 import com.malyvoj3.csvwvalidator.parser.csv.CsvParsingResult;
 import com.malyvoj3.csvwvalidator.utils.CsvwKeywords;
@@ -108,7 +108,7 @@ public class AnnotationCreator {
         List<Cell> cells = annotatedColumn.getCells();
         DataType dataType = annotatedColumn.getDatatype() != null ? annotatedColumn.getDatatype() : createDefaultDataType();
         for (Cell cell : cells) {
-            DataTypeDefinition value;
+            ValueType value;
             String normalizedValue = normalizeCellValue(cell.getStringValue(), dataType);
             normalizedValue = StringUtils.isNotEmpty(normalizedValue) ? normalizedValue : cell.getColumn().getDefaultValue();
             // TODO LIST values
@@ -173,7 +173,7 @@ public class AnnotationCreator {
         return normalizedValue;
     }
 
-    private boolean validateConstraints(DataTypeDefinition value, DataType dataType) throws DataTypeFormatException, IncomparableDataTypeException {
+    private boolean validateConstraints(ValueType value, DataType dataType) throws DataTypeFormatException, IncomparableDataTypeException {
         if (value.isLengthDataType()) {
             if (dataType.getLength() != null && !dataType.getLength().equals(value.getLength())) {
                 return false;
@@ -187,25 +187,25 @@ public class AnnotationCreator {
         }
         if (value.isValueDataType()) {
             if (dataType.getMinimum() != null) {
-                DataTypeDefinition minimumValue = DataTypeFactory.createDataType(dataType.getMinimum(), dataType);
+                ValueType minimumValue = DataTypeFactory.createDataType(dataType.getMinimum(), dataType);
                 if (!value.isGreaterEq(minimumValue)) {
                     return false;
                 }
             }
             if (dataType.getMaximum() != null) {
-                DataTypeDefinition maximumValue = DataTypeFactory.createDataType(dataType.getMaximum(), dataType);
+                ValueType maximumValue = DataTypeFactory.createDataType(dataType.getMaximum(), dataType);
                 if (!value.isLowerEq(maximumValue)) {
                     return false;
                 }
             }
             if (dataType.getMinExclusive() != null) {
-                DataTypeDefinition minExclusiveValue = DataTypeFactory.createDataType(dataType.getMinExclusive(), dataType);
+                ValueType minExclusiveValue = DataTypeFactory.createDataType(dataType.getMinExclusive(), dataType);
                 if (!value.isGreater(minExclusiveValue)) {
                     return false;
                 }
             }
             if (dataType.getMaxExclusive() != null) {
-                DataTypeDefinition maxExclusiveValue = DataTypeFactory.createDataType(dataType.getMaxExclusive(), dataType);
+                ValueType maxExclusiveValue = DataTypeFactory.createDataType(dataType.getMaxExclusive(), dataType);
                 if (!value.isLower(maxExclusiveValue)) {
                     return false;
                 }

@@ -2,7 +2,7 @@ package com.malyvoj3.csvwvalidator.domain.model.datatypes;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class BooleanType extends DataTypeDefinition {
+public class BooleanType extends ValueType {
 
     private static final String TRUE_STRING = "true";
     private static final String FALSE_STRING = "false";

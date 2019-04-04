@@ -2,15 +2,15 @@ package com.malyvoj3.csvwvalidator.domain.model.datatypes.numeric;
 
 import com.malyvoj3.csvwvalidator.domain.FormatParsingResult;
 import com.malyvoj3.csvwvalidator.domain.model.Format;
-import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeDefinition;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeFormatException;
+import com.malyvoj3.csvwvalidator.domain.model.datatypes.ValueType;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.PropertyPlaceholderHelper;
 
 import java.math.BigDecimal;
 import java.util.*;
 
-public abstract class NumericType extends DataTypeDefinition {
+public abstract class NumericType extends ValueType {
 
     protected final static char PERCENT_SIGN = '%';
     protected final static char PER_MILL_SIGN = '\u2030';

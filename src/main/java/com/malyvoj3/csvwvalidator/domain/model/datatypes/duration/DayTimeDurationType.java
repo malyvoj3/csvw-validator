@@ -1,8 +1,8 @@
 package com.malyvoj3.csvwvalidator.domain.model.datatypes.duration;
 
-import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeDefinition;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeFormatException;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.IncomparableDataTypeException;
+import com.malyvoj3.csvwvalidator.domain.model.datatypes.ValueType;
 import lombok.Data;
 
 import javax.xml.datatype.DatatypeFactory;
@@ -26,7 +26,7 @@ public class DayTimeDurationType extends DurationType {
     }
 
     @Override
-    public int compareTo(DataTypeDefinition other) throws IncomparableDataTypeException {
+    public int compareTo(ValueType other) throws IncomparableDataTypeException {
         if (other == null || getClass() != other.getClass()) {
             throw new IncomparableDataTypeException();
         }

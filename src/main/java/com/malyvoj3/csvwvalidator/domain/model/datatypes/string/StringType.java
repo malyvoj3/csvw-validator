@@ -1,13 +1,13 @@
 package com.malyvoj3.csvwvalidator.domain.model.datatypes.string;
 
-import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeDefinition;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeFormatException;
+import com.malyvoj3.csvwvalidator.domain.model.datatypes.ValueType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class StringType extends DataTypeDefinition {
+public class StringType extends ValueType {
 
     public String format;
 
