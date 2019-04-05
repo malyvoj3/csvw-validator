@@ -1,6 +1,7 @@
 package com.malyvoj3.csvwvalidator.utils;
 
 import com.damnhandy.uri.template.UriTemplate;
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import org.urllib.Url;
@@ -8,6 +9,8 @@ import org.urllib.Urls;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @UtilityClass
 public class UriUtils {
@@ -104,13 +107,16 @@ public class UriUtils {
     public String normalizeUri(String uri) {
         String normalizedUrl;
         String fileScheme = getFileScheme(uri);
-        String url = fileScheme != null ? StringUtils.replaceOnceIgnoreCase(uri, fileScheme, "http://") : uri;
+        String url = fileScheme != null ? StringUtils.replaceOnceIgnoreCase(uri, fileScheme, "http://example/") : uri;
         try {
             normalizedUrl = Urls.parse(url).toString();
         } catch (Exception ex) {
             normalizedUrl = null;
         }
-        return fileScheme != null ? StringUtils.replaceOnceIgnoreCase(normalizedUrl, "http://", fileScheme) : normalizedUrl;
+        if (StringUtils.isNotEmpty(fileScheme)) {
+            fileScheme = normalizeFileSchema(fileScheme);
+        }
+        return fileScheme != null ? StringUtils.replaceOnceIgnoreCase(normalizedUrl,"http://example/", fileScheme) : normalizedUrl;
     }
 
     /**
@@ -140,14 +146,14 @@ public class UriUtils {
     public String resolveUri(String baseUri, String uri) {
         String normalizedBase = normalizeUri(baseUri);
         String baseFileScheme = getFileScheme(normalizedBase);
-        normalizedBase = baseFileScheme != null ? StringUtils.replaceOnceIgnoreCase(normalizedBase, baseFileScheme, "http://") : normalizedBase;
+        normalizedBase = baseFileScheme != null ? StringUtils.replaceOnceIgnoreCase(normalizedBase, baseFileScheme, "http://example/") : normalizedBase;
 
         String normalizedUri = normalizeUri(uri);
         String resolvingFileScheme = null;
         if (normalizedUri != null) {
             // It is absolute URI.
-            resolvingFileScheme = getFileScheme(uri);
-            normalizedUri = resolvingFileScheme != null ? StringUtils.replaceOnceIgnoreCase(normalizedUri, resolvingFileScheme, "http://") : normalizedUri;
+            resolvingFileScheme = getFileScheme(normalizedUri);
+            normalizedUri = resolvingFileScheme != null ? StringUtils.replaceOnceIgnoreCase(normalizedUri, resolvingFileScheme, "http://example/") : normalizedUri;
         } else {
             normalizedUri = uri;
         }
@@ -157,9 +163,11 @@ public class UriUtils {
 
         String resolvedString;
         if (resolvingFileScheme != null) {
-            resolvedString = StringUtils.replaceOnceIgnoreCase(resolved.toString(), "http://", resolvingFileScheme);
+            resolvingFileScheme = normalizeFileSchema(resolvingFileScheme);
+            resolvedString = StringUtils.replaceOnceIgnoreCase(resolved.toString(), "http://example/", resolvingFileScheme);
         } else if (baseFileScheme != null) {
-            resolvedString = StringUtils.replaceOnceIgnoreCase(resolved.toString(), "http://", baseFileScheme);
+            baseFileScheme = normalizeFileSchema(baseFileScheme);
+            resolvedString = StringUtils.replaceOnceIgnoreCase(resolved.toString(), "http://example/", baseFileScheme);
         } else {
             resolvedString = resolved.toString();
         }
@@ -177,15 +185,22 @@ public class UriUtils {
     private String getFileScheme(String fileUrl) {
         String fileScheme = null;
         if (StringUtils.isNotEmpty(fileUrl)) {
-            if (StringUtils.startsWithIgnoreCase(fileUrl, "file:///")) {
-                fileScheme = "file:///";
-            } else if (StringUtils.startsWithIgnoreCase(fileUrl, "file://")) {
-                fileScheme = "file://";
-            } else if (StringUtils.startsWithIgnoreCase(fileUrl, "file:/")) {
-                fileScheme = "file:///";
+            Pattern pattern = Pattern.compile("^file:/{1,3}[^/]+(/|$)", Pattern.CASE_INSENSITIVE);
+            Matcher matcher = pattern.matcher(fileUrl);
+            if (matcher.find()) {
+                fileScheme = matcher.group();
+                fileScheme = StringUtils.replaceOnceIgnoreCase(fileScheme, "file", "file");
             }
         }
         return fileScheme;
+    }
+
+    private String normalizeFileSchema(@NonNull String fileSchema) {
+        String normalizeSchema = fileSchema.replaceAll("^file:/{1,3}", "file:///");
+        if (normalizeSchema.charAt(normalizeSchema.length() - 1) != '/') {
+            normalizeSchema = normalizeSchema + '/';
+        }
+        return normalizeSchema;
     }
 
 }

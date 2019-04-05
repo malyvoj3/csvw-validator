@@ -6,8 +6,9 @@ import lombok.Data;
 public class FileResponse {
 
     private String url;
-    private int responseCode;
     private byte[] content;
+    private boolean isRemoteFile = true;
+    private int responseCode;
     private ContentType contentType;
     private Link link;
 }
