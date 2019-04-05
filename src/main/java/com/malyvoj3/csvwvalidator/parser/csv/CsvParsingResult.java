@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -15,7 +16,7 @@ import java.util.List;
 public class CsvParsingResult {
 
     private String csvUrl;
-    private List<ValidationError> parsingErrors;
+    private List<ValidationError> parsingErrors = new ArrayList<>();
     private Table table;
     private TableDescription tableDescription;
 

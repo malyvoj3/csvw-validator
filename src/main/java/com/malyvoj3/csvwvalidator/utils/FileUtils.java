@@ -5,13 +5,13 @@ import com.malyvoj3.csvwvalidator.domain.FileResponse;
 import com.malyvoj3.csvwvalidator.domain.Link;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.ByteBuffer;
@@ -21,7 +21,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 
+// TODO predelat na beanu
 @UtilityClass
+@Slf4j
 public class FileUtils {
 
     public boolean isUtf8(URI uri) {
@@ -47,31 +49,51 @@ public class FileUtils {
     }
 
     public FileResponse downloadFile(String stringUrl) {
+        FileResponse fileResponse;
+        // TODO predelat na Strategy pattern.
+        if (isFileUrl(stringUrl)) {
+            fileResponse = getLocalFile(stringUrl);
+        } else {
+            fileResponse = downloadRemoteFile(stringUrl);
+        }
+        return fileResponse;
+    }
+
+    private static FileResponse getLocalFile(@NonNull String stringUrl) {
         FileResponse fileResponse = null;
         String normalizedUrl = UriUtils.normalizeUri(stringUrl);
         URL url;
         try {
             url = new URL(normalizedUrl);
-        } catch (MalformedURLException e) {
-            throw new IllegalArgumentException("Invalid URL.");
+            byte[] byteArray = IOUtils.toByteArray(url);
+            fileResponse = new FileResponse();
+            fileResponse.setContent(byteArray);
+            fileResponse.setUrl(normalizedUrl);
+            fileResponse.setRemoteFile(false);
+        } catch (IOException e) {
+            log.error("Cannot locate local file with url {}.", stringUrl);
         }
+        return fileResponse;
+    }
+
+    private FileResponse downloadRemoteFile(@NonNull String stringUrl) {
+        String normalizedUrl = UriUtils.normalizeUri(stringUrl);
+        URL url;
+        FileResponse fileResponse = null;
         HttpURLConnection connection = null;
         try {
+            url = new URL(normalizedUrl);
             connection = (HttpURLConnection) url.openConnection();
             connection.setInstanceFollowRedirects(true);
             connection.setRequestMethod("GET");
             if (connection.getResponseCode() == HttpURLConnection.HTTP_MOVED_PERM
                     || connection.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP) {
                 normalizedUrl = UriUtils.normalizeUri(connection.getHeaderField("Location"));
-                try {
-                    url = new URL(normalizedUrl);
-                } catch (MalformedURLException e) {
-                    throw new IllegalArgumentException("Invalid redirect URL.");
-                }
+                url = new URL(normalizedUrl);
                 connection.disconnect();
                 connection = (HttpURLConnection) url.openConnection();
             } else if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                throw new IllegalStateException("Bad response code.");
+                log.error("Illegal response code {}.", connection.getResponseCode());
             }
             if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
                 try (InputStream inputStream = connection.getInputStream()) {
@@ -86,14 +108,18 @@ public class FileUtils {
                 }
             }
         } catch (Exception ex) {
-            // TODO
+            log.error("Cannot locate local file with url {}.", stringUrl);
         }
-            finally {
+        finally {
             if (connection != null) {
                 connection.disconnect();
             }
         }
         return fileResponse;
+    }
+
+    private boolean isFileUrl(String url) {
+        return url != null && url.startsWith("file:/");
     }
 
     private ContentType createContentType(String contentTypeHeader) {

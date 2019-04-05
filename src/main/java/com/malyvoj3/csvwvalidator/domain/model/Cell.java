@@ -1,5 +1,6 @@
 package com.malyvoj3.csvwvalidator.domain.model;
 
+import com.malyvoj3.csvwvalidator.domain.model.datatypes.ValueType;
 import lombok.Builder;
 import lombok.Data;
 
@@ -18,8 +19,7 @@ public class Cell {
     private Row row;
     private String stringValue;
     private Table table;
-    // TODO opravdu object?
-    private Object value;
+    private ValueType value;
     private String valueUrl;
 
 }

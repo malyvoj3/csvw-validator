@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -214,7 +215,7 @@ public class CsvwProcessor {
             if (metadataParsingResult != null) {
                 processingErrors.addAll(process(csvParsingResult, metadataParsingResult));
             } else {
-                processingErrors.add(ValidationError.fatal(String.format("Can't download metadata from url '%s'.", metadataUrl)));
+                processingErrors.add(ValidationError.fatal(String.format("Can't download valid metadata from url '%s'.", metadataUrl)));
             }
         }
         return processingErrors;
@@ -264,10 +265,21 @@ public class CsvwProcessor {
     }
 
     private CsvParsingResult parseCsv(FileResponse tabularResponse) {
-        Dialect dialect = Dialect.builder()
-                .header(!HEADER_ABSENT.equals(tabularResponse.getContentType().getHeader()))
-                .build();
-        return csvParser.parse(dialect, tabularResponse.getUrl(), tabularResponse.getContent());
+        CsvParsingResult csvParsingResult = null;
+        if (tabularResponse != null && tabularResponse.getContent() != null) {
+            String header = Optional.of(tabularResponse)
+                    .map(FileResponse::getContentType)
+                    .map(ContentType::getHeader)
+                    .orElse(null);
+            Dialect dialect = Dialect.builder()
+                    .header(!HEADER_ABSENT.equals(header))
+                    .build();
+            csvParsingResult = csvParser.parse(dialect, tabularResponse.getUrl(), tabularResponse.getContent());
+        } else {
+            csvParsingResult = new CsvParsingResult();
+            csvParsingResult.getParsingErrors().add(ValidationError.fatal("Cannot get CSV file."));
+        }
+        return csvParsingResult;
     }
 
     private MetadataParsingResult locateMetadata(FileResponse csvFileResponse, TableDescription embeddedMetadata) {
@@ -316,14 +328,16 @@ public class CsvwProcessor {
 
     private List<ValidationError> validateCsvFileResponse(FileResponse fileResponse) {
         List<ValidationError> validationErrors = new ArrayList<>();
-        ContentType contentType = fileResponse.getContentType();
-        if (!TEXT_CSV_TYPE.equals(contentType.getType())) {
-            validationErrors.add(ValidationError.warn("CSV file doesn't have specified 'Content-type' HTTP header."));
-        }
-        boolean hasUtfEncoding = UTF8_ENCODING_NAMES.stream()
-                .anyMatch(name -> StringUtils.equalsIgnoreCase(name, contentType.getCharset()));
-        if (!hasUtfEncoding) {
-            validationErrors.add(ValidationError.warn("CSV file doesn't have specified UTF-8 encoding in 'Content-type' HTTP header."));
+        if (fileResponse != null && fileResponse.isRemoteFile()) {
+            ContentType contentType = fileResponse.getContentType();
+            if (!TEXT_CSV_TYPE.equals(contentType.getType())) {
+                validationErrors.add(ValidationError.warn("CSV file doesn't have specified 'Content-type' HTTP header."));
+            }
+            boolean hasUtfEncoding = UTF8_ENCODING_NAMES.stream()
+                    .anyMatch(name -> StringUtils.equalsIgnoreCase(name, contentType.getCharset()));
+            if (!hasUtfEncoding) {
+                validationErrors.add(ValidationError.warn("CSV file doesn't have specified UTF-8 encoding in 'Content-type' HTTP header."));
+            }
         }
         return validationErrors;
     }

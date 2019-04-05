@@ -17,6 +17,7 @@ public class CsvwValidatorApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(CsvwValidatorApplication.class, args);
+        //SpringApplication.run(CsvwValidatorConsole.class, args);
     }
 
     @PostConstruct
