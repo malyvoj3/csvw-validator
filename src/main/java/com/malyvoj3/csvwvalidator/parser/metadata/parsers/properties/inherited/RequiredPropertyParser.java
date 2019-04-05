@@ -23,6 +23,6 @@ public class RequiredPropertyParser<T extends InheritanceDescription> implements
             jsonProperty.addError(ErrorFactory.invalidPropertyType(jsonProperty.getName()));
             required = new BooleanAtomicProperty(REQUIRED_DEFAULT_VALUE);
         }
-        description.setOrdered(required);
+        description.setRequired(required);
     }
 }

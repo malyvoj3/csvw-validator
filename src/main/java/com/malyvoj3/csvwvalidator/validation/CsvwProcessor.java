@@ -1,5 +1,7 @@
 package com.malyvoj3.csvwvalidator.validation;
 
+import com.malyvoj3.csvwvalidator.domain.ContentType;
+import com.malyvoj3.csvwvalidator.domain.FileResponse;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.TableDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.TableGroupDescription;
 import com.malyvoj3.csvwvalidator.domain.model.Table;
@@ -10,8 +12,6 @@ import com.malyvoj3.csvwvalidator.parser.csv.Dialect;
 import com.malyvoj3.csvwvalidator.parser.metadata.MetadataParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.MetadataParsingResult;
 import com.malyvoj3.csvwvalidator.parser.metadata.TopLevelType;
-import com.malyvoj3.csvwvalidator.utils.ContentType;
-import com.malyvoj3.csvwvalidator.utils.FileResponse;
 import com.malyvoj3.csvwvalidator.utils.FileUtils;
 import com.malyvoj3.csvwvalidator.utils.UriUtils;
 import com.malyvoj3.csvwvalidator.validation.metadata.MetadataValidator;
@@ -222,15 +222,12 @@ public class CsvwProcessor {
 
     public List<? extends ValidationError> processTabularData(String tabularUrl) {
         FileResponse tabularResponse = FileUtils.downloadFile(tabularUrl);
-        System.out.println("DOWNLOADED");
         List<ValidationError> processingErrors = validateCsvFileResponse(tabularResponse);
         CsvParsingResult csvParsingResult = parseCsv(tabularResponse);
         processingErrors.addAll(csvParsingResult.getParsingErrors());
-        System.out.println("PARSED CSV");
 
         if (hasNoFatalError(processingErrors)) {
             MetadataParsingResult metadataParsingResult = locateMetadata(tabularResponse, csvParsingResult.getTableDescription());
-            System.out.println("PARSED METADATA");
             processingErrors.addAll(process(csvParsingResult, metadataParsingResult));
         }
         return processingErrors;

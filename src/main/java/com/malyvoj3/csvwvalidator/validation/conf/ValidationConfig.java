@@ -3,9 +3,7 @@ package com.malyvoj3.csvwvalidator.validation.conf;
 import com.malyvoj3.csvwvalidator.validation.AnnotationCreator;
 import com.malyvoj3.csvwvalidator.validation.CsvwProcessor;
 import com.malyvoj3.csvwvalidator.validation.SiteWideLocator;
-import com.malyvoj3.csvwvalidator.validation.metadata.MetadataValidator;
-import com.malyvoj3.csvwvalidator.validation.metadata.TablesRequiredRule;
-import com.malyvoj3.csvwvalidator.validation.metadata.UrlRequiredRule;
+import com.malyvoj3.csvwvalidator.validation.metadata.*;
 import com.malyvoj3.csvwvalidator.validation.model.ModelValidator;
 import com.malyvoj3.csvwvalidator.validation.model.PrimaryKeyRule;
 import com.malyvoj3.csvwvalidator.validation.model.RequiredColumnRule;
@@ -58,5 +56,15 @@ public class ValidationConfig {
     @Bean
     public PrimaryKeyRule primaryKeyRule() {
         return new PrimaryKeyRule();
+    }
+
+    @Bean
+    public StringFormatRegexRule stringFormatRegexRule() {
+        return new StringFormatRegexRule();
+    }
+
+    @Bean
+    public DataTypesValidationRule dataTypesValidationRule() {
+        return new DataTypesValidationRule();
     }
 }

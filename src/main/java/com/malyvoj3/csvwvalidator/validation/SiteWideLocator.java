@@ -1,6 +1,6 @@
 package com.malyvoj3.csvwvalidator.validation;
 
-import com.malyvoj3.csvwvalidator.utils.FileResponse;
+import com.malyvoj3.csvwvalidator.domain.FileResponse;
 import com.malyvoj3.csvwvalidator.utils.FileUtils;
 import com.malyvoj3.csvwvalidator.utils.UriUtils;
 import lombok.extern.slf4j.Slf4j;

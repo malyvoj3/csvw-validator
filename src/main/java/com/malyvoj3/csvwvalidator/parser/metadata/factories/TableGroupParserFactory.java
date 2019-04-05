@@ -2,6 +2,7 @@ package com.malyvoj3.csvwvalidator.parser.metadata.factories;
 
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.TableGroupDescription;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.PropertyParser;
+import com.malyvoj3.csvwvalidator.parser.metadata.parsers.descriptions.DataTypeDescriptionParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.descriptions.DialectDescriptionParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.descriptions.SchemaDescriptionParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.descriptions.TableDescriptionParser;
@@ -12,10 +13,11 @@ public class TableGroupParserFactory<T extends TableGroupDescription> extends To
 
     private final TableDescriptionParser tableDescriptionParser;
 
-    public TableGroupParserFactory(SchemaDescriptionParser schemaDescriptionParser,
+    public TableGroupParserFactory(DataTypeDescriptionParser dataTypeDescriptionParser,
+                                   SchemaDescriptionParser schemaDescriptionParser,
                                    DialectDescriptionParser dialectDescriptionParser,
                                    TableDescriptionParser tableDescriptionParser) {
-        super(schemaDescriptionParser, dialectDescriptionParser);
+        super(dataTypeDescriptionParser, schemaDescriptionParser, dialectDescriptionParser);
         this.tableDescriptionParser = tableDescriptionParser;
     }
 

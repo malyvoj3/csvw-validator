@@ -1,5 +1,8 @@
 package com.malyvoj3.csvwvalidator.utils;
 
+import com.malyvoj3.csvwvalidator.domain.ContentType;
+import com.malyvoj3.csvwvalidator.domain.FileResponse;
+import com.malyvoj3.csvwvalidator.domain.Link;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.io.IOUtils;
@@ -7,7 +10,10 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetDecoder;
@@ -52,24 +58,37 @@ public class FileUtils {
         HttpURLConnection connection = null;
         try {
             connection = (HttpURLConnection) url.openConnection();
+            connection.setInstanceFollowRedirects(true);
             connection.setRequestMethod("GET");
-            try (InputStream inputStream = connection.getInputStream()) {
-                fileResponse = new FileResponse();
-                fileResponse.setResponseCode(connection.getResponseCode());
-                fileResponse.setUrl(normalizedUrl);
-                if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                    fileResponse.setContent(IOUtils.toByteArray(inputStream));
-                    fileResponse.setContentType(createContentType(connection.getContentType()));
-                    fileResponse.setLink(createLink(connection.getHeaderFields().get("Link"), normalizedUrl));
+            if (connection.getResponseCode() == HttpURLConnection.HTTP_MOVED_PERM
+                    || connection.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP) {
+                normalizedUrl = UriUtils.normalizeUri(connection.getHeaderField("Location"));
+                try {
+                    url = new URL(normalizedUrl);
+                } catch (MalformedURLException e) {
+                    throw new IllegalArgumentException("Invalid redirect URL.");
+                }
+                connection.disconnect();
+                connection = (HttpURLConnection) url.openConnection();
+            } else if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                throw new IllegalStateException("Bad response code.");
+            }
+            if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                try (InputStream inputStream = connection.getInputStream()) {
+                    fileResponse = new FileResponse();
+                    fileResponse.setResponseCode(connection.getResponseCode());
+                    fileResponse.setUrl(normalizedUrl);
+                    if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                        fileResponse.setContent(IOUtils.toByteArray(inputStream));
+                        fileResponse.setContentType(createContentType(connection.getContentType()));
+                        fileResponse.setLink(createLink(connection.getHeaderFields().get("Link"), normalizedUrl));
+                    }
                 }
             }
-        } catch (ProtocolException e) {
-            //throw new IllegalArgumentException("Invalid request method.");
-            // TODO log
-        } catch (IOException e) {
-            //throw new IllegalStateException("Connection exception.");
-            // TODO log
-        } finally {
+        } catch (Exception ex) {
+            // TODO
+        }
+            finally {
             if (connection != null) {
                 connection.disconnect();
             }
@@ -123,6 +142,8 @@ public class FileUtils {
             int index = StringUtils.indexOf(header, ";");
             if (index > 0) {
                 value = header.substring(0, index);
+            } else {
+                value = header;
             }
         }
         return value;

@@ -13,8 +13,7 @@ import java.util.List;
 public abstract class InheritanceDescription extends CommonDescription {
 
     protected UriTemplateProperty aboutUrl;
-    // Muze byt i jen string.
-    protected ObjectProperty<DataTypeDescription> dataType;
+    protected AtomicProperty<DataTypeDescription> dataType;
     protected StringAtomicProperty defaultValue;
     protected StringAtomicProperty lang;
     protected ListAtomicProperty<String> nullValue;

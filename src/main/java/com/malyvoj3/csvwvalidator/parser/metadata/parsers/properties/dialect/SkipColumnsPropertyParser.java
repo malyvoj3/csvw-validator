@@ -10,15 +10,15 @@ import lombok.NonNull;
 
 public class SkipColumnsPropertyParser<T extends DialectDescription> implements PropertyParser<T> {
 
-    private static final Integer SKIP_COLUMNS_DEFAULT_VALUE = 0;
+    private static final Long SKIP_COLUMNS_DEFAULT_VALUE = 0L;
 
     @Override
     public void parsePropertyToDescription(@NonNull T description,
                                            @NonNull JsonProperty jsonProperty) {
         JsonNode property = jsonProperty.getJsonValue();
         IntegerAtomicProperty skipColumns;
-        if (property.isInt() && property.intValue() > 0) {
-            skipColumns = new IntegerAtomicProperty(property.intValue());
+        if (property.isIntegralNumber() && property.longValue() > 0) {
+            skipColumns = new IntegerAtomicProperty(property.longValue());
         } else {
             jsonProperty.addError(ErrorFactory.invalidPropertyType(jsonProperty.getName()));
             skipColumns = new IntegerAtomicProperty(SKIP_COLUMNS_DEFAULT_VALUE);

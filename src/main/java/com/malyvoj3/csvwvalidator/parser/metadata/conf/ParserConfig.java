@@ -14,7 +14,7 @@ public class ParserConfig {
     // FACTORIES
     @Bean
     public ColumnParserFactory<ColumnDescription> columnParserFactory() {
-        return new ColumnParserFactory<>();
+        return new ColumnParserFactory<>(dataTypeDescriptionParser());
     }
 
     @Bean
@@ -34,17 +34,27 @@ public class ParserConfig {
 
     @Bean
     public SchemaParserFactory<SchemaDescription> schemaParserFactory() {
-        return new SchemaParserFactory<>(columnDescriptionParser(), foreignKeyDescriptionParser());
+        return new SchemaParserFactory<>(dataTypeDescriptionParser(), columnDescriptionParser(), foreignKeyDescriptionParser());
     }
 
     @Bean
     public TableGroupParserFactory<TableGroupDescription> tableGroupParserFactory() {
-        return new TableGroupParserFactory<>(schemaDescriptionParser(), dialectDescriptionParser(), tableDescriptionParser());
+        return new TableGroupParserFactory<>(dataTypeDescriptionParser(), schemaDescriptionParser(), dialectDescriptionParser(), tableDescriptionParser());
     }
 
     @Bean
     public TableParserFactory<TableDescription> tableParserFactory() {
-        return new TableParserFactory<>(schemaDescriptionParser(), dialectDescriptionParser());
+        return new TableParserFactory<>(dataTypeDescriptionParser(), schemaDescriptionParser(), dialectDescriptionParser());
+    }
+
+    @Bean
+    public FormatParserFactory<FormatDescription> formatParserFactory() {
+        return new FormatParserFactory<>();
+    }
+
+    @Bean
+    public DataTypeParserFactory<DataTypeDescription> dataTypeParserFactory() {
+        return new DataTypeParserFactory<>(formatDescriptionParser());
     }
 
     // DESCRIPTION PARSERS
@@ -91,5 +101,15 @@ public class ParserConfig {
     @Bean
     public TableGroupDescriptionParser tableGroupDescriptionParser() {
         return new TableGroupDescriptionParser(tableGroupParserFactory());
+    }
+
+    @Bean
+    public FormatDescriptionParser formatDescriptionParser() {
+        return new FormatDescriptionParser(formatParserFactory());
+    }
+
+    @Bean
+    public DataTypeDescriptionParser dataTypeDescriptionParser() {
+        return new DataTypeDescriptionParser(dataTypeParserFactory());
     }
 }

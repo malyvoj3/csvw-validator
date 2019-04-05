@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class NumberFormatDescription extends ObjectDescription {
+public class FormatDescription extends ObjectDescription {
 
     private StringAtomicProperty decimalChar;
     private StringAtomicProperty groupChar;

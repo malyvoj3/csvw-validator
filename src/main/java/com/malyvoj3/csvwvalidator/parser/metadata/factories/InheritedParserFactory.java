@@ -2,10 +2,15 @@ package com.malyvoj3.csvwvalidator.parser.metadata.factories;
 
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.InheritanceDescription;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.PropertyParser;
+import com.malyvoj3.csvwvalidator.parser.metadata.parsers.descriptions.DataTypeDescriptionParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.properties.inherited.*;
 import com.malyvoj3.csvwvalidator.utils.CsvwKeywords;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 public class InheritedParserFactory<T extends InheritanceDescription> extends CommonParserFactory<T> {
+
+    private final DataTypeDescriptionParser dataTypeDescriptionParser;
 
     @Override
     public PropertyParser<T> createParser(String key) {
@@ -17,7 +22,7 @@ public class InheritedParserFactory<T extends InheritanceDescription> extends Co
             case CsvwKeywords.ABOUT_URL_PROPERTY:
                 return new AboutUrlPropertyParser<>();
             case CsvwKeywords.DATATYPE_PROPERTY:
-                return new DatatypePropertyParser<>();
+                return new DataTypePropertyParser<>(dataTypeDescriptionParser);
             case CsvwKeywords.DEFAULT_PROPERTY:
                 return new DefaultPropertyParser<>();
             case CsvwKeywords.LANG_PROPERTY:

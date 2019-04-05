@@ -48,12 +48,7 @@ public class MainView extends VerticalLayout {
     }
 
     private void showUpload() {
-        removeAll();
-        tabularDataFile = null;
-        tabularDataFileName = null;
-        metadataFile = null;
-        metadataFileName = null;
-
+        clean();
         add(createLabel("Insert tabular data via:"));
         add(createTabularMode());
         tabularUpload = createTabularUpload();
@@ -63,6 +58,18 @@ public class MainView extends VerticalLayout {
         metadataUpload = createMetadataUpload();
         add(metadataUpload);
         add(createValidationButton());
+    }
+
+    private void clean() {
+        removeAll();
+        tabularDataFile = null;
+        tabularDataFileName = null;
+        metadataFile = null;
+        metadataFileName = null;
+        tabularTextfield = null;
+        metadataTextfield = null;
+        tabularUpload = null;
+        metadataUpload = null;
     }
 
     private void showResult(List<? extends ValidationError> errors) {

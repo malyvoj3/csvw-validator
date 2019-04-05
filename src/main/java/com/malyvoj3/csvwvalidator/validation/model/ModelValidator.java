@@ -1,7 +1,6 @@
 package com.malyvoj3.csvwvalidator.validation.model;
 
-import com.malyvoj3.csvwvalidator.domain.model.Table;
-import com.malyvoj3.csvwvalidator.domain.model.TableGroup;
+import com.malyvoj3.csvwvalidator.domain.model.*;
 import com.malyvoj3.csvwvalidator.validation.ValidationError;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +20,21 @@ public class ModelValidator {
         List<ValidationError> validationErrors = new ArrayList<>();
         for (TableValidationRule rule : tableRules) {
             validationErrors.addAll(rule.validate(table));
+        }
+        validationErrors.addAll(getCellErrors(table));
+        return validationErrors;
+    }
+
+    private List<? extends ValidationError> getCellErrors(Table table) {
+        List<ValidationError> validationErrors = new ArrayList<>();
+        List<Column> columns = table.getColumns();
+        for (Column column : columns) {
+            for (Cell cell : column.getCells()) {
+                for (CellError cellError : cell.getErrors()) {
+                    String errorMsg = String.format("%s", cellError.getMessage());
+                    validationErrors.add(ValidationError.error(errorMsg));
+                }
+            }
         }
         return validationErrors;
     }

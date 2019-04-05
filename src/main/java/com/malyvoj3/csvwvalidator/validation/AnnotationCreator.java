@@ -1,12 +1,19 @@
 package com.malyvoj3.csvwvalidator.validation;
 
+import com.malyvoj3.csvwvalidator.domain.DataTypeFactory;
 import com.malyvoj3.csvwvalidator.domain.metadata.Context;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.*;
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.*;
 import com.malyvoj3.csvwvalidator.domain.model.*;
+import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeDefinition;
+import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeFormatException;
+import com.malyvoj3.csvwvalidator.domain.model.datatypes.IncomparableDataTypeException;
+import com.malyvoj3.csvwvalidator.domain.model.datatypes.ValueType;
+import com.malyvoj3.csvwvalidator.domain.model.datatypes.string.StringType;
 import com.malyvoj3.csvwvalidator.parser.csv.CsvParsingResult;
 import com.malyvoj3.csvwvalidator.utils.CsvwKeywords;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -82,7 +89,9 @@ public class AnnotationCreator {
                     createInheritedProperties(tmpDescription),
                     defaultProperties
             );
-            columns.add(createColumn(tmpColumn, tmpDescription, baseLanguage, inheritedProperties));
+            Column annotatedColumn = createColumn(tmpColumn, tmpDescription, baseLanguage, inheritedProperties);
+            annotatedColumn.setCells(createCells(annotatedColumn));
+            columns.add(annotatedColumn);
         }
         // Add virtual columns.
         for (int i = extractedColumns.size(); i < columnDescriptions.size(); i++) {
@@ -96,12 +105,121 @@ public class AnnotationCreator {
         return columns;
     }
 
+    private List<Cell> createCells(Column annotatedColumn) {
+        List<Cell> cells = annotatedColumn.getCells();
+        DataType dataType = annotatedColumn.getDatatype() != null ? annotatedColumn.getDatatype() : createDefaultDataType();
+        for (Cell cell : cells) {
+            ValueType value;
+            String normalizedValue = normalizeCellValue(cell.getStringValue(), dataType);
+            normalizedValue = StringUtils.isNotEmpty(normalizedValue) ? normalizedValue : cell.getColumn().getDefaultValue();
+            // TODO LIST values
+            if (isNullValue(normalizedValue, cell)) {
+                value = null;
+                if (cell.getColumn().isRequired()) {
+                    String errorMsg = String.format("Cell value (row %d column %d) is null, but column is required.",
+                            cell.getRow().getNumber(), cell.getColumn().getNumber());
+                    cell.getErrors().add(new CellError("REQUIRED", errorMsg));
+                }
+            } else {
+                try {
+                    value = DataTypeFactory.createDataType(cell.getStringValue(), dataType);
+                    boolean isValid = validateConstraints(value, dataType);
+                    if (!isValid) {
+                        String errorMsg = String.format("Cell value (row %d column %d) does not satisfy the " +
+                                "constraints of datatype.", cell.getRow().getNumber(), cell.getColumn().getNumber());
+                        cell.getErrors().add(new CellError("INVALID VALUE", errorMsg));
+                    }
+                } catch (DataTypeFormatException | IncomparableDataTypeException e) {
+                    String errorMsg = String.format("Cell (row %d column %d) cannot be formatted as '%s' " +
+                            "dataype.", cell.getRow().getNumber(), cell.getColumn().getNumber(), dataType.getBase());
+                    cell.getErrors().add(new CellError("INVALID VALUE FORMAT", errorMsg));
+                    value = new StringType(normalizedValue);
+                }
+            }
+            cell.setValue(value);
+            // TODO URI templates - propertyURL, valueURL
+        }
+        return cells;
+    }
+
+    private DataType createDefaultDataType() {
+        return DataType.builder()
+                .base(CsvwKeywords.STRING_DATA_TYPE)
+                .build();
+    }
+
+    private boolean isNullValue(String normalizedValue, Cell cell) {
+        List<String> nullValues = Optional.ofNullable(cell)
+                .map(Cell::getColumn)
+                .map(Column::getNullValues)
+                .orElse(Collections.emptyList());
+        return normalizedValue == null || nullValues.contains(normalizedValue);
+    }
+
+    private String normalizeCellValue(String cellValue, DataType dataType) {
+        String normalizedValue = cellValue;
+        if (StringUtils.isNotEmpty(cellValue)) {
+            boolean isStringType = CsvwKeywords.STRING_DATA_TYPE.equals(dataType.getBase())
+                    || CsvwKeywords.JSON_DATA_TYPE.equals(dataType.getBase())
+                    || CsvwKeywords.HTML_DATA_TYPE.equals(dataType.getBase())
+                    || CsvwKeywords.XML_DATA_TYPE.equals(dataType.getBase())
+                    || CsvwKeywords.ANY_ATOMIC_DATA_TYPE.equals(dataType.getBase());
+            if (!isStringType) {
+                normalizedValue = cellValue.replaceAll("\\t|[\\r\\n]+", " ");
+            }
+            if (!isStringType && !CsvwKeywords.NORMALIZED_STRING_DATA_TYPE.equals(dataType.getBase())) {
+                normalizedValue = StringUtils.normalizeSpace(normalizedValue);
+            }
+        }
+        return normalizedValue;
+    }
+
+    private boolean validateConstraints(ValueType value, DataType dataType) throws DataTypeFormatException, IncomparableDataTypeException {
+        if (value.isLengthDataType()) {
+            if (dataType.getLength() != null && !dataType.getLength().equals(value.getLength())) {
+                return false;
+            }
+            if (dataType.getMinLength() != null && dataType.getMinLength() > value.getLength()) {
+                return false;
+            }
+            if (dataType.getMaxLength() != null && dataType.getMaxLength() < value.getLength()) {
+                return false;
+            }
+        }
+        if (value.isValueDataType()) {
+            if (dataType.getMinimum() != null) {
+                ValueType minimumValue = DataTypeFactory.createDataType(dataType.getMinimum(), dataType);
+                if (!value.isGreaterEq(minimumValue)) {
+                    return false;
+                }
+            }
+            if (dataType.getMaximum() != null) {
+                ValueType maximumValue = DataTypeFactory.createDataType(dataType.getMaximum(), dataType);
+                if (!value.isLowerEq(maximumValue)) {
+                    return false;
+                }
+            }
+            if (dataType.getMinExclusive() != null) {
+                ValueType minExclusiveValue = DataTypeFactory.createDataType(dataType.getMinExclusive(), dataType);
+                if (!value.isGreater(minExclusiveValue)) {
+                    return false;
+                }
+            }
+            if (dataType.getMaxExclusive() != null) {
+                ValueType maxExclusiveValue = DataTypeFactory.createDataType(dataType.getMaxExclusive(), dataType);
+                if (!value.isLower(maxExclusiveValue)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     private InheritedProperties createInheritedProperties(InheritanceDescription description) {
         InheritedProperties inheritedProperties = new InheritedProperties();
         if (description != null) {
             inheritedProperties.setAboutUrl(getValue(description.getAboutUrl()));
-            // TODO datatype
-            inheritedProperties.setDatatype(null);
+            inheritedProperties.setDatatype(createDataType(description.getDataType()));
             inheritedProperties.setDefaultValue(getValue(description.getDefaultValue()));
             inheritedProperties.setLang(getValue(description.getLang()));
             inheritedProperties.setNullValue(description.getNullValue() != null ? description.getNullValue().getValue() : new ArrayList<>());
@@ -143,6 +261,43 @@ public class AnnotationCreator {
             }
         }
         return result;
+    }
+
+    private DataType createDataType(AtomicProperty<DataTypeDescription> dataTypeProp) {
+        DataType dataType = null;
+        if (dataTypeProp != null && dataTypeProp.getValue() != null) {
+            DataTypeDescription desc = dataTypeProp.getValue();
+            String base = getValue(desc.getBase());
+            DataTypeDefinition dataTypeDefinition = DataTypeDefinition.getByName(base);
+            dataType = DataType.builder()
+                    .id(dataTypeDefinition != null ? dataTypeDefinition.getUrl() : null)
+                    .base(base)
+                    .format(createFormat(desc.getFormat()))
+                    .length(getValue(desc.getLength()))
+                    .minLength(getValue(desc.getMinLength()))
+                    .maxLength(getValue(desc.getMaxLength()))
+                    .minimum(getValue(desc.getMinimum()) != null ? getValue(desc.getMinimum()) : getValue(desc.getMinInclusive()))
+                    .maximum(getValue(desc.getMaximum()) != null ? getValue(desc.getMaximum()) : getValue(desc.getMaxInclusive()))
+                    .minExclusive(getValue(desc.getMinExclusive()))
+                    .maxExclusive(getValue(desc.getMaxExclusive()))
+                    .build();
+
+        }
+        return dataType;
+    }
+
+    private Format createFormat(AtomicProperty<FormatDescription> formatProp) {
+        Format format = null;
+        if (formatProp != null && formatProp.getValue() != null) {
+            FormatDescription desc = formatProp.getValue();
+            format = Format.builder()
+                    .decimalChar(getValue(desc.getDecimalChar()))
+                    .groupChar(getValue(desc.getGroupChar()))
+                    .pattern(getValue(desc.getPattern()))
+                    .build();
+
+        }
+        return format;
     }
 
     private List<Note> createNotes(ArrayProperty<NoteDescription> noteDescriptions) {
@@ -208,7 +363,7 @@ public class AnnotationCreator {
         column.setSeparator(inheritedProperties.getSeparator());
         column.setTextDirection(inheritedProperties.getTextDirection());
         column.setValueUrl(inheritedProperties.getValueUrl());
-
+        column.setRequired(getValue(columnDescription.getRequired()));
         if (column.getName() == null) {
             String name;
             List<String> baseLanguageTitles = column.getTitles().get(baseLanguage);
@@ -289,6 +444,14 @@ public class AnnotationCreator {
         return value;
     }
 
+    private Long getValue(IntegerAtomicProperty property) {
+        Long value = null;
+        if (property != null) {
+            value = property.getValue();
+        }
+        return value;
+    }
+
     private InheritedProperties mergeInheritedProperties(InheritedProperties main, InheritedProperties... toMerge) {
         if (main.getAboutUrl() == null) {
             main.setAboutUrl(Arrays.stream(toMerge)
@@ -322,11 +485,11 @@ public class AnnotationCreator {
                     .findFirst()
                     .orElse(null));
         }
-        if (main.getNullValue() == null) {
+        if (main.getNullValue() == null || main.getNullValue().isEmpty()) {
             main.setNullValue(Arrays.stream(toMerge)
                     .filter(Objects::nonNull)
                     .map(InheritedProperties::getNullValue)
-                    .filter(Objects::nonNull)
+                    .filter(nullValues -> nullValues != null && !nullValues.isEmpty())
                     .findFirst()
                     .orElse(new ArrayList<>()));
         }
@@ -368,7 +531,7 @@ public class AnnotationCreator {
     @Data
     class InheritedProperties {
         private String aboutUrl;
-        private Datatype datatype;
+        private DataType datatype;
         private String defaultValue;
         private String lang;
         private List<String> nullValue = new ArrayList<>();

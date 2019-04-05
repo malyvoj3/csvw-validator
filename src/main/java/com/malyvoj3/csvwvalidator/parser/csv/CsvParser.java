@@ -65,7 +65,7 @@ public class CsvParser {
             table.setColumns(columns);
             tableDescription = createTableDescription(columnDescriptions, url);
         } catch (Exception ex) {
-            log.error(String.format("Error during CSV parsing of file '%s'.", url));
+            log.error(String.format("Error during CSV parsing of file '%s'.", url), ex);
             parsingErrors.add(ValidationError.fatal(String.format("File '%s' is not valid CSV file.", url)));
         }
         return new CsvParsingResult(url, parsingErrors, table, tableDescription);
@@ -92,11 +92,18 @@ public class CsvParser {
     private List<ValidationError> createRows(List<String[]> records, Table table, List<Column> columns, boolean hasHeader) {
         List<ValidationError> parsingErrors = new ArrayList<>();
         int rowNumber = hasHeader ? 2 : 1;
+        int columnLength = columns.size();
         for (String[] record : records) {
             if (record.length > 0) {
                 Row row = new Row();
                 row.setNumber(rowNumber);
-                for (int i = 0; i < record.length; i++) {
+                if (record.length > columnLength) {
+                    parsingErrors.add(ValidationError.warn(
+                            String.format("Row %d has more cells than CSV file has columns." +
+                                    " Some cell is not quoted?", rowNumber)
+                    ));
+                }
+                for (int i = 0; i < columnLength; i++) {
                     String value = record[i];
                     parsingErrors.addAll(validateValue(value, rowNumber, i));
                     Cell cell = Cell.builder()
@@ -104,6 +111,7 @@ public class CsvParser {
                             .row(row)
                             .table(table)
                             .stringValue(value)
+                            .errors(new ArrayList<>())
                             .build();
                     row.getCells().add(cell);
                     columns.get(i).getCells().add(cell);
@@ -206,8 +214,13 @@ public class CsvParser {
     }
 
     private static CsvParserSettings defaultSettings(Dialect dialect) {
+        CsvFormat csvFormat = new CsvFormat();
+        csvFormat.setComment('\0');
         CsvParserSettings settings = new CsvParserSettings();
+        settings.setFormat(csvFormat);
         settings.setDelimiterDetectionEnabled(true);
+        settings.setDelimiterDetectionEnabled(true, ',', ';', '\t', '|');
+        settings.trimValues(false);
         settings.setLineSeparatorDetectionEnabled(true);
         settings.setQuoteDetectionEnabled(true);
         settings.setSkipEmptyLines(false);
