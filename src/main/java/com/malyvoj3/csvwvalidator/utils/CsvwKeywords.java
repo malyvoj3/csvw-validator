@@ -2,13 +2,8 @@ package com.malyvoj3.csvwvalidator.utils;
 
 import lombok.experimental.UtilityClass;
 
-import java.util.HashMap;
-
 @UtilityClass
 public class CsvwKeywords {
-
-
-    public final HashMap<String, String> DATA_TYPES = new HashMap<>();
 
     public final String NATURAL_LANGUAGE_CODE = "und";
     public final String CSVW_VOCABULARY_URL = "http://www.w3.org/ns/csvw";
@@ -147,55 +142,4 @@ public class CsvwKeywords {
     public final String UNSIGNED_SHORT_DATA_TYPE = "unsignedShort";
     public final String XML_DATA_TYPE = "xml";
     public final String YEAR_MONTH_DURATION_DATA_TYPE = "yearMonthDuration";
-
-    static {
-        DATA_TYPES.put(ANY_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#");
-        DATA_TYPES.put(ANY_ATOMIC_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#");
-        DATA_TYPES.put(ANY_URI_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#anyURI");
-        DATA_TYPES.put(BASE_64_BINARY_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#base64Binary");
-        DATA_TYPES.put(BINARY_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#base64Binary");
-        DATA_TYPES.put(BOOLEAN_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#boolean");
-        DATA_TYPES.put(BYTE_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#byte");
-        DATA_TYPES.put(DATE_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#date");
-        DATA_TYPES.put(DATE_TIME_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#dateTime");
-        DATA_TYPES.put(DATE_TIME_STAMP_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#dateTimeStamp");
-        DATA_TYPES.put(DATETIME_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#dateTime");
-        DATA_TYPES.put(DAY_TIME_DURATION_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#dayTimeDuration");
-        DATA_TYPES.put(DECIMAL_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#decimal");
-        DATA_TYPES.put(DOUBLE_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#double");
-        DATA_TYPES.put(DURATION_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#duration");
-        DATA_TYPES.put(FLOAT_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#float");
-        DATA_TYPES.put(G_DAY_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#gDay");
-        DATA_TYPES.put(G_MONTH_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#gMonth");
-        DATA_TYPES.put(G_MONTH_DAY_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#gMonthDay");
-        DATA_TYPES.put(G_YEAR_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#gYear");
-        DATA_TYPES.put(G_YEAR_MONTH_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#gYearMonth");
-        DATA_TYPES.put(HTML_DATA_TYPE, "http://www.w3.org/1999/02/22-rdf-syntax-ns#HTML");
-        DATA_TYPES.put(HEX_BINARY_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#hexBinary");
-        DATA_TYPES.put(INT_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#int");
-        DATA_TYPES.put(INTEGER_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#integer");
-        DATA_TYPES.put(JSON_DATA_TYPE, "http://www.w3.org/ns/csvw#JSON");
-        DATA_TYPES.put(LANGUAGE_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#language");
-        DATA_TYPES.put(LONG_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#long");
-        DATA_TYPES.put(NAME_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#Name");
-        DATA_TYPES.put(NCNAME_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#NCName");
-        DATA_TYPES.put(NMTOKEN_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#NMTOKEN");
-        DATA_TYPES.put(NEGATIVE_INTEGER_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#negativeInteger");
-        DATA_TYPES.put(NON_NEGATIVE_INTEGER_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#nonNegativeInteger");
-        DATA_TYPES.put(NON_POSITIVE_INTEGER_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#nonPositiveInteger");
-        DATA_TYPES.put(NORMALIZED_STRING_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#normalizedString");
-        DATA_TYPES.put(NUMBER_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#double");
-        DATA_TYPES.put(QNAME_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#QName");
-        DATA_TYPES.put(POSITIVE_INTEGER_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#positiveInteger");
-        DATA_TYPES.put(SHORT_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#short");
-        DATA_TYPES.put(STRING_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#string");
-        DATA_TYPES.put(TIME_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#time");
-        DATA_TYPES.put(TOKEN_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#token");
-        DATA_TYPES.put(UNSIGNED_BYTE_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#unsignedByte");
-        DATA_TYPES.put(UNSIGNED_INT_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#unsignedInt");
-        DATA_TYPES.put(UNSIGNED_LONG_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#unsignedLong");
-        DATA_TYPES.put(UNSIGNED_SHORT_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#unsignedShort");
-        DATA_TYPES.put(XML_DATA_TYPE, "http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral");
-        DATA_TYPES.put(YEAR_MONTH_DURATION_DATA_TYPE, "http://www.w3.org/2001/XMLSchema#yearMonthDuration");
-    }
 }

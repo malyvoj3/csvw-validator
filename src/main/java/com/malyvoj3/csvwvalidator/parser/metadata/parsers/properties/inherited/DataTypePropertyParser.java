@@ -6,11 +6,11 @@ import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.DataTypeDescripti
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.InheritanceDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.AtomicProperty;
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.StringAtomicProperty;
+import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeDefinition;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonObject;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.PropertyParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.descriptions.DataTypeDescriptionParser;
-import com.malyvoj3.csvwvalidator.utils.CsvwKeywords;
 import com.malyvoj3.csvwvalidator.validation.ErrorFactory;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -29,9 +29,12 @@ public class DataTypePropertyParser<T extends InheritanceDescription> implements
             JsonObject jsonObject = new JsonObject(jsonProperty.getName(), (ObjectNode) property);
             dataType = dataTypeDescriptionParser.parse(jsonObject);
             jsonObject.getParsingErrors().forEach(jsonProperty::addError);
-        } else if (property.isTextual() && CsvwKeywords.DATA_TYPES.get(property.textValue()) != null) {
+        } else if (property.isTextual() && DataTypeDefinition.getByName(property.textValue()) != null) {
             dataType = new DataTypeDescription();
             dataType.setBase(new StringAtomicProperty(property.textValue()));
+        } else if (property.isTextual() && DataTypeDefinition.getByUrl(property.textValue()) != null) {
+            dataType = new DataTypeDescription();
+            dataType.setBase(new StringAtomicProperty(DataTypeDefinition.getByUrl(property.textValue()).getName()));
         } else {
             jsonProperty.addError(ErrorFactory.invalidPropertyType(jsonProperty.getName()));
             dataType = null;

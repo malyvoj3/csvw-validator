@@ -5,9 +5,7 @@ import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.DataTypeDescripti
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.InheritanceDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.TableDescription;
 import com.malyvoj3.csvwvalidator.domain.model.DataType;
-import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeFormatException;
-import com.malyvoj3.csvwvalidator.domain.model.datatypes.IncomparableDataTypeException;
-import com.malyvoj3.csvwvalidator.domain.model.datatypes.ValueType;
+import com.malyvoj3.csvwvalidator.domain.model.datatypes.*;
 import com.malyvoj3.csvwvalidator.utils.CsvwKeywords;
 import com.malyvoj3.csvwvalidator.validation.ValidationError;
 import lombok.extern.slf4j.Slf4j;
@@ -40,8 +38,10 @@ public class DataTypesValidationRule extends TableDescriptionValidationRule {
         String maxInclusive = desc.getMaxInclusive() != null ? desc.getMaxInclusive().getValue() : null;
         String minExclusive = desc.getMinExclusive() != null ? desc.getMinExclusive().getValue() : null;
         String maxExclusive = desc.getMaxExclusive() != null ? desc.getMaxExclusive().getValue() : null;
+        String base = desc.getBase() != null ? desc.getBase().getValue() : null;
+        base = base != null ? base : CsvwKeywords.STRING_DATA_TYPE;
 
-        if (true/*TODO is numeric/date/time type*/) {
+        if (DataTypeConstraintGroup.VALUE == DataTypeDefinition.getByName(base).getConstraintGroup()) {
             // Validate logic without datatypes.
             if (minimum != null && minInclusive != null && !minimum.equals(minInclusive)) {
                 validationErrors.add(ValidationError.error("Datatype has 'minimum' and 'minInclusive' properties with different values."));
@@ -89,7 +89,7 @@ public class DataTypesValidationRule extends TableDescriptionValidationRule {
                 }
             }
             ValueType minExclusiveValue = null;
-            if (minInclusive != null) {
+            if (minExclusive != null) {
                 try {
                     minExclusiveValue = DataTypeFactory.createDataType(minExclusive, dataType);
                 } catch (DataTypeFormatException ex) {
@@ -98,7 +98,7 @@ public class DataTypesValidationRule extends TableDescriptionValidationRule {
                 }
             }
             ValueType maxExclusiveValue = null;
-            if (minInclusive != null) {
+            if (maxExclusive != null) {
                 try {
                     maxExclusiveValue = DataTypeFactory.createDataType(maxExclusive, dataType);
                 } catch (DataTypeFormatException ex) {
@@ -117,7 +117,7 @@ public class DataTypesValidationRule extends TableDescriptionValidationRule {
                     validationErrors.add(ValidationError.error(errorMsg));
                 }
                 if (minExclusiveValue != null && maxExclusiveValue != null && maxExclusiveValue.isLower(minExclusiveValue)) {
-                    String errorMsg = "Property 'minInclusive' is less than or equal to property 'maxInclusive'.";
+                    String errorMsg = "Property 'maxExclusive' is less than or equal to property 'minExclusive'.";
                     validationErrors.add(ValidationError.error(errorMsg));
                 }
                 if (minExclusiveValue != null && maxInclusiveValue != null && maxInclusiveValue.isLowerEq(minExclusiveValue)) {
@@ -152,12 +152,14 @@ public class DataTypesValidationRule extends TableDescriptionValidationRule {
         return validationErrors;
     }
 
-    private List<? extends ValidationError> validateLengthConstraints(DataTypeDescription dataType) {
+    private List<? extends ValidationError> validateLengthConstraints(DataTypeDescription desc) {
         List<ValidationError> validationErrors = new ArrayList<>();
-        Long length = dataType.getLength() != null ? dataType.getLength().getValue() : null;
-        Long minLength = dataType.getMinLength() != null ? dataType.getMinLength().getValue() : null;
-        Long maxLength = dataType.getMaxLength() != null ? dataType.getMaxLength().getValue() : null;
-        if (true/*TODO is string type*/) {
+        Long length = desc.getLength() != null ? desc.getLength().getValue() : null;
+        Long minLength = desc.getMinLength() != null ? desc.getMinLength().getValue() : null;
+        Long maxLength = desc.getMaxLength() != null ? desc.getMaxLength().getValue() : null;
+        String base = desc.getBase() != null ? desc.getBase().getValue() : null;
+        base = base != null ? base : CsvwKeywords.STRING_DATA_TYPE;
+        if (DataTypeConstraintGroup.LENGTH == DataTypeDefinition.getByName(base).getConstraintGroup()) {
             if (length != null && minLength != null && length < minLength) {
                 validationErrors.add(ValidationError.error("Datatype has 'length' property lower than 'minLength'."));
             }
@@ -169,13 +171,13 @@ public class DataTypesValidationRule extends TableDescriptionValidationRule {
             }
         } else {
             if (length != null) {
-                validationErrors.add(ValidationError.error("Non-string datatype has defined 'length' property."));
+                validationErrors.add(ValidationError.error("Not string or binary datatype has defined 'length' property."));
             }
             if (minLength != null) {
-                validationErrors.add(ValidationError.error("Non-string datatype has defined 'minLength' property."));
+                validationErrors.add(ValidationError.error("Not string or binary  datatype has defined 'minLength' property."));
             }
             if (maxLength != null) {
-                validationErrors.add(ValidationError.error("Non-string datatype has defined 'maxLength' property."));
+                validationErrors.add(ValidationError.error("Not string or binary  datatype has defined 'maxLength' property."));
             }
         }
         return validationErrors;

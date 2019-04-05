@@ -5,6 +5,7 @@ import com.malyvoj3.csvwvalidator.domain.metadata.Context;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.*;
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.*;
 import com.malyvoj3.csvwvalidator.domain.model.*;
+import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeDefinition;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeFormatException;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.IncomparableDataTypeException;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.ValueType;
@@ -267,8 +268,9 @@ public class AnnotationCreator {
         if (dataTypeProp != null && dataTypeProp.getValue() != null) {
             DataTypeDescription desc = dataTypeProp.getValue();
             String base = getValue(desc.getBase());
+            DataTypeDefinition dataTypeDefinition = DataTypeDefinition.getByName(base);
             dataType = DataType.builder()
-                    .id(base != null ? CsvwKeywords.DATA_TYPES.get(base) : null)
+                    .id(dataTypeDefinition != null ? dataTypeDefinition.getUrl() : null)
                     .base(base)
                     .format(createFormat(desc.getFormat()))
                     .length(getValue(desc.getLength()))

@@ -1,7 +1,13 @@
 package com.malyvoj3.csvwvalidator.domain.model.datatypes;
 
 import com.malyvoj3.csvwvalidator.utils.CsvwKeywords;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeConstraintGroup.*;
 
@@ -62,6 +68,14 @@ public enum DataTypeDefinition {
     private DataTypeConstraintGroup constraintGroup;
     private DataTypeGroup group;
 
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
+    private static final Map<String, DataTypeDefinition> nameMap = Collections.unmodifiableMap(initializeNameMap());
+
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
+    private static final Map<String, DataTypeDefinition> urlMap = Collections.unmodifiableMap(initializeUrlMap());;
+
     DataTypeDefinition(String name, String url, DataTypeConstraintGroup constraintGroup, DataTypeGroup group) {
         this.name = name;
         this.url = url;
@@ -69,4 +83,35 @@ public enum DataTypeDefinition {
         this.group = group;
     }
 
+    private static Map<String, DataTypeDefinition> initializeNameMap() {
+        Map<String, DataTypeDefinition> nameMap = new HashMap<>(60);
+        for (DataTypeDefinition definition : values()) {
+            nameMap.put(definition.getName(), definition);
+        }
+        return nameMap;
+    }
+
+    private static Map<String, DataTypeDefinition> initializeUrlMap() {
+        Map<String, DataTypeDefinition> urlMap = new HashMap<>(60);
+        for (DataTypeDefinition definition : values()) {
+            urlMap.put(definition.getUrl(), definition);
+        }
+        return urlMap;
+    }
+
+    public static DataTypeDefinition getByName(String name) {
+        DataTypeDefinition definition = null;
+        if (name != null) {
+            definition = nameMap.get(name);
+        }
+        return definition;
+    }
+
+    public static DataTypeDefinition getByUrl(String url) {
+        DataTypeDefinition definition = null;
+        if (url != null) {
+            definition = urlMap.get(url);
+        }
+        return definition;
+    }
 }
