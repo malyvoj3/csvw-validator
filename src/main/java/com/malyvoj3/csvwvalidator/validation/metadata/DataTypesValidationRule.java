@@ -2,19 +2,29 @@ package com.malyvoj3.csvwvalidator.validation.metadata;
 
 import com.malyvoj3.csvwvalidator.domain.DataTypeFactory;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.DataTypeDescription;
+import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.FormatDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.InheritanceDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.TableDescription;
+import com.malyvoj3.csvwvalidator.domain.metadata.properties.AtomicProperty;
+import com.malyvoj3.csvwvalidator.domain.metadata.properties.StringAtomicProperty;
 import com.malyvoj3.csvwvalidator.domain.model.DataType;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.*;
 import com.malyvoj3.csvwvalidator.utils.CsvwKeywords;
 import com.malyvoj3.csvwvalidator.validation.ValidationError;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Slf4j
 public class DataTypesValidationRule extends TableDescriptionValidationRule {
+
+    private static final String BOOLEAN_FORMAT_PATTERN = "\\w+\\|\\w+";
+    private static final String DEFAULT_NUMERIC_FORMAT_PATTERN = "[0\\#\\.\\,E\\+\\%\\u2030\\-]";
 
     @Override
     public List<? extends ValidationError> validate(TableDescription table) {
@@ -23,11 +33,80 @@ public class DataTypesValidationRule extends TableDescriptionValidationRule {
         for (InheritanceDescription desc : inheritanceDescriptions) {
             if (desc.getDataType() != null && desc.getDataType().getValue() != null) {
                 DataTypeDescription dataType = desc.getDataType().getValue();
+                errors.addAll(validateFormat(dataType));
                 errors.addAll(validateLengthConstraints(dataType));
                 errors.addAll(validateValueConstraints(dataType));
             }
         }
         return errors;
+    }
+
+    private List<? extends ValidationError> validateFormat(DataTypeDescription desc) {
+        List<ValidationError> validationErrors = new ArrayList<>();
+        String base = desc.getBase() != null ? desc.getBase().getValue() : null;
+        FormatDescription formatDescription = Optional.of(desc)
+                .map(DataTypeDescription::getFormat)
+                .map(AtomicProperty::getValue)
+                .orElse(null);
+        String format = Optional.ofNullable(formatDescription)
+                .map(FormatDescription::getPattern)
+                .map(StringAtomicProperty::getValue)
+                .orElse(null);
+        base = base != null ? base : CsvwKeywords.STRING_DATA_TYPE;
+        DataTypeGroup group = DataTypeDefinition.getByName(base).getGroup();
+
+        if (StringUtils.isNotEmpty(format)) {
+            switch (group) {
+                case NUMERIC:
+                    String groupChar = Optional.of(formatDescription)
+                            .map(FormatDescription::getGroupChar)
+                            .map(StringAtomicProperty::getValue)
+                            .orElse(null);
+                    String decimalChar = Optional.of(formatDescription)
+                            .map(FormatDescription::getDecimalChar)
+                            .map(StringAtomicProperty::getValue)
+                            .orElse(null);
+                    String numericPatter = createNumericPattern(groupChar, decimalChar);
+                    if (!matchPattern(format, numericPatter)) {
+                        validationErrors.add(ValidationError.warn("Property 'format' is invalid NUMERIC format."));
+                        desc.getFormat().getValue().setPattern(null);
+                    }
+                    break;
+                case BOOLEAN:
+                    if (!matchPattern(format, BOOLEAN_FORMAT_PATTERN)) {
+                        validationErrors.add(ValidationError.warn("Property 'format' is invalid BOOLEAN format."));
+                        desc.getFormat().getValue().setPattern(null);
+                    }
+                    break;
+                case DATE:
+                case DURATION:
+                default:
+                    // TODO
+                    break;
+            }
+        }
+        return validationErrors;
+    }
+
+    private String createNumericPattern(String groupChar, String decimalChar) {
+        String pattern;
+        if (groupChar != null && decimalChar != null) {
+            pattern = DEFAULT_NUMERIC_FORMAT_PATTERN + "|" + String.format("[\\%s\\%s]", groupChar, decimalChar);
+        } else if (groupChar != null) {
+            pattern = DEFAULT_NUMERIC_FORMAT_PATTERN + "|" + String.format("\\%s", groupChar);
+        } else if (decimalChar != null) {
+            pattern = DEFAULT_NUMERIC_FORMAT_PATTERN + "|" + String.format("\\%s", decimalChar);
+        } else {
+            pattern = DEFAULT_NUMERIC_FORMAT_PATTERN;
+        }
+        pattern = String.format("(%s)+", pattern);
+        return pattern;
+    }
+
+    protected boolean matchPattern(String string, String stringPattern) {
+        Pattern pattern = Pattern.compile(stringPattern);
+        Matcher matcher = pattern.matcher(string);
+        return matcher.matches();
     }
 
     private List<? extends ValidationError> validateValueConstraints(DataTypeDescription desc) {
