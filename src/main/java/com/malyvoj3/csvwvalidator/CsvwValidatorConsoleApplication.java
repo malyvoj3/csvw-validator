@@ -1,7 +1,7 @@
 package com.malyvoj3.csvwvalidator;
 
+import com.malyvoj3.csvwvalidator.processor.CsvwProcessor;
 import com.malyvoj3.csvwvalidator.utils.UriUtils;
-import com.malyvoj3.csvwvalidator.validation.CsvwProcessor;
 import com.malyvoj3.csvwvalidator.validation.ValidationError;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.cli.*;

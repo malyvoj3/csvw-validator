@@ -1,32 +1,22 @@
 package com.malyvoj3.csvwvalidator.validation.conf;
 
-import com.malyvoj3.csvwvalidator.validation.AnnotationCreator;
-import com.malyvoj3.csvwvalidator.validation.CsvwProcessor;
-import com.malyvoj3.csvwvalidator.validation.SiteWideLocator;
+import com.malyvoj3.csvwvalidator.domain.DataTypeFactory;
+import com.malyvoj3.csvwvalidator.domain.conf.DomainConfig;
 import com.malyvoj3.csvwvalidator.validation.metadata.*;
 import com.malyvoj3.csvwvalidator.validation.model.ModelValidator;
 import com.malyvoj3.csvwvalidator.validation.model.PrimaryKeyRule;
 import com.malyvoj3.csvwvalidator.validation.model.RequiredColumnRule;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
+@Import({DomainConfig.class})
+@RequiredArgsConstructor
 @Configuration
 public class ValidationConfig {
 
-    @Bean
-    public CsvwProcessor csvwProcessor() {
-        return new CsvwProcessor();
-    }
-
-    @Bean
-    public SiteWideLocator siteWideLocator() {
-        return new SiteWideLocator();
-    }
-
-    @Bean
-    public AnnotationCreator annotationCreator() {
-        return new AnnotationCreator();
-    }
+    private final DataTypeFactory dataTypeFactory;
 
     @Bean
     public MetadataValidator metadataValidator() {
@@ -65,6 +55,6 @@ public class ValidationConfig {
 
     @Bean
     public DataTypesValidationRule dataTypesValidationRule() {
-        return new DataTypesValidationRule();
+        return new DataTypesValidationRule(dataTypeFactory);
     }
 }

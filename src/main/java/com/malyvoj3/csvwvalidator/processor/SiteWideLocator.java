@@ -1,4 +1,4 @@
-package com.malyvoj3.csvwvalidator.validation;
+package com.malyvoj3.csvwvalidator.processor;
 
 import com.malyvoj3.csvwvalidator.domain.FileResponse;
 import com.malyvoj3.csvwvalidator.utils.FileUtils;

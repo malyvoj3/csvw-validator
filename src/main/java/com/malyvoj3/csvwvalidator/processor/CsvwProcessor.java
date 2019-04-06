@@ -1,4 +1,4 @@
-package com.malyvoj3.csvwvalidator.validation;
+package com.malyvoj3.csvwvalidator.processor;
 
 import com.malyvoj3.csvwvalidator.domain.ContentType;
 import com.malyvoj3.csvwvalidator.domain.FileResponse;
@@ -14,11 +14,13 @@ import com.malyvoj3.csvwvalidator.parser.metadata.MetadataParsingResult;
 import com.malyvoj3.csvwvalidator.parser.metadata.TopLevelType;
 import com.malyvoj3.csvwvalidator.utils.FileUtils;
 import com.malyvoj3.csvwvalidator.utils.UriUtils;
+import com.malyvoj3.csvwvalidator.validation.Severity;
+import com.malyvoj3.csvwvalidator.validation.ValidationError;
 import com.malyvoj3.csvwvalidator.validation.metadata.MetadataValidator;
 import com.malyvoj3.csvwvalidator.validation.model.ModelValidator;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -31,6 +33,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
+@RequiredArgsConstructor
 public class CsvwProcessor {
 
     private static final String DEFAULT_URL = "http://example.com/";
@@ -39,23 +42,12 @@ public class CsvwProcessor {
             .collect(Collectors.toSet());
     private static final String HEADER_ABSENT = "absent";
 
-    @Autowired
-    private CsvParser csvParser;
-
-    @Autowired
-    private MetadataParser metadataParser;
-
-    @Autowired
-    private SiteWideLocator siteWideLocator;
-
-    @Autowired
-    private AnnotationCreator annotationCreator;
-
-    @Autowired
-    private MetadataValidator metadataValidator;
-
-    @Autowired
-    private ModelValidator modelValidator;
+    private final CsvParser csvParser;
+    private final MetadataParser metadataParser;
+    private final SiteWideLocator siteWideLocator;
+    private final AnnotationCreator annotationCreator;
+    private final MetadataValidator metadataValidator;
+    private final ModelValidator modelValidator;
 
     /**
      * Processing just upload tabular data file, which means that this file is validated without scheme.

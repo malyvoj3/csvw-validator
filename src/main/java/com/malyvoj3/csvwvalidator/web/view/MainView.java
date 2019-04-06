@@ -1,7 +1,6 @@
 package com.malyvoj3.csvwvalidator.web.view;
 
-import com.malyvoj3.csvwvalidator.parser.metadata.MetadataParser;
-import com.malyvoj3.csvwvalidator.validation.CsvwProcessor;
+import com.malyvoj3.csvwvalidator.processor.CsvwProcessor;
 import com.malyvoj3.csvwvalidator.validation.ValidationError;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -25,9 +24,6 @@ public class MainView extends VerticalLayout {
 
     private static final String URL_MODE = "URL";
     private static final String UPLOAD_MODE = "File upload";
-
-    @Autowired
-    private MetadataParser metadataParser;
 
     @Autowired
     private CsvwProcessor csvwProcessor;

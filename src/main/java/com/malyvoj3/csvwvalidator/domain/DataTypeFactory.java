@@ -10,13 +10,12 @@ import com.malyvoj3.csvwvalidator.domain.model.datatypes.duration.YearMonthDurat
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.numeric.*;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.string.*;
 import com.malyvoj3.csvwvalidator.utils.CsvwKeywords;
-import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 
-@UtilityClass
+@Slf4j
 public class DataTypeFactory {
 
     private final static String DATA_TYPE_BASE_DEFAULT = "string";
-
     private final static String DATE_TIME_FORMAT_DEFAULT = "yyyy-MM-ddTHH:mm:ss";
     private final static String DATE_FORMAT_DEFAULT = "yyyy-MM-dd";
     private final static String TIME_FORMAT_DEFAULT = "HH:mm:ss";
@@ -111,67 +110,67 @@ public class DataTypeFactory {
         }
     }
 
-    private static ValueType createUnsignedLong(String stringValue, Format format) throws DataTypeFormatException {
+    private ValueType createUnsignedLong(String stringValue, Format format) throws DataTypeFormatException {
         return new UnsignedLongType(stringValue, format);
     }
 
-    private static ValueType createUnsignedInt(String stringValue, Format format) throws DataTypeFormatException {
+    private ValueType createUnsignedInt(String stringValue, Format format) throws DataTypeFormatException {
         return new UnsignedIntType(stringValue, format);
     }
 
-    private static ValueType createUnsignedShort(String stringValue, Format format) throws DataTypeFormatException {
+    private ValueType createUnsignedShort(String stringValue, Format format) throws DataTypeFormatException {
         return new UnsignedShortType(stringValue, format);
     }
 
-    private static ValueType createUnsignedByte(String stringValue, Format format) throws DataTypeFormatException {
+    private ValueType createUnsignedByte(String stringValue, Format format) throws DataTypeFormatException {
         return new UnsignedByteType(stringValue, format);
     }
 
-    private static ValueType createNegativeInt(String stringValue, Format format) throws DataTypeFormatException {
+    private ValueType createNegativeInt(String stringValue, Format format) throws DataTypeFormatException {
         return new NegativeIntegerType(stringValue, format);
     }
 
-    private static ValueType createNonNegativeInt(String stringValue, Format format) throws DataTypeFormatException {
+    private ValueType createNonNegativeInt(String stringValue, Format format) throws DataTypeFormatException {
         return new NonNegativeIntegerType(stringValue, format);
     }
 
-    private static ValueType createNonPositiveInt(String stringValue, Format format) throws DataTypeFormatException {
+    private ValueType createNonPositiveInt(String stringValue, Format format) throws DataTypeFormatException {
         return new NonPositiveIntegerType(stringValue, format);
     }
 
-    private static ValueType createPositiveInt(String stringValue, Format format) throws DataTypeFormatException {
+    private ValueType createPositiveInt(String stringValue, Format format) throws DataTypeFormatException {
         return new PositiveIntegerType(stringValue, format);
     }
 
-    private static ValueType createInteger(String stringValue, Format format) throws DataTypeFormatException {
+    private ValueType createInteger(String stringValue, Format format) throws DataTypeFormatException {
         return new IntegerType(stringValue, format);
     }
 
-    private static ValueType createLong(String stringValue, Format format) throws DataTypeFormatException {
+    private ValueType createLong(String stringValue, Format format) throws DataTypeFormatException {
         return new LongType(stringValue, format);
     }
 
-    private static ValueType createInt(String stringValue, Format format) throws DataTypeFormatException {
+    private ValueType createInt(String stringValue, Format format) throws DataTypeFormatException {
         return new IntType(stringValue, format);
     }
 
-    private static ValueType createShort(String stringValue, Format format) throws DataTypeFormatException {
+    private ValueType createShort(String stringValue, Format format) throws DataTypeFormatException {
         return new ShortType(stringValue, format);
     }
 
-    private static ValueType createByte(String stringValue, Format format) throws DataTypeFormatException {
+    private ValueType createByte(String stringValue, Format format) throws DataTypeFormatException {
         return new ByteType(stringValue, format);
     }
 
-    private static ValueType createFloat(String stringValue, Format format) throws DataTypeFormatException {
+    private ValueType createFloat(String stringValue, Format format) throws DataTypeFormatException {
         return new FloatType(stringValue, format);
     }
 
-    private static ValueType createDouble(String stringValue, Format format) throws DataTypeFormatException {
+    private ValueType createDouble(String stringValue, Format format) throws DataTypeFormatException {
         return new DoubleType(stringValue, format);
     }
 
-    private static ValueType createDecimal(String stringValue, Format format) throws DataTypeFormatException {
+    private ValueType createDecimal(String stringValue, Format format) throws DataTypeFormatException {
         return new DecimalType(stringValue, format);
     }
 
@@ -437,6 +436,5 @@ public class DataTypeFactory {
         }
         return resultFormat.toString();
     }
-
 
 }

@@ -1,6 +1,6 @@
 package com.malyvoj3.csvwvalidator.web.rest;
 
-import com.malyvoj3.csvwvalidator.validation.CsvwProcessor;
+import com.malyvoj3.csvwvalidator.processor.CsvwProcessor;
 import com.malyvoj3.csvwvalidator.validation.ValidationError;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -11,6 +11,7 @@ import com.malyvoj3.csvwvalidator.domain.model.DataType;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.*;
 import com.malyvoj3.csvwvalidator.utils.CsvwKeywords;
 import com.malyvoj3.csvwvalidator.validation.ValidationError;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -21,10 +22,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Slf4j
+@RequiredArgsConstructor
 public class DataTypesValidationRule extends TableDescriptionValidationRule {
 
     private static final String BOOLEAN_FORMAT_PATTERN = "\\w+\\|\\w+";
     private static final String DEFAULT_NUMERIC_FORMAT_PATTERN = "[0\\#\\.\\,E\\+\\%\\u2030\\-]";
+
+    private final DataTypeFactory dataTypeFactory;
 
     @Override
     public List<? extends ValidationError> validate(TableDescription table) {
@@ -152,7 +156,7 @@ public class DataTypesValidationRule extends TableDescriptionValidationRule {
             ValueType minInclusiveValue = null;
             if (minInclusive != null) {
                 try {
-                    minInclusiveValue = DataTypeFactory.createDataType(minInclusive, dataType);
+                    minInclusiveValue = dataTypeFactory.createDataType(minInclusive, dataType);
                 } catch (DataTypeFormatException ex) {
                     String errorMsg = String.format("Property 'minInclusive' doesn't have valid format for datatype '%s'.", dataType.getBase());
                     validationErrors.add(ValidationError.error(errorMsg));
@@ -161,7 +165,7 @@ public class DataTypesValidationRule extends TableDescriptionValidationRule {
             ValueType maxInclusiveValue = null;
             if (maxInclusive != null) {
                 try {
-                    maxInclusiveValue = DataTypeFactory.createDataType(maxInclusive, dataType);
+                    maxInclusiveValue = dataTypeFactory.createDataType(maxInclusive, dataType);
                 } catch (DataTypeFormatException ex) {
                     String errorMsg = String.format("Property 'maxInclusive' doesn't have valid format for datatype '%s'.", dataType.getBase());
                     validationErrors.add(ValidationError.error(errorMsg));
@@ -170,7 +174,7 @@ public class DataTypesValidationRule extends TableDescriptionValidationRule {
             ValueType minExclusiveValue = null;
             if (minExclusive != null) {
                 try {
-                    minExclusiveValue = DataTypeFactory.createDataType(minExclusive, dataType);
+                    minExclusiveValue = dataTypeFactory.createDataType(minExclusive, dataType);
                 } catch (DataTypeFormatException ex) {
                     String errorMsg = String.format("Property 'minExclusive' doesn't have valid format for datatype '%s'.", dataType.getBase());
                     validationErrors.add(ValidationError.error(errorMsg));
@@ -179,7 +183,7 @@ public class DataTypesValidationRule extends TableDescriptionValidationRule {
             ValueType maxExclusiveValue = null;
             if (maxExclusive != null) {
                 try {
-                    maxExclusiveValue = DataTypeFactory.createDataType(maxExclusive, dataType);
+                    maxExclusiveValue = dataTypeFactory.createDataType(maxExclusive, dataType);
                 } catch (DataTypeFormatException ex) {
                     String errorMsg = String.format("Property 'maxExclusive' doesn't have valid format for datatype '%s'.", dataType.getBase());
                     validationErrors.add(ValidationError.error(errorMsg));

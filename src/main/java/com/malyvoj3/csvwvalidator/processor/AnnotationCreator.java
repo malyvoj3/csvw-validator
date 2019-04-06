@@ -1,4 +1,4 @@
-package com.malyvoj3.csvwvalidator.validation;
+package com.malyvoj3.csvwvalidator.processor;
 
 import com.malyvoj3.csvwvalidator.domain.DataTypeFactory;
 import com.malyvoj3.csvwvalidator.domain.metadata.Context;
@@ -13,13 +13,18 @@ import com.malyvoj3.csvwvalidator.domain.model.datatypes.string.StringType;
 import com.malyvoj3.csvwvalidator.parser.csv.CsvParsingResult;
 import com.malyvoj3.csvwvalidator.utils.CsvwKeywords;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-// Z metadat vytvori anotace
+@Slf4j
+@RequiredArgsConstructor
 public class AnnotationCreator {
+
+    private final DataTypeFactory dataTypeFactory;
 
     public TableGroup createAnnotations(List<CsvParsingResult> csvParsingResults, TableGroupDescription tableGroupDescription) {
         String baseLanguage = createBaseLanguage(tableGroupDescription);
@@ -122,7 +127,7 @@ public class AnnotationCreator {
                 }
             } else {
                 try {
-                    value = DataTypeFactory.createDataType(cell.getStringValue(), dataType);
+                    value = dataTypeFactory.createDataType(cell.getStringValue(), dataType);
                     boolean isValid = validateConstraints(value, dataType);
                     if (!isValid) {
                         String errorMsg = String.format("Cell value (row %d column %d) does not satisfy the " +
@@ -188,25 +193,25 @@ public class AnnotationCreator {
         }
         if (value.isValueDataType()) {
             if (dataType.getMinimum() != null) {
-                ValueType minimumValue = DataTypeFactory.createDataType(dataType.getMinimum(), dataType);
+                ValueType minimumValue = dataTypeFactory.createDataType(dataType.getMinimum(), dataType);
                 if (!value.isGreaterEq(minimumValue)) {
                     return false;
                 }
             }
             if (dataType.getMaximum() != null) {
-                ValueType maximumValue = DataTypeFactory.createDataType(dataType.getMaximum(), dataType);
+                ValueType maximumValue = dataTypeFactory.createDataType(dataType.getMaximum(), dataType);
                 if (!value.isLowerEq(maximumValue)) {
                     return false;
                 }
             }
             if (dataType.getMinExclusive() != null) {
-                ValueType minExclusiveValue = DataTypeFactory.createDataType(dataType.getMinExclusive(), dataType);
+                ValueType minExclusiveValue = dataTypeFactory.createDataType(dataType.getMinExclusive(), dataType);
                 if (!value.isGreater(minExclusiveValue)) {
                     return false;
                 }
             }
             if (dataType.getMaxExclusive() != null) {
-                ValueType maxExclusiveValue = DataTypeFactory.createDataType(dataType.getMaxExclusive(), dataType);
+                ValueType maxExclusiveValue = dataTypeFactory.createDataType(dataType.getMaxExclusive(), dataType);
                 if (!value.isLower(maxExclusiveValue)) {
                     return false;
                 }

@@ -3,6 +3,11 @@ package com.malyvoj3.csvwvalidator.validation;
 public enum Severity {
 
     /**
+     * Error which is warning in STRICT mode of validating. Otherwise it is not error.
+     */
+    STRICT_WARNING,
+
+    /**
      * Just warning.
      */
     WARNING,
@@ -13,7 +18,7 @@ public enum Severity {
     ERROR,
 
     /**
-     * Error problem and processing must be stopped.
+     * Error problem and processor must be stopped.
      */
     FATAL
 }

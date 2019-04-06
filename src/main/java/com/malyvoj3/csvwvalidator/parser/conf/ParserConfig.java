@@ -1,6 +1,7 @@
-package com.malyvoj3.csvwvalidator.parser.metadata.conf;
+package com.malyvoj3.csvwvalidator.parser.conf;
 
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.*;
+import com.malyvoj3.csvwvalidator.parser.csv.CsvParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.MetadataParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.factories.*;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.ContextParser;
@@ -10,6 +11,17 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class ParserConfig {
+
+    // PARSERS
+    @Bean
+    public MetadataParser metadataParser() {
+        return new MetadataParser(tableDescriptionParser(), tableGroupDescriptionParser());
+    }
+
+    @Bean
+    public CsvParser csvParser() {
+        return new CsvParser();
+    }
 
     // FACTORIES
     @Bean
@@ -58,11 +70,6 @@ public class ParserConfig {
     }
 
     // DESCRIPTION PARSERS
-    @Bean
-    public MetadataParser metadataParser() {
-        return new MetadataParser(tableDescriptionParser(), tableGroupDescriptionParser());
-    }
-
     @Bean
     public ContextParser contextParser() {
         return new ContextParser();

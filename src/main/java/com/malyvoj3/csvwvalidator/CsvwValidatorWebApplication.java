@@ -1,8 +1,6 @@
 package com.malyvoj3.csvwvalidator;
 
-import com.malyvoj3.csvwvalidator.parser.csv.CsvConfig;
-import com.malyvoj3.csvwvalidator.parser.metadata.conf.ParserConfig;
-import com.malyvoj3.csvwvalidator.validation.conf.ValidationConfig;
+import com.malyvoj3.csvwvalidator.processor.conf.ProcessorConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
@@ -11,7 +9,7 @@ import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-@Import({ParserConfig.class, CsvConfig.class, ValidationConfig.class})
+@Import({ProcessorConfig.class})
 @SpringBootApplication
 public class CsvwValidatorWebApplication {
 
