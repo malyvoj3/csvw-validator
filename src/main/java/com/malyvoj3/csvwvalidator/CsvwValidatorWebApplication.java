@@ -13,11 +13,10 @@ import java.net.URISyntaxException;
 
 @Import({ParserConfig.class, CsvConfig.class, ValidationConfig.class})
 @SpringBootApplication
-public class CsvwValidatorApplication {
+public class CsvwValidatorWebApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(CsvwValidatorApplication.class, args);
-        //SpringApplication.run(CsvwValidatorConsole.class, args);
+        SpringApplication.run(CsvwValidatorWebApplication.class, args);
     }
 
     @PostConstruct

@@ -17,7 +17,7 @@ import java.util.List;
 
 @Component
 @Slf4j
-public class CsvwValidatorConsole implements CommandLineRunner {
+public class CsvwValidatorConsoleApplication implements CommandLineRunner {
 
     private static final String HEADER = "Validate CSV file, JSON CSV on the Web schema or both.";
     private static final String FOOTER = "Please report issues at http://github.com/malyvoj3/csvw-validator/issues";
@@ -26,7 +26,7 @@ public class CsvwValidatorConsole implements CommandLineRunner {
     private final CsvwProcessor csvwProcessor;
 
     @Autowired
-    public CsvwValidatorConsole(ApplicationContext appContext, CsvwProcessor csvwProcessor) {
+    public CsvwValidatorConsoleApplication(ApplicationContext appContext, CsvwProcessor csvwProcessor) {
         this.appContext = appContext;
         this.csvwProcessor = csvwProcessor;
     }
