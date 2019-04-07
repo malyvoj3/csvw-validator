@@ -2,12 +2,11 @@ package com.malyvoj3.csvwvalidator.web.rest;
 
 import lombok.Data;
 
-import java.util.List;
-
 @Data
 public class ValidationRequest {
 
-    private String tabularFileUrl;
-    private List<String> metadataFilesUrl;
+    private String tabularUrl;
+    private String metadataUrl;
+    private boolean strictMode = true;
 
 }

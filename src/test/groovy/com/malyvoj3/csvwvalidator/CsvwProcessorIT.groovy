@@ -47,6 +47,7 @@ class CsvwProcessorIT extends Specification {
         "test018" | "http://www.w3.org/2013/csvw/tests/test018/tree-ops.csv" | "http://www.w3.org/2013/csvw/tests/test018/user-metadata.json"                              | ValidationStatus.PASSED
         "test023" | "http://www.w3.org/2013/csvw/tests/tree-ops.csv"         | "https://w3c.github.io/csvw/tests/reports/index.html#test_67f964a94cd7b26f36b32ef111590152" | ValidationStatus.PASSED
         "test027" | "http://www.w3.org/2013/csvw/tests/tree-ops.csv"         | "http://www.w3.org/2013/csvw/tests/test027-user-metadata.json"                              | ValidationStatus.PASSED
+        "test028" | "http://www.w3.org/2013/csvw/tests/countries.csv"        | null                                                                                        | ValidationStatus.PASSED
 
     }
 

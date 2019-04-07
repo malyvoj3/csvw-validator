@@ -50,6 +50,21 @@ public class CsvwProcessor {
     private final ModelValidator modelValidator;
     private final ResultCreator resultCreator;
 
+
+    public BatchProcessingResult processTabularData(ProcessingSettings settings, List<ProcessingInput> inputs) {
+        List<ProcessingResult> processingResults = new ArrayList<>();
+        for (ProcessingInput input : inputs) {
+            if (input.getTabularUrl() != null && input.getMetadataUrl() != null) {
+                processingResults.add(processTabularData(settings, input.getTabularUrl(), input.getMetadataUrl()));
+            } else if (input.getTabularUrl() != null) {
+                processingResults.add(processTabularData(settings, input.getTabularUrl()));
+            } else if (input.getMetadataUrl() != null) {
+                processingResults.add(processMetadata(settings, input.getMetadataUrl()));
+            }
+        }
+        return resultCreator.createBatchResult(settings, processingResults);
+    }
+
     /**
      * Processing just upload tabular data file, which means that this file is validated without scheme.
      *

@@ -49,13 +49,13 @@ public class ResultCreator {
         }
 
         return ProcessingResult.builder()
-                .csvUrl(tabularUrl)
+                .tabularUrl(tabularUrl)
                 .metadataUrl(metadataUrl)
                 .errors(validationErrors)
                 .warningCount(warningCount)
                 .errorCount(errorCount)
                 .fatalCount(fatalCount)
-                .totalErrors(validationErrors.size())
+                .totalErrorsCount(validationErrors.size())
                 .validationStatus(status)
                 .build();
     }
@@ -82,9 +82,9 @@ public class ResultCreator {
 
         return BatchProcessingResult.builder()
                 .filesCount(processingResults.size())
-                .passedCount(passedCount)
-                .warningCount(warningCount)
-                .errorCount(errorCount)
+                .passedFilesCount(passedCount)
+                .warningFilesCount(warningCount)
+                .errorFilesCount(errorCount)
                 .filesResults(processingResults)
                 .build();
     }

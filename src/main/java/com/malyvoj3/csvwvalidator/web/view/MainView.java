@@ -78,8 +78,8 @@ public class MainView extends VerticalLayout {
         grid.setColumns("severity", "formattedMessage");
 
         add(new Label(String.format("Validation result: %s", result.getValidationStatus().name())));
-        if (result.getCsvUrl() != null) {
-            add(new Label(String.format("Tabular file: %s", result.getCsvUrl())));
+        if (result.getTabularUrl() != null) {
+            add(new Label(String.format("Tabular file: %s", result.getTabularUrl())));
         }
         if (result.getMetadataUrl() != null) {
             add(new Label(String.format("Metadata file: %s", result.getMetadataUrl())));
