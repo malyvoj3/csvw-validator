@@ -6,7 +6,7 @@ import com.malyvoj3.csvwvalidator.domain.metadata.properties.StringAtomicPropert
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeDefinition;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.PropertyParser;
-import com.malyvoj3.csvwvalidator.validation.ErrorFactory;
+import com.malyvoj3.csvwvalidator.validation.JsonParserError;
 import lombok.NonNull;
 
 public class BasePropertyParser<T extends DataTypeDescription> implements PropertyParser<T> {
@@ -24,7 +24,7 @@ public class BasePropertyParser<T extends DataTypeDescription> implements Proper
             base = new StringAtomicProperty(DataTypeDefinition.getByUrl(property.textValue()).getName());
         } else {
             base = new StringAtomicProperty(BASE_DEFAULT_VALUE);
-            jsonProperty.addError(ErrorFactory.invalidPropertyType(jsonProperty.getName()));
+            jsonProperty.addError(JsonParserError.invalidPropertyType(jsonProperty.getName()));
         }
         description.setBase(base);
     }

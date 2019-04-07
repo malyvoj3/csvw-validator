@@ -5,7 +5,7 @@ import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.InheritanceDescri
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.BooleanAtomicProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.PropertyParser;
-import com.malyvoj3.csvwvalidator.validation.ErrorFactory;
+import com.malyvoj3.csvwvalidator.validation.JsonParserError;
 import lombok.NonNull;
 
 public class RequiredPropertyParser<T extends InheritanceDescription> implements PropertyParser<T> {
@@ -20,7 +20,7 @@ public class RequiredPropertyParser<T extends InheritanceDescription> implements
         if (property.isBoolean()) {
             required = new BooleanAtomicProperty(property.booleanValue());
         } else {
-            jsonProperty.addError(ErrorFactory.invalidPropertyType(jsonProperty.getName()));
+            jsonProperty.addError(JsonParserError.invalidPropertyType(jsonProperty.getName()));
             required = new BooleanAtomicProperty(REQUIRED_DEFAULT_VALUE);
         }
         description.setRequired(required);

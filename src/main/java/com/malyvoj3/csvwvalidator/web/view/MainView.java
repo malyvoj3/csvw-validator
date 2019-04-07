@@ -1,6 +1,8 @@
 package com.malyvoj3.csvwvalidator.web.view;
 
 import com.malyvoj3.csvwvalidator.processor.CsvwProcessor;
+import com.malyvoj3.csvwvalidator.processor.ProcessingResult;
+import com.malyvoj3.csvwvalidator.processor.ProcessingSettings;
 import com.malyvoj3.csvwvalidator.validation.ValidationError;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -68,19 +70,27 @@ public class MainView extends VerticalLayout {
         metadataUpload = null;
     }
 
-    private void showResult(List<? extends ValidationError> errors) {
+    private void showResult(ProcessingResult result) {
         removeAll();
         Grid<ValidationError> grid = new Grid<>(ValidationError.class);
-        List<ValidationError> items = new ArrayList<>(errors);
+        List<ValidationError> items = new ArrayList<>(result.getErrors());
         grid.setItems(items);
         grid.setColumns("severity", "formattedMessage");
+
+        add(new Label(String.format("Validation result: %s", result.getValidationStatus().name())));
+        if (result.getCsvUrl() != null) {
+            add(new Label(String.format("Tabular file: %s", result.getCsvUrl())));
+        }
+        if (result.getMetadataUrl() != null) {
+            add(new Label(String.format("Metadata file: %s", result.getMetadataUrl())));
+        }
         add(grid);
         add(createBackButton());
     }
 
     private Button createValidationButton() {
         Button validationButton = new Button("Validate");
-
+        ProcessingSettings settings = new ProcessingSettings(); // default strict mode
         validationButton.addClickListener(e -> {
             try {
                 boolean isTabularUpload = tabularUpload != null && tabularDataFile != null;
@@ -88,21 +98,21 @@ public class MainView extends VerticalLayout {
                 boolean isTabularUrl = tabularTextfield != null && StringUtils.isNotBlank(tabularTextfield.getValue());
                 boolean isMetadataUrl = metadataTextfield != null && StringUtils.isNotBlank(metadataTextfield.getValue());
                 if (isTabularUpload && isMetadataUpload) {
-                    showResult(csvwProcessor.processTabularData(tabularDataFile, tabularDataFileName, metadataFile, metadataFileName));
+                    showResult(csvwProcessor.processTabularData(settings, tabularDataFile, tabularDataFileName, metadataFile, metadataFileName));
                 } else if (isTabularUrl && isMetadataUrl) {
-                    showResult(csvwProcessor.processTabularData(tabularTextfield.getValue(), metadataTextfield.getValue()));
+                    showResult(csvwProcessor.processTabularData(settings, tabularTextfield.getValue(), metadataTextfield.getValue()));
                 } else if (isTabularUpload && isMetadataUrl) {
                     Notification.show("Unsupported combination: uploaded tabular data file and metadata url!");
                 } else if (isTabularUrl && isMetadataUpload) {
-                    showResult(csvwProcessor.processTabularData(tabularTextfield.getValue(), metadataFile, metadataFileName));
+                    showResult(csvwProcessor.processTabularData(settings, tabularTextfield.getValue(), metadataFile, metadataFileName));
                 } else if (isMetadataUrl) {
-                    showResult(csvwProcessor.processMetadata(metadataTextfield.getValue()));
+                    showResult(csvwProcessor.processMetadata(settings, metadataTextfield.getValue()));
                 } else if (isTabularUrl) {
-                    showResult(csvwProcessor.processTabularData(tabularTextfield.getValue()));
+                    showResult(csvwProcessor.processTabularData(settings, tabularTextfield.getValue()));
                 } else if (isTabularUpload) {
-                    showResult(csvwProcessor.processTabularData(tabularDataFile, tabularDataFileName));
+                    showResult(csvwProcessor.processTabularData(settings, tabularDataFile, tabularDataFileName));
                 } else if (isMetadataUpload) {
-                    showResult(csvwProcessor.processMetadata(metadataFile, metadataFileName));
+                    showResult(csvwProcessor.processMetadata(settings, metadataFile, metadataFileName));
                 } else {
                     Notification.show("Insert some files!");
                 }

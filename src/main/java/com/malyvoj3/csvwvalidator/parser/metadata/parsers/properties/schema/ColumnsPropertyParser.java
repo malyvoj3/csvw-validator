@@ -10,7 +10,6 @@ import com.malyvoj3.csvwvalidator.parser.metadata.JsonObject;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.PropertyParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.descriptions.ColumnDescriptionParser;
-import com.malyvoj3.csvwvalidator.validation.ErrorFactory;
 import com.malyvoj3.csvwvalidator.validation.JsonParserError;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +45,7 @@ public class ColumnsPropertyParser<T extends SchemaDescription> implements Prope
                         jsonProperty.addError(error);
                     });
                 } else {
-                    JsonParserError error = ErrorFactory.invalidPropertyType(String.valueOf(arrayCounter));
+                    JsonParserError error = JsonParserError.invalidPropertyType(String.valueOf(arrayCounter));
                     error.addKey(jsonProperty.getName());
                     jsonProperty.addError(error);
                 }
@@ -55,7 +54,7 @@ public class ColumnsPropertyParser<T extends SchemaDescription> implements Prope
         if (!columnsList.isEmpty()) {
             columns = new ArrayProperty<>(columnsList);
         } else {
-            jsonProperty.addError(ErrorFactory.invalidPropertyType(jsonProperty.getName()));
+            jsonProperty.addError(JsonParserError.invalidPropertyType(jsonProperty.getName()));
         }
         description.setColumns(columns);
     }

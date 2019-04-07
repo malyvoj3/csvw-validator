@@ -10,7 +10,6 @@ import com.malyvoj3.csvwvalidator.parser.metadata.JsonObject;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.PropertyParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.descriptions.ForeignKeyDescriptionParser;
-import com.malyvoj3.csvwvalidator.validation.ErrorFactory;
 import com.malyvoj3.csvwvalidator.validation.JsonParserError;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +46,7 @@ public class ForeignKeysPropertyParser<T extends SchemaDescription> implements P
                         jsonProperty.addError(error);
                     });
                 } else {
-                    JsonParserError error = ErrorFactory.invalidPropertyType(String.valueOf(arrayCounter));
+                    JsonParserError error = JsonParserError.invalidPropertyType(String.valueOf(arrayCounter));
                     error.addKey(jsonProperty.getName());
                     jsonProperty.addError(error);
                 }
@@ -56,7 +55,7 @@ public class ForeignKeysPropertyParser<T extends SchemaDescription> implements P
         if (!foreignKeyList.isEmpty()) {
             foreignKeys = new ArrayProperty<>(foreignKeyList);
         } else {
-            jsonProperty.addError(ErrorFactory.invalidPropertyType(jsonProperty.getName()));
+            jsonProperty.addError(JsonParserError.invalidPropertyType(jsonProperty.getName()));
         }
         description.setForeignKeys(foreignKeys);
 

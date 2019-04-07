@@ -5,7 +5,7 @@ import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.DataTypeDescripti
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.StringAtomicProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.PropertyParser;
-import com.malyvoj3.csvwvalidator.validation.ErrorFactory;
+import com.malyvoj3.csvwvalidator.validation.JsonParserError;
 import lombok.NonNull;
 
 public class MaxInclusivePropertyParser<T extends DataTypeDescription> implements PropertyParser<T> {
@@ -17,7 +17,7 @@ public class MaxInclusivePropertyParser<T extends DataTypeDescription> implement
         if (property.isIntegralNumber() || property.isFloatingPointNumber() || property.isTextual()) {
             description.setMaxInclusive(new StringAtomicProperty(property.asText()));
         } else if (!property.isNull()) {
-            jsonProperty.addError(ErrorFactory.invalidPropertyType(jsonProperty.getName()));
+            jsonProperty.addError(JsonParserError.invalidPropertyType(jsonProperty.getName()));
         }
     }
 }

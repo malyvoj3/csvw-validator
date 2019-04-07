@@ -5,7 +5,7 @@ import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.DataTypeDescripti
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.IntegerAtomicProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.PropertyParser;
-import com.malyvoj3.csvwvalidator.validation.ErrorFactory;
+import com.malyvoj3.csvwvalidator.validation.JsonParserError;
 import lombok.NonNull;
 
 public class LengthPropertyParser<T extends DataTypeDescription> implements PropertyParser<T> {
@@ -17,7 +17,7 @@ public class LengthPropertyParser<T extends DataTypeDescription> implements Prop
         if (property.isIntegralNumber()) {
             description.setLength(new IntegerAtomicProperty(property.longValue()));
         } else if (!property.isNull()) {
-            jsonProperty.addError(ErrorFactory.invalidPropertyType(jsonProperty.getName()));
+            jsonProperty.addError(JsonParserError.invalidPropertyType(jsonProperty.getName()));
         }
     }
 

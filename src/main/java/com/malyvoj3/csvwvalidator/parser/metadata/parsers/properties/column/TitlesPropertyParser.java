@@ -9,7 +9,7 @@ import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.PropertyParser;
 import com.malyvoj3.csvwvalidator.utils.CsvwKeywords;
 import com.malyvoj3.csvwvalidator.utils.LanguageUtils;
-import com.malyvoj3.csvwvalidator.validation.ErrorFactory;
+import com.malyvoj3.csvwvalidator.validation.JsonParserError;
 import lombok.NonNull;
 
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ public class TitlesPropertyParser<T extends ColumnDescription> implements Proper
             ObjectNode objectNode = (ObjectNode) property;
             titlesMap = titlesFromObject(objectNode);
         } else {
-            jsonProperty.addError(ErrorFactory.invalidPropertyType(jsonProperty.getName()));
+            jsonProperty.addError(JsonParserError.invalidPropertyType(jsonProperty.getName()));
         }
 
         if (!titlesMap.isEmpty()) {

@@ -5,7 +5,7 @@ import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.DialectDescriptio
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.StringAtomicProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.PropertyParser;
-import com.malyvoj3.csvwvalidator.validation.ErrorFactory;
+import com.malyvoj3.csvwvalidator.validation.JsonParserError;
 import lombok.NonNull;
 
 import java.util.Set;
@@ -27,7 +27,7 @@ public class TrimPropertyParser<T extends DialectDescription> implements Propert
         } else if (property.isBoolean()) {
             trim = new StringAtomicProperty(property.asText());
         } else {
-            jsonProperty.addError(ErrorFactory.invalidPropertyType(jsonProperty.getName()));
+            jsonProperty.addError(JsonParserError.invalidPropertyType(jsonProperty.getName()));
             trim = new StringAtomicProperty(TRIM_DEFAULT_VALUE);
         }
         description.setTrim(trim);

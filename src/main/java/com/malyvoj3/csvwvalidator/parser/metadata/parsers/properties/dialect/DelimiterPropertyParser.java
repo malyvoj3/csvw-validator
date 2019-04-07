@@ -5,7 +5,7 @@ import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.DialectDescriptio
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.StringAtomicProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.PropertyParser;
-import com.malyvoj3.csvwvalidator.validation.ErrorFactory;
+import com.malyvoj3.csvwvalidator.validation.JsonParserError;
 import lombok.NonNull;
 
 public class DelimiterPropertyParser<T extends DialectDescription> implements PropertyParser<T> {
@@ -20,7 +20,7 @@ public class DelimiterPropertyParser<T extends DialectDescription> implements Pr
         if (property.isTextual()) {
             delimiter = new StringAtomicProperty(property.textValue());
         } else {
-            jsonProperty.addError(ErrorFactory.invalidPropertyType(jsonProperty.getName()));
+            jsonProperty.addError(JsonParserError.invalidPropertyType(jsonProperty.getName()));
             delimiter = new StringAtomicProperty(DELIMITER_DEFAULT_VALUE);
         }
         description.setDelimiter(delimiter);

@@ -5,7 +5,7 @@ import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.DialectDescriptio
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.BooleanAtomicProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.PropertyParser;
-import com.malyvoj3.csvwvalidator.validation.ErrorFactory;
+import com.malyvoj3.csvwvalidator.validation.JsonParserError;
 import lombok.NonNull;
 
 public class SkipBlankRowsPropertyParser<T extends DialectDescription> implements PropertyParser<T> {
@@ -20,7 +20,7 @@ public class SkipBlankRowsPropertyParser<T extends DialectDescription> implement
         if (property.isBoolean()) {
             skipBlankRows = new BooleanAtomicProperty(property.booleanValue());
         } else {
-            jsonProperty.addError(ErrorFactory.invalidPropertyType(jsonProperty.getName()));
+            jsonProperty.addError(JsonParserError.invalidPropertyType(jsonProperty.getName()));
             skipBlankRows = new BooleanAtomicProperty(SKIP_BLANK_ROWS_DEFAULT_VALUE);
         }
         description.setSkipBlankRows(skipBlankRows);

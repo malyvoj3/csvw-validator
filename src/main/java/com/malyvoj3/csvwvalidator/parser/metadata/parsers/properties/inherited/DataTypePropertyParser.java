@@ -11,7 +11,7 @@ import com.malyvoj3.csvwvalidator.parser.metadata.JsonObject;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.PropertyParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.descriptions.DataTypeDescriptionParser;
-import com.malyvoj3.csvwvalidator.validation.ErrorFactory;
+import com.malyvoj3.csvwvalidator.validation.JsonParserError;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -36,7 +36,7 @@ public class DataTypePropertyParser<T extends InheritanceDescription> implements
             dataType = new DataTypeDescription();
             dataType.setBase(new StringAtomicProperty(DataTypeDefinition.getByUrl(property.textValue()).getName()));
         } else {
-            jsonProperty.addError(ErrorFactory.invalidPropertyType(jsonProperty.getName()));
+            jsonProperty.addError(JsonParserError.invalidPropertyType(jsonProperty.getName()));
             dataType = null;
         }
         if (dataType != null) {

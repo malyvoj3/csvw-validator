@@ -6,6 +6,7 @@ import com.malyvoj3.csvwvalidator.parser.csv.CsvParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.MetadataParser;
 import com.malyvoj3.csvwvalidator.processor.AnnotationCreator;
 import com.malyvoj3.csvwvalidator.processor.CsvwProcessor;
+import com.malyvoj3.csvwvalidator.processor.ResultCreator;
 import com.malyvoj3.csvwvalidator.processor.SiteWideLocator;
 import com.malyvoj3.csvwvalidator.validation.conf.ValidationConfig;
 import com.malyvoj3.csvwvalidator.validation.metadata.MetadataValidator;
@@ -32,7 +33,7 @@ public class ProcessorConfig {
     @Bean
     public CsvwProcessor csvwProcessor() {
         return new CsvwProcessor(csvParser, metadataParser, siteWideLocator(),
-                annotationCreator(), metadataValidator, modelValidator);
+                annotationCreator(), metadataValidator, modelValidator, resultCreator());
     }
 
     @Bean
@@ -43,6 +44,11 @@ public class ProcessorConfig {
     @Bean
     public AnnotationCreator annotationCreator() {
         return new AnnotationCreator(dataTypeFactory);
+    }
+
+    @Bean
+    public ResultCreator resultCreator() {
+        return new ResultCreator();
     }
 
 }

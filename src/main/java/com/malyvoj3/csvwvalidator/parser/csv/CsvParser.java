@@ -53,7 +53,7 @@ public class CsvParser {
         try {
             Reader reader = new InputStreamReader(new ByteArrayInputStream(file));
             if (!FileUtils.isUtf8(file)) {
-                parsingErrors.add(ValidationError.warn("Invalid encoding: file has not 'UTF-8' encoding."));
+                parsingErrors.add(ValidationError.strictWarn("Invalid encoding: file has not 'UTF-8' encoding."));
             }
 
             com.univocity.parsers.csv.CsvParser csvParser = new com.univocity.parsers.csv.CsvParser(defaultSettings(dialect));
@@ -66,7 +66,7 @@ public class CsvParser {
             tableDescription = createTableDescription(columnDescriptions, url);
         } catch (Exception ex) {
             log.error(String.format("Error during CSV parsing of file '%s'.", url), ex);
-            parsingErrors.add(ValidationError.fatal(String.format("File '%s' is not valid CSV file.", url)));
+            parsingErrors.add(ValidationError.fatal("File '%s' is not valid CSV file.", url));
         }
         return new CsvParsingResult(url, parsingErrors, table, tableDescription);
     }
@@ -98,10 +98,10 @@ public class CsvParser {
                 Row row = new Row();
                 row.setNumber(rowNumber);
                 if (record.length > columnLength) {
-                    parsingErrors.add(ValidationError.warn(
-                            String.format("Row %d has more cells than CSV file has columns." +
+                    parsingErrors.add(ValidationError.strictWarn(
+                            "Row %d has more cells than CSV file has columns." +
                                     " Some cell is not quoted?", rowNumber)
-                    ));
+                    );
                 }
                 for (int i = 0; i < columnLength; i++) {
                     String value = record[i];
@@ -118,7 +118,7 @@ public class CsvParser {
                 }
                 table.getRows().add(row);
             } else {
-                parsingErrors.add(ValidationError.warn(String.format("Empty row number %d.", rowNumber)));
+                parsingErrors.add(ValidationError.strictWarn("Empty row number %d.", rowNumber));
             }
             rowNumber++;
         }
@@ -133,7 +133,7 @@ public class CsvParser {
                     .filter(StringUtils::isNotBlank)
                     .count();
             if (notBlankNum == 0) {
-                errors.add(ValidationError.warn(String.format("Column '%s' is empty column.", column.getName())));
+                errors.add(ValidationError.strictWarn("Column '%s' is empty column.", column.getName()));
             }
         }
         return errors;
@@ -144,26 +144,22 @@ public class CsvParser {
         if (value == null) {
             errors = Collections.emptyList();
         } else if (StringUtils.isWhitespace(value)) {
-            errors = Collections.singletonList(ValidationError.warn(
-                    String.format("Value in row %d column %d is just whitespace.", rowNumber, columnNumber
-                    )));
+            errors = Collections.singletonList(ValidationError.strictWarn(
+                    "Value in row %d column %d is just whitespace.", rowNumber, columnNumber
+            ));
         } else if ("null".equals(value)) {
-            errors = Collections.singletonList(ValidationError.warn(
-                    String.format("Value in row %d column %d is equal to 'null', should be empty string.", rowNumber, columnNumber
-                    )));
+            errors = Collections.singletonList(ValidationError.strictWarn(
+                    "Value in row %d column %d is equal to 'null', should be empty string.", rowNumber, columnNumber
+            ));
         } else if (containsLeadingSpaces(value)) {
-            errors = Collections.singletonList(ValidationError.warn(
-                    String.format("Value in row %d column %d has leading spaces.", rowNumber, columnNumber
-                    )));
+            errors = Collections.singletonList(ValidationError.strictWarn(
+                    "Value in row %d column %d has leading spaces.", rowNumber, columnNumber
+            ));
         } else if (containsTrailingSpaces(value)) {
-            errors = Collections.singletonList(ValidationError.warn(
-                    String.format("Value in row %d column %d has trailing spaces.", rowNumber, columnNumber
-                    )));
-        } /*else if (containsMultipleSpaces(value)) {
-            errors = Collections.singletonList(ValidationError.warn(
-                    String.format("Value in row %d column %d has multiple consecutive whitespaces.", rowNumber + 1, columnNumber
-                    )));
-        }*/
+            errors = Collections.singletonList(ValidationError.strictWarn(
+                    "Value in row %d column %d has trailing spaces.", rowNumber, columnNumber
+            ));
+        }
         return errors;
     }
 
@@ -178,22 +174,22 @@ public class CsvParser {
     private List<ValidationError> validateCsvFormat(CsvFormat detectedFormat) {
         List<ValidationError> errorList = new ArrayList<>();
         if (!LINE_SEPARATOR_DEFAULT.equals(detectedFormat.getLineSeparatorString())) {
-            errorList.add(ValidationError.warn(
+            errorList.add(ValidationError.strictWarn(
                     invalidMsg("line separator", escapeLineSeparator(detectedFormat.getLineSeparatorString()), escapeLineSeparator(LINE_SEPARATOR_DEFAULT))
             ));
         }
         if (!FIELD_DELIMITER_DEFAULT.equals(detectedFormat.getDelimiterString())) {
-            errorList.add(ValidationError.warn(
+            errorList.add(ValidationError.strictWarn(
                     invalidMsg("field delimiter", detectedFormat.getDelimiterString(), FIELD_DELIMITER_DEFAULT)
             ));
         }
         if (QUOTE_CHAR_DEFAULT != detectedFormat.getQuote()) {
-            errorList.add(ValidationError.warn(
+            errorList.add(ValidationError.strictWarn(
                     invalidMsg("quote character", String.valueOf(detectedFormat.getQuote()), String.valueOf(QUOTE_CHAR_DEFAULT))
             ));
         }
         if (QUOTE_ESCAPE_CHAR_DEFAULT != detectedFormat.getQuoteEscape()) {
-            errorList.add(ValidationError.warn(
+            errorList.add(ValidationError.strictWarn(
                     invalidMsg("quote escape character", String.valueOf(detectedFormat.getQuoteEscape()), String.valueOf(QUOTE_CHAR_DEFAULT))
             ));
         }

@@ -5,7 +5,7 @@ import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.TopLevelDescripti
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.StringAtomicProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.PropertyParser;
-import com.malyvoj3.csvwvalidator.validation.ErrorFactory;
+import com.malyvoj3.csvwvalidator.validation.JsonParserError;
 import lombok.NonNull;
 
 import java.util.Set;
@@ -25,7 +25,7 @@ public class TableDirectionPropertyParser<T extends TopLevelDescription> impleme
         if (property.isTextual() && possibleValues.contains(property.textValue())) {
             textDirection = new StringAtomicProperty(property.textValue());
         } else {
-            jsonProperty.addError(ErrorFactory.invalidPropertyType(jsonProperty.getName()));
+            jsonProperty.addError(JsonParserError.invalidPropertyType(jsonProperty.getName()));
             textDirection = new StringAtomicProperty(TABLE_DIRECTION_DEFAULT_VALUE);
         }
         description.setTableDirection(textDirection);

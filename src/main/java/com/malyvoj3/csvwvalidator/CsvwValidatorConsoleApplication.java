@@ -1,8 +1,9 @@
 package com.malyvoj3.csvwvalidator;
 
 import com.malyvoj3.csvwvalidator.processor.CsvwProcessor;
+import com.malyvoj3.csvwvalidator.processor.ProcessingResult;
+import com.malyvoj3.csvwvalidator.processor.ProcessingSettings;
 import com.malyvoj3.csvwvalidator.utils.UriUtils;
-import com.malyvoj3.csvwvalidator.validation.ValidationError;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.cli.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +13,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 @Slf4j
@@ -40,8 +39,8 @@ public class CsvwValidatorConsoleApplication implements CommandLineRunner {
             try {
                 formatter.printHelp("java -jar validator.jar", HEADER, options, FOOTER, true);
                 CommandLine line = parser.parse(options, args);
-                List<? extends ValidationError> errors = validate(line.getOptionValue('f'), line.getOptionValue('s'));
-                System.out.println(errors);
+                ProcessingResult result = validate(line.getOptionValue('f'), line.getOptionValue('s'));
+                System.out.println(result);
             } catch (ParseException ex) {
                 System.err.println("Invalid program arguments. Use -h or --help.");
             }
@@ -49,20 +48,21 @@ public class CsvwValidatorConsoleApplication implements CommandLineRunner {
         }
     }
 
-    private List<? extends ValidationError> validate(String fileUrl, String schemaUrl) {
-        List<ValidationError> errors = new ArrayList<>();
+    private ProcessingResult validate(String fileUrl, String schemaUrl) {
+        ProcessingResult processingResult;
         String fileAbsoluteUrl = getAbsoluteUrl(fileUrl);
         String schemaAbsoluteUrl = getAbsoluteUrl(schemaUrl);
+        ProcessingSettings settings = new ProcessingSettings(); // TODO
         if (fileAbsoluteUrl != null && schemaAbsoluteUrl != null) {
-            errors.addAll(csvwProcessor.processTabularData(fileAbsoluteUrl, schemaAbsoluteUrl));
+            processingResult = csvwProcessor.processTabularData(settings, fileAbsoluteUrl, schemaAbsoluteUrl);
         } else if (fileAbsoluteUrl != null) {
-            errors.addAll(csvwProcessor.processTabularData(fileAbsoluteUrl));
+            processingResult = csvwProcessor.processTabularData(settings, fileAbsoluteUrl);
         } else if (schemaAbsoluteUrl != null) {
-            errors.addAll(csvwProcessor.processMetadata(schemaAbsoluteUrl));
+            processingResult = csvwProcessor.processMetadata(settings, schemaAbsoluteUrl);
         } else {
             throw new IllegalStateException();
         }
-        return errors;
+        return processingResult;
     }
 
     private String getAbsoluteUrl(String url) {

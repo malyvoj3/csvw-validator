@@ -10,7 +10,7 @@ import com.malyvoj3.csvwvalidator.parser.metadata.JsonObject;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.PropertyParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.descriptions.FormatDescriptionParser;
-import com.malyvoj3.csvwvalidator.validation.ErrorFactory;
+import com.malyvoj3.csvwvalidator.validation.JsonParserError;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -35,7 +35,7 @@ public class FormatPropertyParser<T extends DataTypeDescription> implements Prop
             format = new AtomicProperty<>(formatDescription);
         } else {
             format = null;
-            jsonProperty.addError(ErrorFactory.invalidPropertyType(jsonProperty.getName()));
+            jsonProperty.addError(JsonParserError.invalidPropertyType(jsonProperty.getName()));
         }
         description.setFormat(format);
     }

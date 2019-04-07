@@ -6,7 +6,6 @@ import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.ParserFactory;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.ObjectDescriptionParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.PropertyParser;
-import com.malyvoj3.csvwvalidator.validation.ErrorFactory;
 import com.malyvoj3.csvwvalidator.validation.JsonParserError;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +33,7 @@ public abstract class DefaultDescriptionParser<T extends ObjectDescription> impl
                 });
             } else {
                 log.warn("Unknown property {}.", entry.getKey());
-                JsonParserError error = ErrorFactory.unknownProperty(entry.getKey());
+                JsonParserError error = JsonParserError.unknownProperty(entry.getKey());
                 if (jsonObject.getName() != null) {
                     error.addKey(jsonObject.getName());
                 }

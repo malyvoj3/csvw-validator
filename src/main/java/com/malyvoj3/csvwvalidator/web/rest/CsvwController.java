@@ -1,18 +1,12 @@
 package com.malyvoj3.csvwvalidator.web.rest;
 
 import com.malyvoj3.csvwvalidator.processor.CsvwProcessor;
-import com.malyvoj3.csvwvalidator.validation.ValidationError;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 public class CsvwController {
@@ -30,7 +24,7 @@ public class CsvwController {
     public ResponseEntity<ValidationResponse> validate(@RequestBody ValidationRequest request) {
         ValidationResponse response = new ValidationResponse();
         if (request.getMetadataFilesUrl() != null && request.getMetadataFilesUrl().size() > 0) {
-            String metadataUrl = request.getMetadataFilesUrl().get(0);
+            /*String metadataUrl = request.getMetadataFilesUrl().get(0);
             String tabularUrl = request.getTabularFileUrl();
             List<? extends ValidationError> errors = new ArrayList<>();
             if (StringUtils.isNotEmpty(metadataUrl) && StringUtils.isNotEmpty(tabularUrl)) {
@@ -42,7 +36,7 @@ public class CsvwController {
             }
             response.setValidationErrors(errors.stream()
                     .map(ValidationError::getFormattedMessage)
-                    .collect(Collectors.toList()));
+                    .collect(Collectors.toList()));*/
         }
         return ResponseEntity.ok(response);
     }

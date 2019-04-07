@@ -5,7 +5,7 @@ import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.FormatDescription
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.StringAtomicProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.PropertyParser;
-import com.malyvoj3.csvwvalidator.validation.ErrorFactory;
+import com.malyvoj3.csvwvalidator.validation.JsonParserError;
 import lombok.NonNull;
 
 public class GroupCharPropertyParser<T extends FormatDescription> implements PropertyParser<T> {
@@ -21,7 +21,7 @@ public class GroupCharPropertyParser<T extends FormatDescription> implements Pro
             groupChar = new StringAtomicProperty(property.textValue());
         } else {
             groupChar = new StringAtomicProperty(GROUP_CHAR_DEFAULT_VALUE);
-            jsonProperty.addError(ErrorFactory.invalidPropertyType(jsonProperty.getName()));
+            jsonProperty.addError(JsonParserError.invalidPropertyType(jsonProperty.getName()));
         }
         description.setGroupChar(groupChar);
     }

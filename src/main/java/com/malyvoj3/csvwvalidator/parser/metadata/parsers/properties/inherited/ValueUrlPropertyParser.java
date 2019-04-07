@@ -5,7 +5,7 @@ import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.InheritanceDescri
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.UriTemplateProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.PropertyParser;
-import com.malyvoj3.csvwvalidator.validation.ErrorFactory;
+import com.malyvoj3.csvwvalidator.validation.JsonParserError;
 import lombok.NonNull;
 
 public class ValueUrlPropertyParser<T extends InheritanceDescription> implements PropertyParser<T> {
@@ -20,7 +20,7 @@ public class ValueUrlPropertyParser<T extends InheritanceDescription> implements
         if (property.isTextual()) {
             valueUrl = new UriTemplateProperty(property.textValue());
         } else {
-            jsonProperty.addError(ErrorFactory.invalidPropertyType(jsonProperty.getName()));
+            jsonProperty.addError(JsonParserError.invalidPropertyType(jsonProperty.getName()));
             valueUrl = new UriTemplateProperty(VALUE_URL_DEFAULT_VALUE);
         }
         description.setValueUrl(valueUrl);

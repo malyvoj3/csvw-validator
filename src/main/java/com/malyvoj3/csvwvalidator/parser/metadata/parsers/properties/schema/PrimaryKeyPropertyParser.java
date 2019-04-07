@@ -6,7 +6,7 @@ import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.SchemaDescription
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.ColumnReferenceProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.PropertyParser;
-import com.malyvoj3.csvwvalidator.validation.ErrorFactory;
+import com.malyvoj3.csvwvalidator.validation.JsonParserError;
 import lombok.NonNull;
 
 import java.util.ArrayList;
@@ -32,7 +32,7 @@ public class PrimaryKeyPropertyParser<T extends SchemaDescription> implements Pr
             });
             primaryKey = new ColumnReferenceProperty(primaryKeysList);
         } else {
-            jsonProperty.addError(ErrorFactory.invalidPropertyType(jsonProperty.getName()));
+            jsonProperty.addError(JsonParserError.invalidPropertyType(jsonProperty.getName()));
             primaryKey = null;
         }
         description.setPrimaryKey(primaryKey);

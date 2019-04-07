@@ -5,7 +5,7 @@ import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.ReferenceDescript
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.LinkProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.PropertyParser;
-import com.malyvoj3.csvwvalidator.validation.ErrorFactory;
+import com.malyvoj3.csvwvalidator.validation.JsonParserError;
 import lombok.NonNull;
 
 public class SchemaReferencePropertyParser<T extends ReferenceDescription> implements PropertyParser<T> {
@@ -18,7 +18,7 @@ public class SchemaReferencePropertyParser<T extends ReferenceDescription> imple
         if (property.isTextual()) {
             schemaReference = new LinkProperty(property.textValue());
         } else {
-            jsonProperty.addError(ErrorFactory.invalidPropertyType(jsonProperty.getName()));
+            jsonProperty.addError(JsonParserError.invalidPropertyType(jsonProperty.getName()));
             schemaReference = null;
         }
         description.setSchemaReference(schemaReference);
