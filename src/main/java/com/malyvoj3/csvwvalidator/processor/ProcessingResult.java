@@ -1,11 +1,13 @@
-package com.malyvoj3.csvwvalidator.validation;
+package com.malyvoj3.csvwvalidator.processor;
 
+import com.malyvoj3.csvwvalidator.validation.ValidationError;
+import com.malyvoj3.csvwvalidator.validation.ValidationStatus;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class ValidationResult {
+public class ProcessingResult {
 
     private String csvUrl;
     private String metadataUrl;

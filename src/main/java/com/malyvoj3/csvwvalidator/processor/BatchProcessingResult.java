@@ -1,4 +1,4 @@
-package com.malyvoj3.csvwvalidator.validation;
+package com.malyvoj3.csvwvalidator.processor;
 
 import lombok.Data;
 
@@ -6,12 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class BatchValidationResult {
+public class BatchProcessingResult {
 
     private long filesNum;
     private long passedNum;
     private long warningNum;
     private long errorNum;
-    private List<ValidationResult> filesResults = new ArrayList<>();
+    private List<ProcessingResult> filesResults = new ArrayList<>();
 
 }
