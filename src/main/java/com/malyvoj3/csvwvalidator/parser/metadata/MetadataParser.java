@@ -65,7 +65,6 @@ public class MetadataParser {
                 } else {
                     validationErrors.add(ValidationError.fatal("Metadata JSON does not contain valid 'url' or 'tables' property, or it contains both."));
                 }
-
                 // TODO validation - urls of table group > 1, unique names in tableSchema.columns, virtual columns after  normal,... more
             } else {
                 throw new ParserException();

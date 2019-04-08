@@ -9,6 +9,7 @@ import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;
 import com.malyvoj3.csvwvalidator.utils.CsvwKeywords;
 import com.malyvoj3.csvwvalidator.utils.LanguageUtils;
 import com.malyvoj3.csvwvalidator.utils.UriUtils;
+import com.malyvoj3.csvwvalidator.validation.JsonParserError;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,23 +36,31 @@ public class ContextParser {
                     ObjectNode objectNode = (ObjectNode) second;
                     JsonNode base = objectNode.get(CsvwKeywords.BASE_PROPERTY);
                     JsonNode language = objectNode.get(CsvwKeywords.LANGUAGE_PROPERTY);
-                    addBase(context, base);
-                    addLanguage(context, language);
+                    addBase(context, base, jsonProperty);
+                    addLanguage(context, language, jsonProperty);
                 }
             }
         }
         return context;
     }
 
-    private void addBase(Context context, JsonNode base) {
-        if (base != null && base.isTextual()) {
-            context.setBase(new StringAtomicProperty(base.textValue()));
+    private void addBase(Context context, JsonNode base, JsonProperty jsonProperty) {
+        if (base != null) {
+            if (base.isTextual()) {
+                context.setBase(new StringAtomicProperty(base.textValue()));
+            } else {
+                jsonProperty.addError(JsonParserError.invalidPropertyType("@base"));
+            }
         }
     }
 
-    private void addLanguage(Context context, JsonNode language) {
-        if (language != null && language.isTextual() && LanguageUtils.isLanguageTag(language.textValue())) {
-            context.setLanguage(new StringAtomicProperty(language.textValue()));
+    private void addLanguage(Context context, JsonNode language, JsonProperty jsonProperty) {
+        if (language != null) {
+            if (language.isTextual() && LanguageUtils.isLanguageTag(language.textValue())) {
+                context.setLanguage(new StringAtomicProperty(language.textValue()));
+            } else {
+                jsonProperty.addError(JsonParserError.invalidPropertyType("@language"));
+            }
         }
     }
 

@@ -22,7 +22,8 @@ public class DataTypeFactory {
     private final static String TIMEZONE_SUFFIX = "XXX";
 
     public ValueType createDataType(String stringValue, DataType dataType) throws DataTypeFormatException {
-        String base = dataType != null ? dataType.getBase() : DATA_TYPE_BASE_DEFAULT;
+        String base = dataType != null ? dataType.getBase() : null;
+        base = base == null ? DATA_TYPE_BASE_DEFAULT : base;
         Format format = dataType != null ? dataType.getFormat() : null;
         if (CsvwKeywords.STRING_DATA_TYPE.equals(base) || CsvwKeywords.ANY_URI_DATA_TYPE.equals(base)
                 || CsvwKeywords.JSON_DATA_TYPE.equals(base)

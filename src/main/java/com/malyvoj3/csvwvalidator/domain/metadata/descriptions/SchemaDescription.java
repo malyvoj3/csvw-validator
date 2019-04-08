@@ -26,20 +26,22 @@ public class SchemaDescription extends InheritanceDescription implements Compati
 
     @Override
     public boolean isCompatibleWith(@NonNull SchemaDescription other) {
-        List<ColumnDescription> nonVirtualColumns = columns.getValue().stream()
-                .filter(column -> column.getVirtual() == null || !column.getVirtual().getValue())
-                .collect(Collectors.toList());
-        List<ColumnDescription> otherNonVirtualColumns = other.getColumns().getValue().stream()
-                .filter(column -> column.getVirtual() == null ||!column.getVirtual().getValue())
-                .collect(Collectors.toList());
         boolean compatible = false;
-        if (nonVirtualColumns.size() == otherNonVirtualColumns.size()) {
-            int length = nonVirtualColumns.size();
-            compatible = true;
-            for (int i = 0; i < length; i++) {
-                ColumnDescription firstColumn = nonVirtualColumns.get(i);
-                ColumnDescription secondColumn = otherNonVirtualColumns.get(i);
-                compatible &= firstColumn.isCompatibleWith(secondColumn);
+        if (columns != null && other.columns != null) {
+            List<ColumnDescription> nonVirtualColumns = columns.getValue().stream()
+                    .filter(column -> column.getVirtual() == null || !column.getVirtual().getValue())
+                    .collect(Collectors.toList());
+            List<ColumnDescription> otherNonVirtualColumns = other.getColumns().getValue().stream()
+                    .filter(column -> column.getVirtual() == null ||!column.getVirtual().getValue())
+                    .collect(Collectors.toList());
+            if (nonVirtualColumns.size() == otherNonVirtualColumns.size()) {
+                int length = nonVirtualColumns.size();
+                compatible = true;
+                for (int i = 0; i < length; i++) {
+                    ColumnDescription firstColumn = nonVirtualColumns.get(i);
+                    ColumnDescription secondColumn = otherNonVirtualColumns.get(i);
+                    compatible &= firstColumn.isCompatibleWith(secondColumn);
+                }
             }
         }
         return compatible;

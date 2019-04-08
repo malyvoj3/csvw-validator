@@ -13,6 +13,7 @@ public class Cell {
 
     private String aboutUrl;
     private Column column;
+    @Builder.Default
     private List<CellError> errors = new ArrayList<>();
     private boolean ordered;
     private String propertyUrl;

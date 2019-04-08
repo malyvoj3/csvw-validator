@@ -31,8 +31,10 @@ public class ColumnDescription extends InheritanceDescription implements Compati
             compatible = true;
         } else if ((name == null && other.getName() == null) || name.equals(other.getName())) {
             compatible = true;
-        } else {
+        } else if (titles != null) {
             compatible = titles.hasIntersectionWith(other.getTitles());
+        } else {
+            compatible = false;
         }
         return compatible;
     }
