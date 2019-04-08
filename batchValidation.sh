@@ -1,6 +1,6 @@
 #!/bin/sh
 curl -X POST \
-  http://localhost:8080/validateBatch \
+  "http://127.0.0.1:8080/validateBatch" \
   -H 'Accept: application/json' \
   -H 'Content-Type: application/json' \
   -H 'cache-control: no-cache' \

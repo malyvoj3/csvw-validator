@@ -72,7 +72,7 @@ public class FileUtils {
             fileResponse.setUrl(normalizedUrl);
             fileResponse.setRemoteFile(false);
         } catch (IOException e) {
-            log.error("Cannot locate local file with url {}.", stringUrl);
+            log.error("Cannot open local file with url {}.", stringUrl);
         }
         return fileResponse;
     }
@@ -88,30 +88,29 @@ public class FileUtils {
             log.info("Downloading file {}.", normalizedUrl);
             connection.setInstanceFollowRedirects(true);
             connection.setRequestMethod("GET");
-            log.info("{} responded with response code {}.", normalizedUrl, connection.getResponseCode());
-            if (connection.getResponseCode() == HttpURLConnection.HTTP_MOVED_PERM
-                    || connection.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP) {
+            int responseCode = connection.getResponseCode();
+            log.info("{} responded with response code {}.", normalizedUrl, responseCode);
+            if (responseCode == HttpURLConnection.HTTP_MOVED_PERM
+                    || responseCode == HttpURLConnection.HTTP_MOVED_TEMP) {
+                connection.disconnect();
                 normalizedUrl = UriUtils.normalizeUri(connection.getHeaderField("Location"));
                 url = new URL(normalizedUrl);
-                connection.disconnect();
                 connection = (HttpURLConnection) url.openConnection();
+                responseCode = connection.getResponseCode();
             }
-            if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+            if (responseCode == HttpURLConnection.HTTP_OK) {
                 try (InputStream inputStream = connection.getInputStream()) {
                     fileResponse = new FileResponse();
-                    fileResponse.setResponseCode(connection.getResponseCode());
+                    fileResponse.setResponseCode(responseCode);
                     fileResponse.setUrl(normalizedUrl);
-                    if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                        fileResponse.setContent(IOUtils.toByteArray(inputStream));
-                        fileResponse.setContentType(createContentType(connection.getContentType()));
-                        fileResponse.setLink(createLink(connection.getHeaderFields().get("Link"), normalizedUrl));
-                    }
+                    fileResponse.setContent(IOUtils.toByteArray(inputStream));
+                    fileResponse.setContentType(createContentType(connection.getContentType()));
+                    fileResponse.setLink(createLink(connection.getHeaderFields().get("Link"), normalizedUrl));
                 }
             }
         } catch (Exception ex) {
-            log.error("Cannot locate local file with url {}.", stringUrl);
-        }
-        finally {
+            log.error("Cannot download file with url {}.", stringUrl);
+        } finally {
             if (connection != null) {
                 connection.disconnect();
             }
