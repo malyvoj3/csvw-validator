@@ -65,6 +65,7 @@ public class FileUtils {
         URL url;
         try {
             url = new URL(normalizedUrl);
+            log.info("Opening local file {}.", normalizedUrl);
             byte[] byteArray = IOUtils.toByteArray(url);
             fileResponse = new FileResponse();
             fileResponse.setContent(byteArray);
@@ -84,16 +85,16 @@ public class FileUtils {
         try {
             url = new URL(normalizedUrl);
             connection = (HttpURLConnection) url.openConnection();
+            log.info("Downloading file {}.", normalizedUrl);
             connection.setInstanceFollowRedirects(true);
             connection.setRequestMethod("GET");
+            log.info("{} responded with response code {}.", normalizedUrl, connection.getResponseCode());
             if (connection.getResponseCode() == HttpURLConnection.HTTP_MOVED_PERM
                     || connection.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP) {
                 normalizedUrl = UriUtils.normalizeUri(connection.getHeaderField("Location"));
                 url = new URL(normalizedUrl);
                 connection.disconnect();
                 connection = (HttpURLConnection) url.openConnection();
-            } else if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                log.error("Illegal response code {}.", connection.getResponseCode());
             }
             if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
                 try (InputStream inputStream = connection.getInputStream()) {

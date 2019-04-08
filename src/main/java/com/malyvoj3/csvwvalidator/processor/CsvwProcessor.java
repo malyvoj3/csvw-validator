@@ -331,7 +331,7 @@ public class CsvwProcessor {
                 metadataParsingResult = tmp;
             }
         } catch (Exception ex) {
-            log.error("Error during getting metadata parsing results.");
+            log.info("Error during downloading metadata parsing results.");
         }
         return metadataParsingResult;
     }
