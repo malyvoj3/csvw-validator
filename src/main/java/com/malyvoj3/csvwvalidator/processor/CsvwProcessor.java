@@ -172,18 +172,24 @@ public class CsvwProcessor {
     }
 
     public ProcessingResult processTabularData(ProcessingSettings settings, String tabularUrl, String metadataUrl) {
-        FileResponse tabularResponse = FileUtils.downloadFile(tabularUrl);
-        List<ValidationError> processingErrors = validateCsvFileResponse(tabularResponse);
-        CsvParsingResult csvParsingResult = parseCsv(tabularResponse);
-        processingErrors.addAll(csvParsingResult.getParsingErrors());
-        MetadataParsingResult metadataParsingResult = downloadAndParseMetadata(tabularResponse, metadataUrl);
-
-        if (hasNoFatalError(processingErrors)) {
-            if (metadataParsingResult != null) {
-                processingErrors.addAll(process(csvParsingResult, metadataParsingResult));
+        MetadataParsingResult metadataParsingResult = downloadAndParseMetadata(metadataUrl);
+        List<ValidationError> processingErrors = new ArrayList<>();
+        if (metadataParsingResult != null && metadataParsingResult.getTopLevelDescription() != null) {
+            processingErrors.addAll(metadataParsingResult.getValidationErrors());
+            if (metadataParsingResult.getTopLevelDescription().describesTabularData(tabularUrl)
+                    && hasNoFatalError(processingErrors)) {
+                FileResponse tabularResponse = FileUtils.downloadFile(tabularUrl);
+                CsvParsingResult csvParsingResult = parseCsv(tabularResponse);
+                processingErrors.addAll(csvParsingResult.getParsingErrors());
+                processingErrors.addAll(validateCsvFileResponse(tabularResponse));
+                if (hasNoFatalError(processingErrors)) {
+                    processingErrors.addAll(process(csvParsingResult, metadataParsingResult));
+                }
             } else {
-                processingErrors.add(ValidationError.fatal("Can't download valid metadata from url '%s'.", metadataUrl));
+                processMetadata(settings, metadataUrl);
             }
+        } else {
+            processingErrors.add(ValidationError.fatal("Can't download valid metadata from url '%s'.", metadataUrl));
         }
         return resultCreator.createResult(settings, processingErrors, tabularUrl, metadataUrl);
     }
@@ -293,19 +299,35 @@ public class CsvwProcessor {
     }
 
     private MetadataParsingResult locateMetadata(FileResponse csvFileResponse, TableDescription embeddedMetadata) {
+        List<ValidationError> locatingErrors = new ArrayList<>();
         MetadataParsingResult metadataParsingResult = null;
+        MetadataParsingResult tmpResult = null;
         // Link header metadata locations.
         if (csvFileResponse.getLink() != null) {
-            metadataParsingResult = downloadAndParseMetadata(csvFileResponse, csvFileResponse.getLink().getLink());
+            tmpResult = downloadAndParseMetadata(csvFileResponse.getLink().getLink());
+            if (tmpResult != null && tmpResult.getTopLevelDescription() != null) {
+                if (tmpResult.getTopLevelDescription().describesTabularData(csvFileResponse.getUrl())) {
+                    metadataParsingResult = tmpResult;
+                } else {
+                    locatingErrors.add(ValidationError.warn("Schema '%s' does not explicitly include a" +
+                            " reference to the requested tabular data file.", csvFileResponse.getLink().getLink()));
+                }
+            }
         }
 
         // Site-wide/default metadata locations.
         if (metadataParsingResult == null) {
             List<String> metadataUrls = siteWideLocator.getMetadataUris(csvFileResponse.getUrl());
             for (String metadataUrl : metadataUrls) {
-                metadataParsingResult = downloadAndParseMetadata(csvFileResponse, metadataUrl);
-                if (metadataParsingResult != null) {
-                    break;
+                tmpResult = downloadAndParseMetadata(metadataUrl);
+                if (tmpResult != null && tmpResult.getTopLevelDescription() != null) {
+                    if (tmpResult.getTopLevelDescription().describesTabularData(csvFileResponse.getUrl())) {
+                        metadataParsingResult = tmpResult;
+                        break;
+                    } else {
+                        locatingErrors.add(ValidationError.warn("Schema '%s' does not explicitly include a" +
+                                " reference to the requested tabular data file.", metadataUrl));
+                    }
                 }
             }
         }
@@ -315,21 +337,21 @@ public class CsvwProcessor {
             metadataParsingResult = new MetadataParsingResult();
             metadataParsingResult.setTopLevelDescription(embeddedMetadata);
             metadataParsingResult.setTopLevelType(TopLevelType.TABLE);
+            metadataParsingResult.setValidationErrors(locatingErrors);
             metadataParsingResult.getValidationErrors().add(ValidationError.strictWarn("Missing schema for tabular data." +
                     " Validating will continue using embedded metadata"));
+        } else {
+            metadataParsingResult.getValidationErrors().addAll(locatingErrors);
         }
         return metadataParsingResult;
     }
 
-    private MetadataParsingResult downloadAndParseMetadata(FileResponse fileResponse, String metadataUrl) {
+    private MetadataParsingResult downloadAndParseMetadata(String metadataUrl) {
         FileResponse metadataResponse = FileUtils.downloadFile(metadataUrl);
         MetadataParsingResult metadataParsingResult = null;
         try {
             InputStream inputStream = new ByteArrayInputStream(metadataResponse.getContent());
-            MetadataParsingResult tmp = metadataParser.parseJson(inputStream, metadataResponse.getUrl());
-            if (tmp.getTopLevelDescription().describesTabularData(fileResponse.getUrl())) {
-                metadataParsingResult = tmp;
-            }
+            metadataParsingResult = metadataParser.parseJson(inputStream, metadataResponse.getUrl());
         } catch (Exception ex) {
             log.info("Error during downloading metadata parsing results.");
         }

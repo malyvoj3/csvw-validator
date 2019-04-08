@@ -1,5 +1,6 @@
 package com.malyvoj3.csvwvalidator.web.view;
 
+import com.malyvoj3.csvwvalidator.processor.CsvResultWriter;
 import com.malyvoj3.csvwvalidator.processor.CsvwProcessor;
 import com.malyvoj3.csvwvalidator.processor.ProcessingResult;
 import com.malyvoj3.csvwvalidator.processor.ProcessingSettings;
@@ -14,9 +15,12 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.StreamResource;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.vaadin.olli.FileDownloadWrapper;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +33,9 @@ public class MainView extends VerticalLayout {
 
     @Autowired
     private CsvwProcessor csvwProcessor;
+
+    @Autowired
+    private CsvResultWriter csvResultWriter;
 
     private InputStream tabularDataFile;
     private String tabularDataFileName;
@@ -72,11 +79,20 @@ public class MainView extends VerticalLayout {
 
     private void showResult(ProcessingResult result) {
         removeAll();
+
+        Button csvButton = new Button("Download CSV");
+        FileDownloadWrapper csvButtonWrapper = new FileDownloadWrapper(
+                new StreamResource("result.csv", () -> new ByteArrayInputStream(csvResultWriter.writeResult(result))));
+        csvButtonWrapper.wrapComponent(csvButton);
+        Button rdfButton = new Button("Download RDF");
+        FileDownloadWrapper rdfButtonWrapper = new FileDownloadWrapper(
+                new StreamResource("result.ttl", () -> new ByteArrayInputStream("fooRDF".getBytes())));
+        rdfButtonWrapper.wrapComponent(rdfButton);
+
         Grid<ValidationError> grid = new Grid<>(ValidationError.class);
         List<ValidationError> items = new ArrayList<>(result.getErrors());
         grid.setItems(items);
         grid.setColumns("severity", "formattedMessage");
-
         add(new Label(String.format("Validation result: %s", result.getValidationStatus().name())));
         if (result.getTabularUrl() != null) {
             add(new Label(String.format("Tabular file: %s", result.getTabularUrl())));
@@ -84,6 +100,8 @@ public class MainView extends VerticalLayout {
         if (result.getMetadataUrl() != null) {
             add(new Label(String.format("Metadata file: %s", result.getMetadataUrl())));
         }
+        add(csvButtonWrapper);
+        add(rdfButtonWrapper);
         add(grid);
         add(createBackButton());
     }

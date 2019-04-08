@@ -12,10 +12,7 @@ import com.malyvoj3.csvwvalidator.utils.LanguageUtils;
 import com.malyvoj3.csvwvalidator.validation.JsonParserError;
 import lombok.NonNull;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TitlesPropertyParser<T extends ColumnDescription> implements PropertyParser<T> {
 
@@ -29,10 +26,20 @@ public class TitlesPropertyParser<T extends ColumnDescription> implements Proper
             titlesMap.put(CsvwKeywords.NATURAL_LANGUAGE_CODE, titlesFromValue(property.textValue()));
         } else if (property.isArray()) {
             ArrayNode arrayNode = (ArrayNode) property;
-            titlesMap.put(CsvwKeywords.NATURAL_LANGUAGE_CODE, titlesFromArray(arrayNode));
+            JsonProperty tmp = new JsonProperty(jsonProperty.getName(), arrayNode);
+            titlesMap.put(CsvwKeywords.NATURAL_LANGUAGE_CODE, titlesFromArray(arrayNode, tmp));
+            tmp.getParsingErrors().forEach(error -> {
+                error.addKey(jsonProperty.getName());
+                jsonProperty.addError(error);
+            });
         } else if (property.isObject()) {
             ObjectNode objectNode = (ObjectNode) property;
-            titlesMap = titlesFromObject(objectNode);
+            JsonProperty tmp = new JsonProperty(jsonProperty.getName(), objectNode);
+            titlesMap = titlesFromObject(objectNode, jsonProperty);
+            tmp.getParsingErrors().forEach(error -> {
+                error.addKey(jsonProperty.getName());
+                jsonProperty.addError(error);
+            });
         } else {
             jsonProperty.addError(JsonParserError.invalidPropertyType(jsonProperty.getName()));
         }
@@ -43,7 +50,7 @@ public class TitlesPropertyParser<T extends ColumnDescription> implements Proper
         description.setTitles(titles);
     }
 
-    private Map<String, List<String>> titlesFromObject(ObjectNode objectNode) {
+    private Map<String, List<String>> titlesFromObject(ObjectNode objectNode, JsonProperty jsonProperty) {
         Map<String, List<String>> map = new HashMap<>();
         objectNode.fields().forEachRemaining(entry -> {
             String key = entry.getKey();
@@ -52,20 +59,29 @@ public class TitlesPropertyParser<T extends ColumnDescription> implements Proper
                 if (value.isTextual()) {
                     putToMap(key, titlesFromValue(value.textValue()), map);
                 } else if (value.isArray()) {
-                    putToMap(key, titlesFromArray((ArrayNode) value), map);
+                    JsonProperty tmp = new JsonProperty(key, null);
+                    putToMap(key, titlesFromArray((ArrayNode) value, tmp), map);
+                    tmp.getParsingErrors().forEach(error -> {
+                        error.addKey(key);
+                        jsonProperty.addError(error);
+                    });
                 }
             }
         });
         return map;
     }
 
-    private List<String> titlesFromArray(ArrayNode arrayNode) {
+    private List<String> titlesFromArray(ArrayNode arrayNode, JsonProperty jsonProperty) {
         List<String> titlesList = new ArrayList<>();
-        arrayNode.elements().forEachRemaining(jsonNode -> {
+        int arrayCounter = 0;
+        for (Iterator<JsonNode> iter = arrayNode.elements(); iter.hasNext(); arrayCounter++) {
+            JsonNode jsonNode = iter.next();
             if (jsonNode.isTextual()) {
                 titlesList.add(jsonNode.textValue());
+            } else {
+                jsonProperty.addError(JsonParserError.invalidPropertyType(String.valueOf(arrayCounter)));
             }
-        });
+        }
         return titlesList;
     }
 

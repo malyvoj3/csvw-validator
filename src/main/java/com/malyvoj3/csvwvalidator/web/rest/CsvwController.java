@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
@@ -56,14 +57,15 @@ public class CsvwController {
         settings.setStrictMode(request.isStrictMode());
         BatchProcessingResult result = csvwProcessor.processTabularData(settings, request.getFilesToProcess());
 
+        List<ValidationResponse> filesResults = result.getFilesResults().stream()
+                .map(this::createResponse)
+                .collect(Collectors.toList());
         BatchValidationResponse response = BatchValidationResponse.builder()
                 .filesCount(result.getFilesCount())
                 .passedFilesCount(result.getPassedFilesCount())
                 .warningFilesCount(result.getWarningFilesCount())
                 .errorFilesCount(result.getErrorFilesCount())
-                .filesResults(result.getFilesResults().stream()
-                        .map(this::createResponse)
-                        .collect(Collectors.toList()))
+                .filesResults(request.isFilesResults() ? filesResults : null)
                 .build();
 
         return ResponseEntity.ok(response);
