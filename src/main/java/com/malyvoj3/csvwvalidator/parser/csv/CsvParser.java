@@ -50,24 +50,32 @@ public class CsvParser {
         TableDescription tableDescription = null;
         List<ValidationError> parsingErrors = new ArrayList<>();
 
-        try {
-            Reader reader = new InputStreamReader(new ByteArrayInputStream(file));
-            if (!FileUtils.isUtf8(file)) {
-                parsingErrors.add(ValidationError.strictWarn("Invalid encoding: file has not 'UTF-8' encoding."));
-            }
+        if (file.length > 0) {
+            try {
+                Reader reader = new InputStreamReader(new ByteArrayInputStream(file));
+                if (!FileUtils.isUtf8(file)) {
+                    parsingErrors.add(ValidationError.strictWarn("Invalid encoding: file has not 'UTF-8' encoding."));
+                }
 
-            com.univocity.parsers.csv.CsvParser csvParser = new com.univocity.parsers.csv.CsvParser(defaultSettings(dialect));
-            List<String[]> records = csvParser.parseAll(reader);
-            createColumns(csvParser, table, columns, columnDescriptions);
-            parsingErrors.addAll(createRows(records, table, columns, dialect.isHeader()));
-            parsingErrors.addAll(validateColumns(columns));
-            parsingErrors.addAll(validateCsvFormat(csvParser.getDetectedFormat()));
-            table.setColumns(columns);
-            tableDescription = createTableDescription(columnDescriptions, url);
-        } catch (Exception ex) {
-            log.error(String.format("Error during CSV parsing of file '%s'.", url), ex);
-            parsingErrors.add(ValidationError.fatal("File '%s' is not valid CSV file.", url));
+                com.univocity.parsers.csv.CsvParser csvParser = new com.univocity.parsers.csv.CsvParser(defaultSettings(dialect));
+                List<String[]> records = csvParser.parseAll(reader);
+                createColumns(csvParser, table, columns, columnDescriptions);
+                parsingErrors.addAll(createRows(records, table, columns, dialect.isHeader()));
+                parsingErrors.addAll(validateColumns(columns));
+                parsingErrors.addAll(validateCsvFormat(csvParser.getDetectedFormat()));
+                table.setColumns(columns);
+                tableDescription = createTableDescription(columnDescriptions, url);
+            } catch (CsvFormatException ex) {
+                log.error("Invalid CSF file format. Stop parsing.");
+                parsingErrors.add(ex.getValidationError());
+            } catch (Exception ex) {
+                log.error(String.format("Error during CSV parsing of file '%s'.", url), ex);
+                parsingErrors.add(ValidationError.fatal("File '%s' is not valid CSV file.", url));
+            }
+        } else {
+            parsingErrors.add(ValidationError.fatal("The CSV file is empty."));
         }
+
         return new CsvParsingResult(url, parsingErrors, table, tableDescription);
     }
 
@@ -89,7 +97,7 @@ public class CsvParser {
         }
     }
 
-    private List<ValidationError> createRows(List<String[]> records, Table table, List<Column> columns, boolean hasHeader) {
+    private List<ValidationError> createRows(List<String[]> records, Table table, List<Column> columns, boolean hasHeader) throws CsvFormatException {
         List<ValidationError> parsingErrors = new ArrayList<>();
         int rowNumber = hasHeader ? 2 : 1;
         int columnLength = columns.size();
@@ -97,24 +105,22 @@ public class CsvParser {
             if (record.length > 0) {
                 Row row = new Row();
                 row.setNumber(rowNumber);
-                if (record.length > columnLength) {
-                    parsingErrors.add(ValidationError.strictWarn(
-                            "Row %d has more cells than CSV file has columns." +
-                                    " Some cell is not quoted?", rowNumber)
-                    );
-                }
-                for (int i = 0; i < columnLength; i++) {
+                parsingErrors.addAll(validateRowLength(record.length, rowNumber, columnLength));
+                for (int i = 0; i < record.length; i++) {
                     String value = record[i];
                     parsingErrors.addAll(validateValue(value, rowNumber, i));
+                    Column cellColumn = i < columns.size() ? columns.get(i) : null;
                     Cell cell = Cell.builder()
-                            .column(columns.get(i))
+                            .column(cellColumn)
                             .row(row)
                             .table(table)
                             .stringValue(value)
                             .errors(new ArrayList<>())
                             .build();
                     row.getCells().add(cell);
-                    columns.get(i).getCells().add(cell);
+                    if (cellColumn != null) {
+                        cellColumn.getCells().add(cell);
+                    }
                 }
                 table.getRows().add(row);
             } else {
@@ -123,6 +129,22 @@ public class CsvParser {
             rowNumber++;
         }
         return parsingErrors;
+    }
+
+    private List<ValidationError> validateRowLength(int recordLength, int rowNumber, int columnLength) {
+        List<ValidationError> errors = new ArrayList<>();
+        if (recordLength > columnLength) {
+            errors.add(ValidationError.fatal(
+                    "Row %d has more cells than columns." +
+                            " Possible problems: wrong quote of cell, wrong escape of quote character, extra delimiter/value.", rowNumber)
+            );
+        } else if (recordLength < columnLength) {
+            errors.add(ValidationError.fatal(
+                    "Row %d has fewer cells than columns." +
+                            " Possible problems: missing header, wrong quoting of cell, missing delimiters/values.", rowNumber)
+            );
+        }
+        return errors;
     }
 
     private List<ValidationError> validateColumns(List<Column> columns) {
@@ -180,7 +202,7 @@ public class CsvParser {
         }
         if (!FIELD_DELIMITER_DEFAULT.equals(detectedFormat.getDelimiterString())) {
             errorList.add(ValidationError.strictWarn(
-                    invalidMsg("field delimiter", detectedFormat.getDelimiterString(), FIELD_DELIMITER_DEFAULT)
+                    invalidMsg("field delimiter", detectedFormat.getDelimiter() == '\t' ? "\\t" : detectedFormat.getDelimiterString(), FIELD_DELIMITER_DEFAULT)
             ));
         }
         if (QUOTE_CHAR_DEFAULT != detectedFormat.getQuote()) {
@@ -212,15 +234,17 @@ public class CsvParser {
     private static CsvParserSettings defaultSettings(Dialect dialect) {
         CsvFormat csvFormat = new CsvFormat();
         csvFormat.setComment('\0');
+        csvFormat.setQuoteEscape(QUOTE_ESCAPE_CHAR_DEFAULT);
+        csvFormat.setQuote(QUOTE_CHAR_DEFAULT);
         CsvParserSettings settings = new CsvParserSettings();
         settings.setFormat(csvFormat);
-        settings.setDelimiterDetectionEnabled(true);
         settings.setDelimiterDetectionEnabled(true, ',', ';', '\t', '|');
         settings.trimValues(false);
         settings.setLineSeparatorDetectionEnabled(true);
-        settings.setQuoteDetectionEnabled(true);
+        settings.setQuoteDetectionEnabled(false);
         settings.setSkipEmptyLines(false);
         settings.setHeaderExtractionEnabled(dialect.isHeader());
+        settings.setMaxCharsPerColumn(8192);
         return settings;
     }
 

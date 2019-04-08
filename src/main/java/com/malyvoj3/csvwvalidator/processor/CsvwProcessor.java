@@ -54,6 +54,7 @@ public class CsvwProcessor {
     public BatchProcessingResult processTabularData(ProcessingSettings settings, List<ProcessingInput> inputs) {
         List<ProcessingResult> processingResults = new ArrayList<>();
         for (ProcessingInput input : inputs) {
+            log.info("Processing file {}", input.getTabularUrl());
             if (input.getTabularUrl() != null && input.getMetadataUrl() != null) {
                 processingResults.add(processTabularData(settings, input.getTabularUrl(), input.getMetadataUrl()));
             } else if (input.getTabularUrl() != null) {

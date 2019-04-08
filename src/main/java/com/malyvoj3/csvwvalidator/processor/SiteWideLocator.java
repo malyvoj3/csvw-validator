@@ -53,6 +53,11 @@ public class SiteWideLocator {
             try (BufferedReader br = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(fileResponse.getContent())))) {
                 String line;
                 while ((line = br.readLine()) != null) {
+                    if (line.contains("<!DOCTYPE html")) {
+                        log.warn("Well known URL is HTML, skipping it.");
+                        templates = new ArrayList<>();
+                        break;
+                    }
                     templates.add(line);
                 }
             }
