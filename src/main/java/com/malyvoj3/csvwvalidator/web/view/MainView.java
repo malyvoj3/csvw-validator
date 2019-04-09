@@ -1,9 +1,6 @@
 package com.malyvoj3.csvwvalidator.web.view;
 
-import com.malyvoj3.csvwvalidator.processor.CsvResultWriter;
-import com.malyvoj3.csvwvalidator.processor.CsvwProcessor;
-import com.malyvoj3.csvwvalidator.processor.ProcessingResult;
-import com.malyvoj3.csvwvalidator.processor.ProcessingSettings;
+import com.malyvoj3.csvwvalidator.processor.*;
 import com.malyvoj3.csvwvalidator.validation.ValidationError;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -36,6 +33,9 @@ public class MainView extends VerticalLayout {
 
     @Autowired
     private CsvResultWriter csvResultWriter;
+
+    @Autowired
+    private RdfResultWriter rdfResultWriter;
 
     private InputStream tabularDataFile;
     private String tabularDataFileName;
@@ -86,7 +86,7 @@ public class MainView extends VerticalLayout {
         csvButtonWrapper.wrapComponent(csvButton);
         Button rdfButton = new Button("Download RDF");
         FileDownloadWrapper rdfButtonWrapper = new FileDownloadWrapper(
-                new StreamResource("result.ttl", () -> new ByteArrayInputStream("fooRDF".getBytes())));
+                new StreamResource("result.ttl", () -> new ByteArrayInputStream(rdfResultWriter.writeResult(result))));
         rdfButtonWrapper.wrapComponent(rdfButton);
 
         Grid<ValidationError> grid = new Grid<>(ValidationError.class);

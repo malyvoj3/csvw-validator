@@ -108,6 +108,7 @@ Request body has to be JSON with format:
 }
 ```
 Where *stricMode* is the same boolean property as in ```/validate``` endpoint. And property *filesToProcess* is array property, which contains object with *tabularUrl* and/or *metadataUrl* as in ```/validate``` endpoint.
+Last property is boolean property *filesResults*, which enable or disable results for each validated file in response. By default is set to true.
 
 Response has property *filesCount*, which contains number of validated files. Then there are counters for passed (*passedFileCount*), warning (*warningFileCount*) and error (*errorFileCount*) files. For each validated files, there is ValidationResponse (object from ```/validate``` endpoint) in *filesResults* property.
 

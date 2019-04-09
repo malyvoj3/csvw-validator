@@ -5,6 +5,7 @@ curl -X POST \
   -H 'Content-Type: application/json' \
   -H 'cache-control: no-cache' \
   -d '{
+  "filesResults": false,
   "filesToProcess": [
     {
       "tabularUrl": "http://data.mfcr.cz/sites/default/files/Faktury_UZSVM_2019_0.csv"
