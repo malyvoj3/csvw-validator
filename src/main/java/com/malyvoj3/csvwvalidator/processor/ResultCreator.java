@@ -57,6 +57,7 @@ public class ResultCreator {
                 .fatalCount(fatalCount)
                 .totalErrorsCount(validationErrors.size())
                 .validationStatus(status)
+                .settings(settings)
                 .build();
     }
 

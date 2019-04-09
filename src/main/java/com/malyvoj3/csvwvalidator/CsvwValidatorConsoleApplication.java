@@ -18,7 +18,7 @@ import java.io.File;
 @Slf4j
 public class CsvwValidatorConsoleApplication implements CommandLineRunner {
 
-    private static final String HEADER = "Validate CSV file, JSON CSV on the Web schema or both.";
+    private static final String HEADER = "Validate CSV file, W3C CSV on the Web schema or both.";
     private static final String FOOTER = "Please report issues at http://github.com/malyvoj3/csvw-validator/issues";
 
     private final ApplicationContext appContext;
@@ -94,6 +94,28 @@ public class CsvwValidatorConsoleApplication implements CommandLineRunner {
                 .desc("The CSVW schema URL to be processed")
                 .hasArg()
                 .argName("SCHEMA")
+                .required(false)
+                .build());
+        options.addOption(Option.builder("o")
+                .longOpt("output")
+                .desc("The name of output file without suffix")
+                .hasArg()
+                .argName("OUTPUT")
+                .required(false)
+                .build());
+        options.addOption(Option.builder()
+                .longOpt("strict")
+                .desc("Enables strict mode")
+                .required(false)
+                .build());
+        options.addOption(Option.builder()
+                .longOpt("rdf")
+                .desc("Output is in RDF format")
+                .required(false)
+                .build());
+        options.addOption(Option.builder()
+                .longOpt("csv")
+                .desc("Output is in CSV format")
                 .required(false)
                 .build());
         options.addOption(Option.builder("h")

@@ -15,6 +15,7 @@ public class ProcessingResult {
     private String metadataUrl;
     private ValidationStatus validationStatus;
     private List<? extends ValidationError> errors;
+    private ProcessingSettings settings;
     private long warningCount;
     private long errorCount;
     private long fatalCount;

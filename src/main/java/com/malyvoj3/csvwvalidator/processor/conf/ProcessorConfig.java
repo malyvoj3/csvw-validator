@@ -53,4 +53,14 @@ public class ProcessorConfig {
         return new CsvResultWriter();
     }
 
+    @Bean
+    public RdfResultWriter rdfResultWriter() {
+        return new RdfResultWriter();
+    }
+
+    @Bean
+    public TextResultWriter textResultWriter() {
+        return new TextResultWriter();
+    }
+
 }
