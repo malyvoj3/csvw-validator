@@ -136,7 +136,7 @@ public class AnnotationCreator {
                     }
                 } catch (DataTypeFormatException | IncomparableDataTypeException e) {
                     String errorMsg = String.format("Cell (row %d column %d) cannot be formatted as '%s' " +
-                            "dataype.", cell.getRow().getNumber(), cell.getColumn().getNumber(), dataType.getBase());
+                            "datatype.", cell.getRow().getNumber(), cell.getColumn().getNumber(), dataType.getBase());
                     cell.getErrors().add(new CellError("INVALID VALUE FORMAT", errorMsg));
                     value = new StringType(normalizedValue);
                 }

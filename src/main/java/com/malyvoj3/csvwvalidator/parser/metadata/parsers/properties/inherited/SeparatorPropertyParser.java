@@ -20,8 +20,10 @@ public class SeparatorPropertyParser<T extends InheritanceDescription> implement
         if (property.isTextual()) {
             separator = new StringAtomicProperty(property.textValue());
         } else {
-            jsonProperty.addError(JsonParserError.invalidPropertyType(jsonProperty.getName()));
             separator = new StringAtomicProperty(SEPARATOR_DEFAULT_VALUE);
+            if (!property.isNull()) {
+                jsonProperty.addError(JsonParserError.invalidPropertyType(jsonProperty.getName()));
+            }
         }
         description.setSeparator(separator);
     }

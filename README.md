@@ -26,7 +26,25 @@ mvn spring-boot:run
 After success application startup, open ```http://localhost:8080/``` in our browser or use ```http://localhost:8080/validate```, ```http://localhost:8080/validateBatch``` endpoints.
 
 ### Command-line application
-TODO
+
+Run command-line application:
+```
+java -jar validator.jar [-f <FILE>] [-s <SCHEMA>] [-o <OUTPUT>]
+ [--strict] [-h] [--rdf] [--csv] 
+
+ -f,--file <FILE>       The CSV file URL to be processed
+ -s,--schema <SCHEMA>   The CSVW schema URL to be processed
+ -o,--output <OUTPUT>   The name of output file without suffix
+    --strict            Enables strict mode
+    --csv               Validator will generate output also in CSV format.
+    --rdf               Validator will generate output also in RDF format
+ -h,--help              Show help    
+```
+
+Where validator.jar is generated jar after ```mvn clean install```. At least FILE or SCHEMA must be specified.
+Default file name of output file is "result". Command-line application will print result of validating to output and also create
+default text result file. If --rdf or --csv arguments are specified, then validator will create extra files with these formats.
+
 ## Examples
 
 ### Validate endpoint
@@ -113,6 +131,27 @@ Last property is boolean property *filesResults*, which enable or disable result
 Response has property *filesCount*, which contains number of validated files. Then there are counters for passed (*passedFileCount*), warning (*warningFileCount*) and error (*errorFileCount*) files. For each validated files, there is ValidationResponse (object from ```/validate``` endpoint) in *filesResults* property.
 
 ### Command-line application
+
+For validating by command line with these arguments:
+```
+java -jar validator.jar -f http://www.w3.org/2013/csvw/tests/test286.csv
+ -s http://www.w3.org/2013/csvw/tests/test286-metadata.json --rdf --csv
+```
+
+result is:
+
+```
+Tabular URL: http://www.w3.org/2013/csvw/tests/test286.csv
+Metadata URL: http://www.w3.org/2013/csvw/tests/test286-metadata.json
+Result: ERROR
+Strict mode: false
+Total errors: 1
+Warning errors: 0
+Error errors: 1
+Fatal errors: 0
+Errors:
+  ERROR: Cell (row 2 column 1) cannot be formatted as 'integer' datatype.
+```
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/) 

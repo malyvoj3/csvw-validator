@@ -47,9 +47,8 @@ public class TextResultWriter implements ResultWriter {
         writer.newLine();
         writer.write("Errors:");
         writer.newLine();
-        writer.newLine();
         for (ValidationError error : result.getErrors()) {
-            writer.write(error.getSeverity().name()+ ": " + error.getFormattedMessage());
+            writer.write("  " + error.getSeverity().name()+ ": " + error.getFormattedMessage());
             writer.newLine();
         }
         writer.flush();
