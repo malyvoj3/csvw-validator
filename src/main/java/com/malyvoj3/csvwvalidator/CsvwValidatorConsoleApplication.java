@@ -1,11 +1,10 @@
 package com.malyvoj3.csvwvalidator;
 
-import com.malyvoj3.csvwvalidator.processor.CsvwProcessor;
-import com.malyvoj3.csvwvalidator.processor.ProcessingResult;
-import com.malyvoj3.csvwvalidator.processor.ProcessingSettings;
+import com.malyvoj3.csvwvalidator.processor.*;
 import com.malyvoj3.csvwvalidator.utils.UriUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.cli.*;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -20,14 +19,25 @@ public class CsvwValidatorConsoleApplication implements CommandLineRunner {
 
     private static final String HEADER = "Validate CSV file, W3C CSV on the Web schema or both.";
     private static final String FOOTER = "Please report issues at http://github.com/malyvoj3/csvw-validator/issues";
+    private static final String RESULT_FILE_NAME_DEFAULT = "result";
 
     private final ApplicationContext appContext;
     private final CsvwProcessor csvwProcessor;
+    private final CsvResultWriter csvWriter;
+    private final RdfResultWriter rdfWriter;
+    private final TextResultWriter textWriter;
 
     @Autowired
-    public CsvwValidatorConsoleApplication(ApplicationContext appContext, CsvwProcessor csvwProcessor) {
+    public CsvwValidatorConsoleApplication(ApplicationContext appContext,
+                                           CsvwProcessor csvwProcessor,
+                                           CsvResultWriter csvWriter,
+                                           RdfResultWriter rdfWriter,
+                                           TextResultWriter textWriter) {
         this.appContext = appContext;
         this.csvwProcessor = csvwProcessor;
+        this.csvWriter = csvWriter;
+        this.rdfWriter = rdfWriter;
+        this.textWriter = textWriter;
     }
 
     @Override
@@ -37,10 +47,24 @@ public class CsvwValidatorConsoleApplication implements CommandLineRunner {
             HelpFormatter formatter = new HelpFormatter();
             Options options = createOptions();
             try {
-                formatter.printHelp("java -jar validator.jar", HEADER, options, FOOTER, true);
                 CommandLine line = parser.parse(options, args);
-                ProcessingResult result = validate(line.getOptionValue('f'), line.getOptionValue('s'));
-                System.out.println(result);
+                if (line.hasOption('h')) {
+                    formatter.printHelp("java -jar validator.jar", HEADER, options, FOOTER, true);
+                }
+                ProcessingResult result = validate(line.getOptionValue('f'), line.getOptionValue('s'),
+                        line.hasOption("strict"));
+                String fileName = line.hasOption('o') ? line.getOptionValue('o') : RESULT_FILE_NAME_DEFAULT;
+                if (line.hasOption("rdf")) {
+                    byte[] rdfResult = rdfWriter.writeResult(result);
+                    FileUtils.writeByteArrayToFile(new File(fileName + ".ttl"), rdfResult);
+                }
+                if (line.hasOption("csv")) {
+                    byte[] csvResult = csvWriter.writeResult(result);
+                    FileUtils.writeByteArrayToFile(new File(fileName + ".csv"), csvResult);
+                }
+                byte[] textResult = textWriter.writeResult(result);
+                FileUtils.writeByteArrayToFile(new File(fileName + ".txt"), textResult);
+                System.out.println(new String(textResult));
             } catch (ParseException ex) {
                 System.err.println("Invalid program arguments. Use -h or --help.");
             }
@@ -48,11 +72,12 @@ public class CsvwValidatorConsoleApplication implements CommandLineRunner {
         }
     }
 
-    private ProcessingResult validate(String fileUrl, String schemaUrl) {
+    private ProcessingResult validate(String fileUrl, String schemaUrl, boolean isStrict) {
         ProcessingResult processingResult;
         String fileAbsoluteUrl = getAbsoluteUrl(fileUrl);
         String schemaAbsoluteUrl = getAbsoluteUrl(schemaUrl);
-        ProcessingSettings settings = new ProcessingSettings(); // TODO
+        ProcessingSettings settings = new ProcessingSettings();
+        settings.setStrictMode(isStrict);
         if (fileAbsoluteUrl != null && schemaAbsoluteUrl != null) {
             processingResult = csvwProcessor.processTabularData(settings, fileAbsoluteUrl, schemaAbsoluteUrl);
         } else if (fileAbsoluteUrl != null) {
