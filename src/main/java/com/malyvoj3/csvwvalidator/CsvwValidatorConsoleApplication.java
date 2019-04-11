@@ -50,23 +50,26 @@ public class CsvwValidatorConsoleApplication implements CommandLineRunner {
                 CommandLine line = parser.parse(options, args);
                 if (line.hasOption('h')) {
                     formatter.printHelp("java -jar validator.jar", HEADER, options, FOOTER, true);
-                }
-                ProcessingResult result = validate(line.getOptionValue('f'), line.getOptionValue('s'),
+                } else {
+                    ProcessingResult result = validate(line.getOptionValue('f'), line.getOptionValue('s'),
                         line.hasOption("strict"));
-                String fileName = line.hasOption('o') ? line.getOptionValue('o') : RESULT_FILE_NAME_DEFAULT;
-                if (line.hasOption("rdf")) {
-                    byte[] rdfResult = rdfWriter.writeResult(result);
-                    FileUtils.writeByteArrayToFile(new File(fileName + ".ttl"), rdfResult);
+                    String fileName = line.hasOption('o') ? line.getOptionValue('o') : RESULT_FILE_NAME_DEFAULT;
+                    if (line.hasOption("rdf")) {
+                        byte[] rdfResult = rdfWriter.writeResult(result);
+                        FileUtils.writeByteArrayToFile(new File(fileName + ".ttl"), rdfResult);
+                    }
+                    if (line.hasOption("csv")) {
+                        byte[] csvResult = csvWriter.writeResult(result);
+                        FileUtils.writeByteArrayToFile(new File(fileName + ".csv"), csvResult);
+                    }
+                    byte[] textResult = textWriter.writeResult(result);
+                    FileUtils.writeByteArrayToFile(new File(fileName + ".txt"), textResult);
+                    System.out.println(new String(textResult));
                 }
-                if (line.hasOption("csv")) {
-                    byte[] csvResult = csvWriter.writeResult(result);
-                    FileUtils.writeByteArrayToFile(new File(fileName + ".csv"), csvResult);
-                }
-                byte[] textResult = textWriter.writeResult(result);
-                FileUtils.writeByteArrayToFile(new File(fileName + ".txt"), textResult);
-                System.out.println(new String(textResult));
             } catch (ParseException ex) {
                 System.err.println("Invalid program arguments. Use -h or --help.");
+            } catch (Exception ex) {
+                System.err.println("Invalid usage of program. Use -h or --help. At least file or schema must be specified.");
             }
             SpringApplication.exit(appContext, () -> 0);
         }
