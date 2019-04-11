@@ -37,4 +37,9 @@ public class DialectDescription extends ObjectDescription {
     private IntegerAtomicProperty skipRows;
 
     private StringAtomicProperty trim;
+
+    @Override
+    protected String getValidType() {
+        return "Dialect";
+    }
 }

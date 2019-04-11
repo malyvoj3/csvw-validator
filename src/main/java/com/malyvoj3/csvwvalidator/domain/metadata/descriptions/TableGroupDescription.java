@@ -39,6 +39,11 @@ public class TableGroupDescription extends TopLevelDescription implements Compat
     }
 
     @Override
+    protected String getValidType() {
+        return "TableGroup";
+    }
+
+    @Override
     public boolean describesTabularData(String tabularUrl) {
         return tables.getValue().stream()
                 .anyMatch(table -> UriUtils.uriEquals(table.getUrl().getValue(), tabularUrl));

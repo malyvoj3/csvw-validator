@@ -30,6 +30,18 @@ public class JsonParserError extends ValidationError {
                 .toString();
     }
 
+    public static JsonParserError invalidType(String jsonKey, String correctType) {
+        JsonParserError jsonParserError = new JsonParserError(Severity.FATAL, String.format("Invalid type. It should be %s.", correctType));
+        jsonParserError.addKey(jsonKey);
+        return jsonParserError;
+    }
+
+    public static JsonParserError isBlankNode(String jsonKey) {
+        JsonParserError jsonParserError = new JsonParserError(Severity.FATAL, "Property is blank node");
+        jsonParserError.addKey(jsonKey);
+        return jsonParserError;
+    }
+
     public static JsonParserError invalidPropertyType(String jsonKey) {
         JsonParserError jsonParserError = new JsonParserError(Severity.WARNING, "Invalid property type");
         jsonParserError.addKey(jsonKey);

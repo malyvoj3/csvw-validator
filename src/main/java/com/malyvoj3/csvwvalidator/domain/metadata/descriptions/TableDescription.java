@@ -50,6 +50,11 @@ public class TableDescription extends TopLevelDescription implements CompatibleD
     }
 
     @Override
+    protected String getValidType() {
+        return "Table";
+    }
+
+    @Override
     public boolean describesTabularData(String tabularUrl) {
         return UriUtils.uriEquals(url.getValue(), tabularUrl);
     }

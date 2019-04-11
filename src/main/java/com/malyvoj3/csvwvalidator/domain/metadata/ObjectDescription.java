@@ -17,9 +17,7 @@ public abstract class ObjectDescription implements Normalizable {
 
     @Override
     public List<ValidationError> normalize(Context context) {
-        List<ValidationError> normalizationErrors = new ArrayList<>();
-        normalizationErrors.addAll(normalizeProperty(id, context));
-        return normalizationErrors;
+        return new ArrayList<>(normalizeProperty(id, context));
     }
 
     protected List<ValidationError> normalizeProperty(Property<?> property, Context context) {
@@ -30,5 +28,9 @@ public abstract class ObjectDescription implements Normalizable {
             normalizationErrors = Collections.emptyList();
         }
         return normalizationErrors;
+    }
+
+    public String getValidType() {
+        return null;
     }
 }

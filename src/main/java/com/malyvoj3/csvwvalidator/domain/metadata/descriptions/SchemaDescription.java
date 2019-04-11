@@ -57,4 +57,9 @@ public class SchemaDescription extends InheritanceDescription implements Compati
         normalizationErrors.addAll(normalizeProperty(foreignKeys, context));
         return normalizationErrors;
     }
+
+    @Override
+    protected String getValidType() {
+        return "Schema";
+    }
 }

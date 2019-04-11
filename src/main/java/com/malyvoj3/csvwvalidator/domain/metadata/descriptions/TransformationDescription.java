@@ -30,4 +30,9 @@ public class TransformationDescription extends ObjectDescription {
         normalizationErrors.addAll(normalizeProperty(titles, context));
         return normalizationErrors;
     }
+
+    @Override
+    protected String getValidType() {
+        return "Template";
+    }
 }
