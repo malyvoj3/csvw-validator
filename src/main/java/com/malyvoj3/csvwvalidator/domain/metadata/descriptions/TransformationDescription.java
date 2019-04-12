@@ -32,7 +32,7 @@ public class TransformationDescription extends ObjectDescription {
     }
 
     @Override
-    protected String getValidType() {
+    public String getValidType() {
         return "Template";
     }
 }

@@ -39,7 +39,7 @@ public class TableGroupDescription extends TopLevelDescription implements Compat
     }
 
     @Override
-    protected String getValidType() {
+    public String getValidType() {
         return "TableGroup";
     }
 

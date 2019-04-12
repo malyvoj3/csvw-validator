@@ -50,7 +50,7 @@ public class TableDescription extends TopLevelDescription implements CompatibleD
     }
 
     @Override
-    protected String getValidType() {
+    public String getValidType() {
         return "Table";
     }
 

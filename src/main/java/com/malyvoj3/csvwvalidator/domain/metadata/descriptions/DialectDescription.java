@@ -39,7 +39,7 @@ public class DialectDescription extends ObjectDescription {
     private StringAtomicProperty trim;
 
     @Override
-    protected String getValidType() {
+    public String getValidType() {
         return "Dialect";
     }
 }

@@ -59,7 +59,7 @@ public class SchemaDescription extends InheritanceDescription implements Compati
     }
 
     @Override
-    protected String getValidType() {
+    public String getValidType() {
         return "Schema";
     }
 }

@@ -47,7 +47,7 @@ public class ColumnDescription extends InheritanceDescription implements Compati
     }
 
     @Override
-    protected String getValidType() {
+    public String getValidType() {
         return "Column";
     }
 }

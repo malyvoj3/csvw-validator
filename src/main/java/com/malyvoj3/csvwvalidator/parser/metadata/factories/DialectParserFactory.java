@@ -1,14 +1,17 @@
 package com.malyvoj3.csvwvalidator.parser.metadata.factories;
 
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.DialectDescription;
-import com.malyvoj3.csvwvalidator.parser.metadata.ParserFactory;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.PropertyParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.properties.dialect.*;
 import com.malyvoj3.csvwvalidator.utils.CsvwKeywords;
 
-public class DialectParserFactory<T extends DialectDescription> implements ParserFactory<T> {
+public class DialectParserFactory<T extends DialectDescription> extends ObjectDescriptionParserFactory<T> {
 
     public PropertyParser<T> createParser(String propertyName) {
+        PropertyParser<T> propertyParser = super.createParser(propertyName);
+        if (propertyParser != null) {
+            return propertyParser;
+        }
         switch (propertyName) {
             case CsvwKeywords.COMMENT_PREFIX_PROPERTY:
                 return new CommentPrefixPropertyParser<>();
