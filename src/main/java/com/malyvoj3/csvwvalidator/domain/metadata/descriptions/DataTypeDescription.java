@@ -25,4 +25,8 @@ public class DataTypeDescription extends CommonDescription {
     private StringAtomicProperty maxInclusive;
     private StringAtomicProperty maxExclusive;
 
+    @Override
+    public String getValidType() {
+        return "Datatype";
+    }
 }

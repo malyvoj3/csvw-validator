@@ -45,4 +45,9 @@ public class ColumnDescription extends InheritanceDescription implements Compati
         normalizationErrors.addAll(normalizeProperty(titles, context));
         return normalizationErrors;
     }
+
+    @Override
+    public String getValidType() {
+        return "Column";
+    }
 }
