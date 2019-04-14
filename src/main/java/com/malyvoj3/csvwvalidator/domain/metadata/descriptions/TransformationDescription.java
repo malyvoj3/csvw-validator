@@ -1,11 +1,11 @@
 package com.malyvoj3.csvwvalidator.domain.metadata.descriptions;
 
+import com.malyvoj3.csvwvalidator.domain.ValidationError;
 import com.malyvoj3.csvwvalidator.domain.metadata.Context;
 import com.malyvoj3.csvwvalidator.domain.metadata.ObjectDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.LinkProperty;
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.NaturalLanguageProperty;
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.StringAtomicProperty;
-import com.malyvoj3.csvwvalidator.validation.ValidationError;
 
 import java.util.List;
 

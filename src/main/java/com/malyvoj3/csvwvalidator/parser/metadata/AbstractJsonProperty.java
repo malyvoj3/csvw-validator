@@ -1,6 +1,5 @@
 package com.malyvoj3.csvwvalidator.parser.metadata;
 
-import com.malyvoj3.csvwvalidator.validation.JsonParserError;
 import lombok.Data;
 
 import java.util.ArrayList;

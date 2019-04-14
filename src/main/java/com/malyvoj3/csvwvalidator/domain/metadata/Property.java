@@ -1,6 +1,6 @@
 package com.malyvoj3.csvwvalidator.domain.metadata;
 
-import com.malyvoj3.csvwvalidator.validation.ValidationError;
+import com.malyvoj3.csvwvalidator.domain.ValidationError;
 import lombok.Data;
 
 import java.util.Collections;

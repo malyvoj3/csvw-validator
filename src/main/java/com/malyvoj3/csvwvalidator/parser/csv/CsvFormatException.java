@@ -1,6 +1,6 @@
 package com.malyvoj3.csvwvalidator.parser.csv;
 
-import com.malyvoj3.csvwvalidator.validation.ValidationError;
+import com.malyvoj3.csvwvalidator.domain.ValidationError;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

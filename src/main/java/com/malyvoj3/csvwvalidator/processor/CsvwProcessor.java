@@ -2,6 +2,8 @@ package com.malyvoj3.csvwvalidator.processor;
 
 import com.malyvoj3.csvwvalidator.domain.ContentType;
 import com.malyvoj3.csvwvalidator.domain.FileResponse;
+import com.malyvoj3.csvwvalidator.domain.Severity;
+import com.malyvoj3.csvwvalidator.domain.ValidationError;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.TableDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.TableGroupDescription;
 import com.malyvoj3.csvwvalidator.domain.model.Table;
@@ -17,8 +19,6 @@ import com.malyvoj3.csvwvalidator.processor.result.ProcessingResult;
 import com.malyvoj3.csvwvalidator.processor.result.ResultCreator;
 import com.malyvoj3.csvwvalidator.utils.FileUtils;
 import com.malyvoj3.csvwvalidator.utils.UriUtils;
-import com.malyvoj3.csvwvalidator.validation.Severity;
-import com.malyvoj3.csvwvalidator.validation.ValidationError;
 import com.malyvoj3.csvwvalidator.validation.metadata.MetadataValidator;
 import com.malyvoj3.csvwvalidator.validation.model.ModelValidator;
 import lombok.RequiredArgsConstructor;

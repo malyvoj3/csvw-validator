@@ -1,17 +1,16 @@
 package com.malyvoj3.csvwvalidator.domain.metadata.properties;
 
-import java.util.List;
-import java.util.Map;
-
+import com.malyvoj3.csvwvalidator.domain.ValidationError;
 import com.malyvoj3.csvwvalidator.domain.metadata.Context;
 import com.malyvoj3.csvwvalidator.domain.metadata.Property;
 import com.malyvoj3.csvwvalidator.utils.CsvwKeywords;
 import com.malyvoj3.csvwvalidator.utils.LanguageUtils;
-import com.malyvoj3.csvwvalidator.validation.ValidationError;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
+
+import java.util.List;
+import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

@@ -1,8 +1,8 @@
 package com.malyvoj3.csvwvalidator.validation.model;
 
+import com.malyvoj3.csvwvalidator.domain.ValidationError;
 import com.malyvoj3.csvwvalidator.domain.model.Table;
 import com.malyvoj3.csvwvalidator.domain.model.TableGroup;
-import com.malyvoj3.csvwvalidator.validation.ValidationError;
 
 import java.util.List;
 

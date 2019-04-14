@@ -1,12 +1,12 @@
 package com.malyvoj3.csvwvalidator.domain.metadata.descriptions;
 
+import com.malyvoj3.csvwvalidator.domain.ValidationError;
 import com.malyvoj3.csvwvalidator.domain.metadata.CompatibleDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.Context;
 import com.malyvoj3.csvwvalidator.domain.metadata.Property;
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.BooleanAtomicProperty;
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.LinkProperty;
 import com.malyvoj3.csvwvalidator.utils.UriUtils;
-import com.malyvoj3.csvwvalidator.validation.ValidationError;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;

@@ -5,11 +5,11 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.ColumnDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.NaturalLanguageProperty;
+import com.malyvoj3.csvwvalidator.parser.metadata.JsonParserError;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.PropertyParser;
 import com.malyvoj3.csvwvalidator.utils.CsvwKeywords;
 import com.malyvoj3.csvwvalidator.utils.LanguageUtils;
-import com.malyvoj3.csvwvalidator.validation.JsonParserError;
 import lombok.NonNull;
 
 import java.util.*;

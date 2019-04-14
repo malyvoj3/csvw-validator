@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.SchemaDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.ColumnReferenceProperty;
+import com.malyvoj3.csvwvalidator.parser.metadata.JsonParserError;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.PropertyParser;
-import com.malyvoj3.csvwvalidator.validation.JsonParserError;
 import lombok.NonNull;
 
 import java.util.ArrayList;

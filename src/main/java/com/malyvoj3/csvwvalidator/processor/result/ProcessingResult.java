@@ -1,8 +1,8 @@
 package com.malyvoj3.csvwvalidator.processor.result;
 
+import com.malyvoj3.csvwvalidator.domain.ValidationError;
+import com.malyvoj3.csvwvalidator.domain.ValidationStatus;
 import com.malyvoj3.csvwvalidator.processor.ProcessingSettings;
-import com.malyvoj3.csvwvalidator.validation.ValidationError;
-import com.malyvoj3.csvwvalidator.validation.ValidationStatus;
 import lombok.Builder;
 import lombok.Data;
 

@@ -1,6 +1,6 @@
 package com.malyvoj3.csvwvalidator.processor.result;
 
-import com.malyvoj3.csvwvalidator.validation.ValidationError;
+import com.malyvoj3.csvwvalidator.domain.ValidationError;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedWriter;

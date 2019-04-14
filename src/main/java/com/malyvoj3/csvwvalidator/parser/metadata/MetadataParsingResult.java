@@ -1,8 +1,7 @@
 package com.malyvoj3.csvwvalidator.parser.metadata;
 
+import com.malyvoj3.csvwvalidator.domain.ValidationError;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.TopLevelDescription;
-import com.malyvoj3.csvwvalidator.validation.JsonParserError;
-import com.malyvoj3.csvwvalidator.validation.ValidationError;
 import lombok.Data;
 
 import java.util.ArrayList;

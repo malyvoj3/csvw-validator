@@ -1,7 +1,7 @@
 package com.malyvoj3.csvwvalidator.processor.result;
 
+import com.malyvoj3.csvwvalidator.domain.ValidationError;
 import com.malyvoj3.csvwvalidator.processor.ProcessingSettings;
-import com.malyvoj3.csvwvalidator.validation.ValidationError;
 
 import java.util.List;
 

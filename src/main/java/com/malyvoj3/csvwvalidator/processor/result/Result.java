@@ -1,6 +1,6 @@
 package com.malyvoj3.csvwvalidator.processor.result;
 
-import com.malyvoj3.csvwvalidator.validation.ValidationStatus;
+import com.malyvoj3.csvwvalidator.domain.ValidationStatus;
 
 public interface Result {
 

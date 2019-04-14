@@ -1,6 +1,7 @@
 package com.malyvoj3.csvwvalidator.parser.csv;
 
 
+import com.malyvoj3.csvwvalidator.domain.ValidationError;
 import com.malyvoj3.csvwvalidator.domain.metadata.Context;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.ColumnDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.SchemaDescription;
@@ -12,7 +13,6 @@ import com.malyvoj3.csvwvalidator.domain.model.Row;
 import com.malyvoj3.csvwvalidator.domain.model.Table;
 import com.malyvoj3.csvwvalidator.utils.CsvwKeywords;
 import com.malyvoj3.csvwvalidator.utils.FileUtils;
-import com.malyvoj3.csvwvalidator.validation.ValidationError;
 import com.univocity.parsers.csv.CsvFormat;
 import com.univocity.parsers.csv.CsvParserSettings;
 import lombok.extern.slf4j.Slf4j;

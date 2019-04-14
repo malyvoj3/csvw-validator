@@ -1,6 +1,6 @@
 package com.malyvoj3.csvwvalidator.web.rest;
 
-import com.malyvoj3.csvwvalidator.validation.ValidationStatus;
+import com.malyvoj3.csvwvalidator.domain.ValidationStatus;
 import lombok.Builder;
 import lombok.Data;
 

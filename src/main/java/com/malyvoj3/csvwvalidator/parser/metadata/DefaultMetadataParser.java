@@ -3,6 +3,7 @@ package com.malyvoj3.csvwvalidator.parser.metadata;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.malyvoj3.csvwvalidator.domain.ValidationError;
 import com.malyvoj3.csvwvalidator.domain.metadata.Context;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.TopLevelDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.StringAtomicProperty;
@@ -10,7 +11,6 @@ import com.malyvoj3.csvwvalidator.parser.metadata.parsers.descriptions.TableDesc
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.descriptions.TableGroupDescriptionParser;
 import com.malyvoj3.csvwvalidator.utils.CsvwKeywords;
 import com.malyvoj3.csvwvalidator.utils.UriUtils;
-import com.malyvoj3.csvwvalidator.validation.ValidationError;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

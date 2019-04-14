@@ -86,7 +86,7 @@ public class CsvwController {
                 .build();
     }
 
-    private ValidationError createError(com.malyvoj3.csvwvalidator.validation.ValidationError error) {
+    private ValidationError createError(com.malyvoj3.csvwvalidator.domain.ValidationError error) {
         ErrorSeverity severity;
         switch (error.getSeverity()) {
             case STRICT_WARNING:

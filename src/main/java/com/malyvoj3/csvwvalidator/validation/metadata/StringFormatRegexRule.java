@@ -1,10 +1,10 @@
 package com.malyvoj3.csvwvalidator.validation.metadata;
 
+import com.malyvoj3.csvwvalidator.domain.ValidationError;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.DataTypeDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.InheritanceDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.TableDescription;
 import com.malyvoj3.csvwvalidator.utils.CsvwKeywords;
-import com.malyvoj3.csvwvalidator.validation.ValidationError;
 
 import java.util.ArrayList;
 import java.util.List;

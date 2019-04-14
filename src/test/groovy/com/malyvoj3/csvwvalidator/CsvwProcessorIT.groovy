@@ -1,9 +1,9 @@
 package com.malyvoj3.csvwvalidator
 
+import com.malyvoj3.csvwvalidator.domain.ValidationStatus
 import com.malyvoj3.csvwvalidator.processor.CsvwProcessor
 import com.malyvoj3.csvwvalidator.processor.ProcessingSettings
 import com.malyvoj3.csvwvalidator.processor.result.ProcessingResult
-import com.malyvoj3.csvwvalidator.validation.ValidationStatus
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import spock.lang.Specification

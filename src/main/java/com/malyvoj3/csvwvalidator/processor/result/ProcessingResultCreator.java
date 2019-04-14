@@ -1,9 +1,9 @@
 package com.malyvoj3.csvwvalidator.processor.result;
 
+import com.malyvoj3.csvwvalidator.domain.Severity;
+import com.malyvoj3.csvwvalidator.domain.ValidationError;
+import com.malyvoj3.csvwvalidator.domain.ValidationStatus;
 import com.malyvoj3.csvwvalidator.processor.ProcessingSettings;
-import com.malyvoj3.csvwvalidator.validation.Severity;
-import com.malyvoj3.csvwvalidator.validation.ValidationError;
-import com.malyvoj3.csvwvalidator.validation.ValidationStatus;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;

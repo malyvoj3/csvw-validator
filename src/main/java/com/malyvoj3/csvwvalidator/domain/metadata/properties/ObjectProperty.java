@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.malyvoj3.csvwvalidator.domain.FileResponse;
+import com.malyvoj3.csvwvalidator.domain.ValidationError;
 import com.malyvoj3.csvwvalidator.domain.metadata.Context;
 import com.malyvoj3.csvwvalidator.domain.metadata.ObjectDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.Property;
@@ -13,7 +14,6 @@ import com.malyvoj3.csvwvalidator.parser.metadata.parsers.ContextParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.ObjectDescriptionParser;
 import com.malyvoj3.csvwvalidator.utils.FileUtils;
 import com.malyvoj3.csvwvalidator.utils.UriUtils;
-import com.malyvoj3.csvwvalidator.validation.ValidationError;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

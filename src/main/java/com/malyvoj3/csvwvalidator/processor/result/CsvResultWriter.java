@@ -1,6 +1,6 @@
 package com.malyvoj3.csvwvalidator.processor.result;
 
-import com.malyvoj3.csvwvalidator.validation.ValidationError;
+import com.malyvoj3.csvwvalidator.domain.ValidationError;
 import com.univocity.parsers.csv.CsvFormat;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;

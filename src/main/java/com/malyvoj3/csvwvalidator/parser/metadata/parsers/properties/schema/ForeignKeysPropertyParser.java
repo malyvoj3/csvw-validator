@@ -7,10 +7,10 @@ import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.ForeignKeyDescrip
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.SchemaDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.ArrayProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonObject;
+import com.malyvoj3.csvwvalidator.parser.metadata.JsonParserError;
 import com.malyvoj3.csvwvalidator.parser.metadata.JsonProperty;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.PropertyParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.descriptions.ForeignKeyDescriptionParser;
-import com.malyvoj3.csvwvalidator.validation.JsonParserError;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 

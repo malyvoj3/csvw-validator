@@ -1,4 +1,4 @@
-package com.malyvoj3.csvwvalidator.validation;
+package com.malyvoj3.csvwvalidator.domain;
 
 public enum ValidationStatus {
     PASSED,

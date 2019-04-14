@@ -1,6 +1,7 @@
 package com.malyvoj3.csvwvalidator.validation.metadata;
 
 import com.malyvoj3.csvwvalidator.domain.DataTypeFactory;
+import com.malyvoj3.csvwvalidator.domain.ValidationError;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.DataTypeDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.FormatDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.InheritanceDescription;
@@ -10,7 +11,6 @@ import com.malyvoj3.csvwvalidator.domain.metadata.properties.StringAtomicPropert
 import com.malyvoj3.csvwvalidator.domain.model.DataType;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.*;
 import com.malyvoj3.csvwvalidator.utils.CsvwKeywords;
-import com.malyvoj3.csvwvalidator.validation.ValidationError;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

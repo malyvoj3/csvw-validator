@@ -1,5 +1,7 @@
-package com.malyvoj3.csvwvalidator.validation;
+package com.malyvoj3.csvwvalidator.parser.metadata;
 
+import com.malyvoj3.csvwvalidator.domain.Severity;
+import com.malyvoj3.csvwvalidator.domain.ValidationError;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
