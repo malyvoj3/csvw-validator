@@ -1,4 +1,4 @@
-package com.malyvoj3.csvwvalidator.domain.conf;
+package com.malyvoj3.csvwvalidator.config;
 
 import com.malyvoj3.csvwvalidator.domain.DataTypeFactory;
 import org.springframework.context.annotation.Bean;

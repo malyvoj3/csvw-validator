@@ -1,13 +1,11 @@
-package com.malyvoj3.csvwvalidator.processor.conf;
+package com.malyvoj3.csvwvalidator.config;
 
 import com.malyvoj3.csvwvalidator.domain.DataTypeFactory;
-import com.malyvoj3.csvwvalidator.parser.conf.ParserConfig;
 import com.malyvoj3.csvwvalidator.parser.csv.CsvParser;
-import com.malyvoj3.csvwvalidator.parser.metadata.MetadataParser;
+import com.malyvoj3.csvwvalidator.parser.metadata.DefaultMetadataParser;
 import com.malyvoj3.csvwvalidator.processor.*;
-import com.malyvoj3.csvwvalidator.validation.conf.ValidationConfig;
-import com.malyvoj3.csvwvalidator.validation.metadata.MetadataValidator;
-import com.malyvoj3.csvwvalidator.validation.model.ModelValidator;
+import com.malyvoj3.csvwvalidator.validation.metadata.DefaultMetadataValidator;
+import com.malyvoj3.csvwvalidator.validation.model.DefaultModelValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,9 +20,9 @@ import org.springframework.context.annotation.Import;
 public class ProcessorConfig {
 
     private final CsvParser csvParser;
-    private final MetadataParser metadataParser;
-    private final MetadataValidator metadataValidator;
-    private final ModelValidator modelValidator;
+    private final DefaultMetadataParser metadataParser;
+    private final DefaultMetadataValidator metadataValidator;
+    private final DefaultModelValidator modelValidator;
     private final DataTypeFactory dataTypeFactory;
 
     @Bean
@@ -34,18 +32,18 @@ public class ProcessorConfig {
     }
 
     @Bean
-    public SiteWideLocator siteWideLocator() {
-        return new SiteWideLocator();
+    public CsvwShemaLocator siteWideLocator() {
+        return new CsvwShemaLocator();
     }
 
     @Bean
-    public AnnotationCreator annotationCreator() {
-        return new AnnotationCreator(dataTypeFactory);
+    public DefaultAnnotationCreator annotationCreator() {
+        return new DefaultAnnotationCreator(dataTypeFactory);
     }
 
     @Bean
-    public ResultCreator resultCreator() {
-        return new ResultCreator();
+    public ProcessingResultCreator resultCreator() {
+        return new ProcessingResultCreator();
     }
 
     @Bean

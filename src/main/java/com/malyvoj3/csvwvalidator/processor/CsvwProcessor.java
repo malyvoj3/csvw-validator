@@ -7,17 +7,17 @@ import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.TableGroupDescrip
 import com.malyvoj3.csvwvalidator.domain.model.Table;
 import com.malyvoj3.csvwvalidator.domain.model.TableGroup;
 import com.malyvoj3.csvwvalidator.parser.csv.CsvParser;
-import com.malyvoj3.csvwvalidator.parser.csv.CsvParsingResult;
 import com.malyvoj3.csvwvalidator.parser.csv.Dialect;
-import com.malyvoj3.csvwvalidator.parser.metadata.MetadataParser;
+import com.malyvoj3.csvwvalidator.parser.csv.TabularParsingResult;
+import com.malyvoj3.csvwvalidator.parser.metadata.DefaultMetadataParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.MetadataParsingResult;
 import com.malyvoj3.csvwvalidator.parser.metadata.TopLevelType;
 import com.malyvoj3.csvwvalidator.utils.FileUtils;
 import com.malyvoj3.csvwvalidator.utils.UriUtils;
 import com.malyvoj3.csvwvalidator.validation.Severity;
 import com.malyvoj3.csvwvalidator.validation.ValidationError;
-import com.malyvoj3.csvwvalidator.validation.metadata.MetadataValidator;
-import com.malyvoj3.csvwvalidator.validation.model.ModelValidator;
+import com.malyvoj3.csvwvalidator.validation.metadata.DefaultMetadataValidator;
+import com.malyvoj3.csvwvalidator.validation.model.DefaultModelValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -34,7 +34,7 @@ import java.util.stream.Stream;
 
 @Slf4j
 @RequiredArgsConstructor
-public class CsvwProcessor {
+public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessingResult> {
 
     private static final String DEFAULT_URL = "http://example.com/";
     private static final String TEXT_CSV_TYPE = "text/csv";
@@ -43,14 +43,14 @@ public class CsvwProcessor {
     private static final String HEADER_ABSENT = "absent";
 
     private final CsvParser csvParser;
-    private final MetadataParser metadataParser;
-    private final SiteWideLocator siteWideLocator;
-    private final AnnotationCreator annotationCreator;
-    private final MetadataValidator metadataValidator;
-    private final ModelValidator modelValidator;
-    private final ResultCreator resultCreator;
+    private final DefaultMetadataParser metadataParser;
+    private final CsvwShemaLocator siteWideLocator;
+    private final DefaultAnnotationCreator annotationCreator;
+    private final DefaultMetadataValidator metadataValidator;
+    private final DefaultModelValidator modelValidator;
+    private final ProcessingResultCreator resultCreator;
 
-
+    @Override
     public BatchProcessingResult processTabularData(ProcessingSettings settings, List<ProcessingInput> inputs) {
         List<ProcessingResult> processingResults = new ArrayList<>();
         for (ProcessingInput input : inputs) {
@@ -72,10 +72,11 @@ public class CsvwProcessor {
      * @param file
      * @param fileName
      */
+    @Override
     public ProcessingResult processTabularData(ProcessingSettings settings, InputStream file, String fileName) {
         Dialect dialect = Dialect.builder().header(true).build();
         List<ValidationError> errors = new ArrayList<>();
-        CsvParsingResult csvParsingResult;
+        TabularParsingResult csvParsingResult;
         try {
             csvParsingResult = csvParser.parse(dialect, fileName, file);
             errors = csvParsingResult.getParsingErrors();
@@ -91,6 +92,7 @@ public class CsvwProcessor {
      * @param file
      * @param fileName
      */
+    @Override
     public ProcessingResult processMetadata(ProcessingSettings settings, InputStream file, String fileName) {
         String metadataUrl = DEFAULT_URL + fileName;
         MetadataParsingResult metadataParsingResult = metadataParser.parseJson(file, metadataUrl);
@@ -101,11 +103,12 @@ public class CsvwProcessor {
         return resultCreator.createResult(settings, metadataParsingResult.getParsingErrors(), null, fileName);
     }
 
+    @Override
     public ProcessingResult processTabularData(ProcessingSettings settings, InputStream tabularFile, String tabularFileName, InputStream metadataFile, String metadataFileName) {
         String tabularUrl = DEFAULT_URL + tabularFileName;
         String metadataUrl = DEFAULT_URL + metadataFileName;
         Dialect dialect = Dialect.builder().header(true).build();
-        CsvParsingResult csvParsingResult;
+        TabularParsingResult csvParsingResult;
         List<ValidationError> processingErrors = new ArrayList<>();
         try {
             csvParsingResult = csvParser.parse(dialect, tabularUrl, tabularFile);
@@ -127,10 +130,11 @@ public class CsvwProcessor {
      * @param metadataFile
      * @param metadataFileName
      */
+    @Override
     public ProcessingResult processTabularData(ProcessingSettings settings, String tabularUrl, InputStream metadataFile, String metadataFileName) {
         FileResponse tabularResponse = FileUtils.downloadFile(tabularUrl);
         List<ValidationError> processingErrors = validateCsvFileResponse(tabularResponse);
-        CsvParsingResult csvParsingResult = parseCsv(tabularResponse);
+        TabularParsingResult csvParsingResult = parseCsv(tabularResponse);
         String metadataUrl = UriUtils.resolveUri(tabularUrl, metadataFileName);
         MetadataParsingResult metadataParsingResult = metadataParser.parseJson(metadataFile, metadataUrl);
         processingErrors.addAll(csvParsingResult.getParsingErrors());
@@ -146,6 +150,7 @@ public class CsvwProcessor {
      *
      * @param metadataUrl
      */
+    @Override
     public ProcessingResult processMetadata(ProcessingSettings settings, String metadataUrl) {
         FileResponse metadataResponse = FileUtils.downloadFile(metadataUrl);
         List<ValidationError> processingErrors = new ArrayList<>();
@@ -171,6 +176,7 @@ public class CsvwProcessor {
         return resultCreator.createResult(settings, processingErrors, null, metadataUrl);
     }
 
+    @Override
     public ProcessingResult processTabularData(ProcessingSettings settings, String tabularUrl, String metadataUrl) {
         MetadataParsingResult metadataParsingResult = downloadAndParseMetadata(metadataUrl);
         List<ValidationError> processingErrors = new ArrayList<>();
@@ -179,7 +185,7 @@ public class CsvwProcessor {
             if (metadataParsingResult.getTopLevelDescription().describesTabularData(tabularUrl)
                     && hasNoFatalError(processingErrors)) {
                 FileResponse tabularResponse = FileUtils.downloadFile(tabularUrl);
-                CsvParsingResult csvParsingResult = parseCsv(tabularResponse);
+                TabularParsingResult csvParsingResult = parseCsv(tabularResponse);
                 processingErrors.addAll(csvParsingResult.getParsingErrors());
                 processingErrors.addAll(validateCsvFileResponse(tabularResponse));
                 if (hasNoFatalError(processingErrors)) {
@@ -194,10 +200,11 @@ public class CsvwProcessor {
         return resultCreator.createResult(settings, processingErrors, tabularUrl, metadataUrl);
     }
 
+    @Override
     public ProcessingResult processTabularData(ProcessingSettings settings, String tabularUrl) {
         FileResponse tabularResponse = FileUtils.downloadFile(tabularUrl);
         List<ValidationError> processingErrors = validateCsvFileResponse(tabularResponse);
-        CsvParsingResult csvParsingResult = parseCsv(tabularResponse);
+        TabularParsingResult csvParsingResult = parseCsv(tabularResponse);
         processingErrors.addAll(csvParsingResult.getParsingErrors());
 
         if (hasNoFatalError(processingErrors)) {
@@ -212,7 +219,7 @@ public class CsvwProcessor {
         if (hasNoFatalError(processingErrors)) {
             String tabularUrl = tableDescription.getUrl().getValue();
             FileResponse tabularResponse = FileUtils.downloadFile(tabularUrl);
-            CsvParsingResult csvParsingResult = parseCsv(tabularResponse);
+            TabularParsingResult csvParsingResult = parseCsv(tabularResponse);
             processingErrors.addAll(validateCsvFileResponse(tabularResponse));
             processingErrors.addAll(csvParsingResult.getParsingErrors());
             if (hasNoFatalError(processingErrors)) {
@@ -233,11 +240,11 @@ public class CsvwProcessor {
                 metadataValidator.validateTableGroup(tableGroupDescription)
         );
         if (hasNoFatalError(processingErrors)) {
-            List<CsvParsingResult> csvParsingResults = new ArrayList<>();
+            List<TabularParsingResult> csvParsingResults = new ArrayList<>();
             for (TableDescription tableDesc : tableGroupDescription.getTables().getValue()) {
                 String tabularUrl = tableDesc.getUrl().getValue();
                 FileResponse tabularResponse = FileUtils.downloadFile(tabularUrl);
-                CsvParsingResult csvParsingResult = parseCsv(tabularResponse);
+                TabularParsingResult csvParsingResult = parseCsv(tabularResponse);
                 processingErrors.addAll(validateCsvFileResponse(tabularResponse));
                 processingErrors.addAll(csvParsingResult.getParsingErrors());
                 csvParsingResults.add(csvParsingResult);
@@ -250,14 +257,14 @@ public class CsvwProcessor {
         return processingErrors;
     }
 
-    private List<ValidationError> process(CsvParsingResult csvParsingResult,
+    private List<ValidationError> process(TabularParsingResult csvParsingResult,
                                           MetadataParsingResult metadataParsingResult) {
         List<ValidationError> processingErrors = new ArrayList<>(metadataParsingResult.getErrors());
         TableDescription embeddedMetadata = csvParsingResult.getTableDescription();
         if (hasNoFatalError(processingErrors)) {
             processingErrors.addAll(validateMetadata(metadataParsingResult));
             if (hasNoFatalError(processingErrors)) {
-                TableDescription tableDesc = getTableDescription(metadataParsingResult, csvParsingResult.getCsvUrl());
+                TableDescription tableDesc = getTableDescription(metadataParsingResult, csvParsingResult.getTabularUrl());
                 // Embedded metadata has to be compatible with metadata.
                 if (tableDesc != null && tableDesc.isCompatibleWith(embeddedMetadata)) {
                     Table annotatedTable = annotationCreator.createAnnotations(csvParsingResult, tableDesc);
@@ -280,8 +287,8 @@ public class CsvwProcessor {
         return metadataValidatingErrors;
     }
 
-    private CsvParsingResult parseCsv(FileResponse tabularResponse) {
-        CsvParsingResult csvParsingResult = null;
+    private TabularParsingResult parseCsv(FileResponse tabularResponse) {
+        TabularParsingResult csvParsingResult = null;
         if (tabularResponse != null && tabularResponse.getContent() != null) {
             String header = Optional.of(tabularResponse)
                     .map(FileResponse::getContentType)
@@ -292,7 +299,7 @@ public class CsvwProcessor {
                     .build();
             csvParsingResult = csvParser.parse(dialect, tabularResponse.getUrl(), tabularResponse.getContent());
         } else {
-            csvParsingResult = new CsvParsingResult();
+            csvParsingResult = new TabularParsingResult();
             csvParsingResult.getParsingErrors().add(ValidationError.fatal("Cannot download CSV file."));
         }
         return csvParsingResult;

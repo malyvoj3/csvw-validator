@@ -8,7 +8,7 @@ import java.util.List;
 
 @Data
 @Builder
-public class BatchProcessingResult {
+public class BatchProcessingResult implements BatchResult<ProcessingResult> {
 
     private long filesCount;
     private long passedFilesCount;

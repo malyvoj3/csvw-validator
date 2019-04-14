@@ -9,7 +9,7 @@ import java.util.List;
 
 @Data
 @Builder
-public class ProcessingResult {
+public class ProcessingResult implements Result {
 
     private String tabularUrl;
     private String metadataUrl;

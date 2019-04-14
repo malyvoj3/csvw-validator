@@ -1,8 +1,8 @@
-package com.malyvoj3.csvwvalidator.parser.conf;
+package com.malyvoj3.csvwvalidator.config;
 
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.*;
 import com.malyvoj3.csvwvalidator.parser.csv.CsvParser;
-import com.malyvoj3.csvwvalidator.parser.metadata.MetadataParser;
+import com.malyvoj3.csvwvalidator.parser.metadata.DefaultMetadataParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.factories.*;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.ContextParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.descriptions.*;
@@ -14,8 +14,8 @@ public class ParserConfig {
 
     // PARSERS
     @Bean
-    public MetadataParser metadataParser() {
-        return new MetadataParser(tableDescriptionParser(), tableGroupDescriptionParser());
+    public DefaultMetadataParser metadataParser() {
+        return new DefaultMetadataParser(tableDescriptionParser(), tableGroupDescriptionParser());
     }
 
     @Bean

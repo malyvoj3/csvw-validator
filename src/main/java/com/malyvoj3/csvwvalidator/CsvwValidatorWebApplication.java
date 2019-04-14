@@ -1,6 +1,6 @@
 package com.malyvoj3.csvwvalidator;
 
-import com.malyvoj3.csvwvalidator.processor.conf.ProcessorConfig;
+import com.malyvoj3.csvwvalidator.config.ProcessorConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;

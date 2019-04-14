@@ -1,9 +1,8 @@
-package com.malyvoj3.csvwvalidator.validation.conf;
+package com.malyvoj3.csvwvalidator.config;
 
 import com.malyvoj3.csvwvalidator.domain.DataTypeFactory;
-import com.malyvoj3.csvwvalidator.domain.conf.DomainConfig;
 import com.malyvoj3.csvwvalidator.validation.metadata.*;
-import com.malyvoj3.csvwvalidator.validation.model.ModelValidator;
+import com.malyvoj3.csvwvalidator.validation.model.DefaultModelValidator;
 import com.malyvoj3.csvwvalidator.validation.model.PrimaryKeyRule;
 import com.malyvoj3.csvwvalidator.validation.model.RequiredColumnRule;
 import lombok.RequiredArgsConstructor;
@@ -19,13 +18,13 @@ public class ValidationConfig {
     private final DataTypeFactory dataTypeFactory;
 
     @Bean
-    public MetadataValidator metadataValidator() {
-        return new MetadataValidator();
+    public DefaultMetadataValidator metadataValidator() {
+        return new DefaultMetadataValidator();
     }
 
     @Bean
-    public ModelValidator modelValidator() {
-        return new ModelValidator();
+    public DefaultModelValidator modelValidator() {
+        return new DefaultModelValidator();
     }
 
     @Bean

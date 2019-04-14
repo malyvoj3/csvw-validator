@@ -25,24 +25,27 @@ import java.net.URISyntaxException;
 import java.util.*;
 
 @Slf4j
-public class CsvParser {
+public class CsvParser implements TabularDataParser {
 
     private static final String FIELD_DELIMITER_DEFAULT = ",";
     private static final String LINE_SEPARATOR_DEFAULT = "\r\n";
     private static final char QUOTE_CHAR_DEFAULT = '"';
     private static final char QUOTE_ESCAPE_CHAR_DEFAULT = '"';
 
-    public CsvParsingResult parse(Dialect dialect, String url) throws URISyntaxException, IOException {
+    @Override
+    public TabularParsingResult parse(Dialect dialect, String url) throws URISyntaxException, IOException {
         byte[] fileArray = IOUtils.toByteArray(new URI(url));
         return parse(dialect, url, fileArray);
     }
 
-    public CsvParsingResult parse(Dialect dialect, String url, InputStream inputStream) throws IOException {
+    @Override
+    public TabularParsingResult parse(Dialect dialect, String url, InputStream inputStream) throws IOException {
         byte[] fileArray = IOUtils.toByteArray(inputStream);
         return parse(dialect, url, fileArray);
     }
 
-    public CsvParsingResult parse(Dialect dialect, String url, byte[] file) {
+    @Override
+    public TabularParsingResult parse(Dialect dialect, String url, byte[] file) {
         Table table = new Table();
         table.setUrl(url);
         List<Column> columns = new ArrayList<>();
@@ -76,7 +79,7 @@ public class CsvParser {
             parsingErrors.add(ValidationError.fatal("The CSV file is empty."));
         }
 
-        return new CsvParsingResult(url, parsingErrors, table, tableDescription);
+        return new TabularParsingResult(url, parsingErrors, table, tableDescription);
     }
 
     private void createColumns(com.univocity.parsers.csv.CsvParser parser, Table table, List<Column> columns, List<ColumnDescription> columnDescriptions) {
