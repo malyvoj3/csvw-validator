@@ -1,4 +1,4 @@
-package com.malyvoj3.csvwvalidator.processor;
+package com.malyvoj3.csvwvalidator.processor.result;
 
 import lombok.Builder;
 import lombok.Data;

@@ -6,18 +6,21 @@ import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.TableDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.TableGroupDescription;
 import com.malyvoj3.csvwvalidator.domain.model.Table;
 import com.malyvoj3.csvwvalidator.domain.model.TableGroup;
-import com.malyvoj3.csvwvalidator.parser.csv.CsvParser;
 import com.malyvoj3.csvwvalidator.parser.csv.Dialect;
+import com.malyvoj3.csvwvalidator.parser.csv.TabularDataParser;
 import com.malyvoj3.csvwvalidator.parser.csv.TabularParsingResult;
-import com.malyvoj3.csvwvalidator.parser.metadata.DefaultMetadataParser;
+import com.malyvoj3.csvwvalidator.parser.metadata.MetadataParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.MetadataParsingResult;
 import com.malyvoj3.csvwvalidator.parser.metadata.TopLevelType;
+import com.malyvoj3.csvwvalidator.processor.result.BatchProcessingResult;
+import com.malyvoj3.csvwvalidator.processor.result.ProcessingResult;
+import com.malyvoj3.csvwvalidator.processor.result.ResultCreator;
 import com.malyvoj3.csvwvalidator.utils.FileUtils;
 import com.malyvoj3.csvwvalidator.utils.UriUtils;
 import com.malyvoj3.csvwvalidator.validation.Severity;
 import com.malyvoj3.csvwvalidator.validation.ValidationError;
-import com.malyvoj3.csvwvalidator.validation.metadata.DefaultMetadataValidator;
-import com.malyvoj3.csvwvalidator.validation.model.DefaultModelValidator;
+import com.malyvoj3.csvwvalidator.validation.metadata.MetadataValidator;
+import com.malyvoj3.csvwvalidator.validation.model.ModelValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -42,13 +45,13 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
             .collect(Collectors.toSet());
     private static final String HEADER_ABSENT = "absent";
 
-    private final CsvParser csvParser;
-    private final DefaultMetadataParser metadataParser;
-    private final CsvwShemaLocator siteWideLocator;
-    private final DefaultAnnotationCreator annotationCreator;
-    private final DefaultMetadataValidator metadataValidator;
-    private final DefaultModelValidator modelValidator;
-    private final ProcessingResultCreator resultCreator;
+    private final TabularDataParser tabularParser;
+    private final MetadataParser metadataParser;
+    private final SchemaLocator schemaLocator;
+    private final AnnotationCreator annotationCreator;
+    private final MetadataValidator metadataValidator;
+    private final ModelValidator modelValidator;
+    private final ResultCreator<ProcessingResult, BatchProcessingResult> resultCreator;
 
     @Override
     public BatchProcessingResult processTabularData(ProcessingSettings settings, List<ProcessingInput> inputs) {
@@ -78,7 +81,7 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
         List<ValidationError> errors = new ArrayList<>();
         TabularParsingResult csvParsingResult;
         try {
-            csvParsingResult = csvParser.parse(dialect, fileName, file);
+            csvParsingResult = tabularParser.parse(dialect, fileName, file);
             errors = csvParsingResult.getParsingErrors();
         } catch (IOException e) {
             errors.add(ValidationError.fatal("Error during parsing file %s.", fileName));
@@ -111,7 +114,7 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
         TabularParsingResult csvParsingResult;
         List<ValidationError> processingErrors = new ArrayList<>();
         try {
-            csvParsingResult = csvParser.parse(dialect, tabularUrl, tabularFile);
+            csvParsingResult = tabularParser.parse(dialect, tabularUrl, tabularFile);
             processingErrors.addAll(csvParsingResult.getParsingErrors());
             MetadataParsingResult metadataParsingResult = metadataParser.parseJson(metadataFile, metadataUrl);
             if (hasNoFatalError(processingErrors)) {
@@ -297,7 +300,7 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
             Dialect dialect = Dialect.builder()
                     .header(!HEADER_ABSENT.equals(header))
                     .build();
-            csvParsingResult = csvParser.parse(dialect, tabularResponse.getUrl(), tabularResponse.getContent());
+            csvParsingResult = tabularParser.parse(dialect, tabularResponse.getUrl(), tabularResponse.getContent());
         } else {
             csvParsingResult = new TabularParsingResult();
             csvParsingResult.getParsingErrors().add(ValidationError.fatal("Cannot download CSV file."));
@@ -324,7 +327,7 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
 
         // Site-wide/default metadata locations.
         if (metadataParsingResult == null) {
-            List<String> metadataUrls = siteWideLocator.getMetadataUris(csvFileResponse.getUrl());
+            List<String> metadataUrls = schemaLocator.getMetadataUris(csvFileResponse.getUrl());
             for (String metadataUrl : metadataUrls) {
                 tmpResult = downloadAndParseMetadata(metadataUrl);
                 if (tmpResult != null && tmpResult.getTopLevelDescription() != null) {

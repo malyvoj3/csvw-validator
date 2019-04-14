@@ -1,5 +1,8 @@
 package com.malyvoj3.csvwvalidator.processor;
 
+import com.malyvoj3.csvwvalidator.processor.result.BatchResult;
+import com.malyvoj3.csvwvalidator.processor.result.Result;
+
 import java.io.InputStream;
 import java.util.List;
 
