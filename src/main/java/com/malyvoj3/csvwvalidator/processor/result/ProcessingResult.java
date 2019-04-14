@@ -1,5 +1,6 @@
-package com.malyvoj3.csvwvalidator.processor;
+package com.malyvoj3.csvwvalidator.processor.result;
 
+import com.malyvoj3.csvwvalidator.processor.ProcessingSettings;
 import com.malyvoj3.csvwvalidator.validation.ValidationError;
 import com.malyvoj3.csvwvalidator.validation.ValidationStatus;
 import lombok.Builder;
@@ -9,7 +10,7 @@ import java.util.List;
 
 @Data
 @Builder
-public class ProcessingResult {
+public class ProcessingResult implements Result {
 
     private String tabularUrl;
     private String metadataUrl;

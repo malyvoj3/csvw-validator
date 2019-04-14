@@ -17,12 +17,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
-public class SiteWideLocator {
+public class CsvwShemaLocator implements SchemaLocator {
 
     private static final String WELL_KNOWN_URI = "/.well-known/csvm";
     private static final List<String> defaultLocations = Stream.of("{+url}-metadata.json", "csv-metadata.json")
             .collect(Collectors.toList());
 
+    @Override
     public List<String> getMetadataUris(String csvUri) {
         List<String> metadataUris = new ArrayList<>();
 

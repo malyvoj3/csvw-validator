@@ -1,9 +1,9 @@
 package com.malyvoj3.csvwvalidator.web.rest;
 
-import com.malyvoj3.csvwvalidator.processor.BatchProcessingResult;
 import com.malyvoj3.csvwvalidator.processor.CsvwProcessor;
-import com.malyvoj3.csvwvalidator.processor.ProcessingResult;
 import com.malyvoj3.csvwvalidator.processor.ProcessingSettings;
+import com.malyvoj3.csvwvalidator.processor.result.BatchProcessingResult;
+import com.malyvoj3.csvwvalidator.processor.result.ProcessingResult;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

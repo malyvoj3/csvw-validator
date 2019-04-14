@@ -1,6 +1,10 @@
 package com.malyvoj3.csvwvalidator.web.view;
 
-import com.malyvoj3.csvwvalidator.processor.*;
+import com.malyvoj3.csvwvalidator.processor.CsvwProcessor;
+import com.malyvoj3.csvwvalidator.processor.ProcessingSettings;
+import com.malyvoj3.csvwvalidator.processor.result.CsvResultWriter;
+import com.malyvoj3.csvwvalidator.processor.result.ProcessingResult;
+import com.malyvoj3.csvwvalidator.processor.result.RdfResultWriter;
 import com.malyvoj3.csvwvalidator.validation.ValidationError;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;

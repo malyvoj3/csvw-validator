@@ -1,4 +1,4 @@
-package com.malyvoj3.csvwvalidator.processor;
+package com.malyvoj3.csvwvalidator.processor.result;
 
 import lombok.Builder;
 import lombok.Data;
@@ -8,7 +8,7 @@ import java.util.List;
 
 @Data
 @Builder
-public class BatchProcessingResult {
+public class BatchProcessingResult implements BatchResult<ProcessingResult> {
 
     private long filesCount;
     private long passedFilesCount;

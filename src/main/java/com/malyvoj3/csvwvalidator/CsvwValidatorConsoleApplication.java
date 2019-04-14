@@ -1,6 +1,11 @@
 package com.malyvoj3.csvwvalidator;
 
-import com.malyvoj3.csvwvalidator.processor.*;
+import com.malyvoj3.csvwvalidator.processor.CsvwProcessor;
+import com.malyvoj3.csvwvalidator.processor.ProcessingSettings;
+import com.malyvoj3.csvwvalidator.processor.result.CsvResultWriter;
+import com.malyvoj3.csvwvalidator.processor.result.ProcessingResult;
+import com.malyvoj3.csvwvalidator.processor.result.RdfResultWriter;
+import com.malyvoj3.csvwvalidator.processor.result.TextResultWriter;
 import com.malyvoj3.csvwvalidator.utils.UriUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.cli.*;

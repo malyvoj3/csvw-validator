@@ -1,5 +1,6 @@
-package com.malyvoj3.csvwvalidator.processor;
+package com.malyvoj3.csvwvalidator.processor.result;
 
+import com.malyvoj3.csvwvalidator.processor.ProcessingSettings;
 import com.malyvoj3.csvwvalidator.validation.Severity;
 import com.malyvoj3.csvwvalidator.validation.ValidationError;
 import com.malyvoj3.csvwvalidator.validation.ValidationStatus;
@@ -9,8 +10,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class ResultCreator {
+public class ProcessingResultCreator implements ResultCreator<ProcessingResult, BatchProcessingResult> {
 
+    @Override
     public ProcessingResult createResult(ProcessingSettings settings, List<? extends ValidationError> errors, String tabularUrl, String metadataUrl) {
         List<? extends ValidationError> validationErrors;
         if (!settings.isStrictMode()) {
@@ -61,6 +63,7 @@ public class ResultCreator {
                 .build();
     }
 
+    @Override
     public BatchProcessingResult createBatchResult(ProcessingSettings settings, List<ProcessingResult> processingResults) {
         long passedCount = 0L;
         long warningCount = 0L;

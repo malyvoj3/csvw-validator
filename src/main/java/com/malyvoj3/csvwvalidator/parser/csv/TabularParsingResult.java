@@ -13,9 +13,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class CsvParsingResult {
+public class TabularParsingResult {
 
-    private String csvUrl;
+    private String tabularUrl;
     private List<ValidationError> parsingErrors = new ArrayList<>();
     private Table table;
     private TableDescription tableDescription;
