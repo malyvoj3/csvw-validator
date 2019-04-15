@@ -1,11 +1,11 @@
 package com.malyvoj3.csvwvalidator.config;
 
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.*;
-import com.malyvoj3.csvwvalidator.parser.csv.CsvParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.DefaultMetadataParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.factories.*;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.ContextParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.parsers.descriptions.*;
+import com.malyvoj3.csvwvalidator.parser.tabular.CsvParser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

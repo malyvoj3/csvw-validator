@@ -10,7 +10,7 @@ import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeFormatException
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.IncomparableDataTypeException;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.ValueType;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.string.StringType;
-import com.malyvoj3.csvwvalidator.parser.csv.TabularParsingResult;
+import com.malyvoj3.csvwvalidator.parser.tabular.TabularParsingResult;
 import com.malyvoj3.csvwvalidator.utils.CsvwKeywords;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;

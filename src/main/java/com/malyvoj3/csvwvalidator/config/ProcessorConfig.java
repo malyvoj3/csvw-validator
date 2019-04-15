@@ -1,8 +1,8 @@
 package com.malyvoj3.csvwvalidator.config;
 
 import com.malyvoj3.csvwvalidator.domain.DataTypeFactory;
-import com.malyvoj3.csvwvalidator.parser.csv.CsvParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.DefaultMetadataParser;
+import com.malyvoj3.csvwvalidator.parser.tabular.CsvParser;
 import com.malyvoj3.csvwvalidator.processor.CsvwProcessor;
 import com.malyvoj3.csvwvalidator.processor.CsvwShemaLocator;
 import com.malyvoj3.csvwvalidator.processor.DefaultAnnotationCreator;

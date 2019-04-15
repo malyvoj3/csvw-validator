@@ -8,12 +8,13 @@ import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.TableDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.TableGroupDescription;
 import com.malyvoj3.csvwvalidator.domain.model.Table;
 import com.malyvoj3.csvwvalidator.domain.model.TableGroup;
-import com.malyvoj3.csvwvalidator.parser.csv.Dialect;
-import com.malyvoj3.csvwvalidator.parser.csv.TabularDataParser;
-import com.malyvoj3.csvwvalidator.parser.csv.TabularParsingResult;
 import com.malyvoj3.csvwvalidator.parser.metadata.MetadataParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.MetadataParsingResult;
+import com.malyvoj3.csvwvalidator.parser.metadata.ParsingContext;
 import com.malyvoj3.csvwvalidator.parser.metadata.TopLevelType;
+import com.malyvoj3.csvwvalidator.parser.tabular.Dialect;
+import com.malyvoj3.csvwvalidator.parser.tabular.TabularDataParser;
+import com.malyvoj3.csvwvalidator.parser.tabular.TabularParsingResult;
 import com.malyvoj3.csvwvalidator.processor.result.BatchProcessingResult;
 import com.malyvoj3.csvwvalidator.processor.result.ProcessingResult;
 import com.malyvoj3.csvwvalidator.processor.result.ResultCreator;
@@ -98,7 +99,7 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
     @Override
     public ProcessingResult processMetadata(ProcessingSettings settings, InputStream file, String fileName) {
         String metadataUrl = DEFAULT_URL + fileName;
-        MetadataParsingResult metadataParsingResult = metadataParser.parseJson(file, metadataUrl);
+        MetadataParsingResult metadataParsingResult = metadataParser.parseJson(file, new ParsingContext(metadataUrl));
         List<ValidationError> processingErrors = new ArrayList<>(metadataParsingResult.getErrors());
         if (hasNoFatalError(processingErrors)) {
             processingErrors.addAll(validateMetadata(metadataParsingResult));
@@ -116,7 +117,8 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
         try {
             csvParsingResult = tabularParser.parse(dialect, tabularUrl, tabularFile);
             processingErrors.addAll(csvParsingResult.getParsingErrors());
-            MetadataParsingResult metadataParsingResult = metadataParser.parseJson(metadataFile, metadataUrl);
+            MetadataParsingResult metadataParsingResult = metadataParser.parseJson(metadataFile,
+                    new ParsingContext(metadataUrl));
             if (hasNoFatalError(processingErrors)) {
                 processingErrors.addAll(process(csvParsingResult, metadataParsingResult));
             }
@@ -139,7 +141,8 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
         List<ValidationError> processingErrors = validateCsvFileResponse(tabularResponse);
         TabularParsingResult csvParsingResult = parseCsv(tabularResponse);
         String metadataUrl = UriUtils.resolveUri(tabularUrl, metadataFileName);
-        MetadataParsingResult metadataParsingResult = metadataParser.parseJson(metadataFile, metadataUrl);
+        MetadataParsingResult metadataParsingResult = metadataParser.parseJson(metadataFile,
+                new ParsingContext(metadataUrl));
         processingErrors.addAll(csvParsingResult.getParsingErrors());
 
         if (hasNoFatalError(processingErrors)) {
@@ -159,7 +162,8 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
         List<ValidationError> processingErrors = new ArrayList<>();
         if (metadataResponse != null && metadataResponse.getContent() != null) {
             InputStream inputStream = new ByteArrayInputStream(metadataResponse.getContent());
-            MetadataParsingResult metadataParsingResult = metadataParser.parseJson(inputStream, metadataResponse.getUrl());
+            MetadataParsingResult metadataParsingResult = metadataParser.parseJson(inputStream,
+                    new ParsingContext(metadataResponse.getUrl()));
             if (metadataParsingResult != null) {
                 processingErrors.addAll(metadataParsingResult.getErrors());
                 if (hasNoFatalError(processingErrors)) {
@@ -361,7 +365,7 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
         MetadataParsingResult metadataParsingResult = null;
         try {
             InputStream inputStream = new ByteArrayInputStream(metadataResponse.getContent());
-            metadataParsingResult = metadataParser.parseJson(inputStream, metadataResponse.getUrl());
+            metadataParsingResult = metadataParser.parseJson(inputStream, new ParsingContext(metadataResponse.getUrl()));
         } catch (Exception ex) {
             log.info("Error during downloading metadata parsing results.");
         }

@@ -1,4 +1,4 @@
-package com.malyvoj3.csvwvalidator.parser.csv;
+package com.malyvoj3.csvwvalidator.parser.tabular;
 
 public enum Trim {
 

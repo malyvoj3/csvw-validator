@@ -27,10 +27,10 @@ public class DefaultMetadataParser implements MetadataParser {
     private final TableGroupDescriptionParser tableGroupParser;
 
     @Override
-    public MetadataParsingResult parseJson(InputStream inputStream, String metadataUrl) {
+    public MetadataParsingResult parseJson(InputStream inputStream, ParsingContext parsingContext) {
         List<ValidationError> validationErrors = new ArrayList<>();
         MetadataParsingResult result = new MetadataParsingResult();
-        result.setMetadataUrl(metadataUrl);
+        result.setMetadataUrl(parsingContext.getMetadataUrl());
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode mainNode = objectMapper.readTree(inputStream);
@@ -53,9 +53,9 @@ public class DefaultMetadataParser implements MetadataParser {
                     // If base property is null, base URL is url of metadata document.
                     Context context = topLevelDescription.getContext();
                     if (context.getBase() == null) {
-                        context.setBase(new StringAtomicProperty(metadataUrl));
+                        context.setBase(new StringAtomicProperty(parsingContext.getMetadataUrl()));
                     } else {
-                        context.setBase(new StringAtomicProperty(UriUtils.resolveUri(metadataUrl, context.getBase().getValue())));
+                        context.setBase(new StringAtomicProperty(UriUtils.resolveUri(parsingContext.getMetadataUrl(), context.getBase().getValue())));
                     }
 
                     // Normalize.
@@ -66,12 +66,11 @@ public class DefaultMetadataParser implements MetadataParser {
                 } else {
                     validationErrors.add(ValidationError.fatal("Metadata JSON does not contain valid 'url' or 'tables' property, or it contains both."));
                 }
-                // TODO validation - urls of table group > 1, unique names in tableSchema.columns, virtual columns after  normal,... more
             } else {
                 throw new ParserException();
             }
         } catch (IOException e) {
-            validationErrors.add(ValidationError.fatal(String.format("Error during parsing metadata JSON file '%s'", metadataUrl)));
+            validationErrors.add(ValidationError.fatal(String.format("Error during parsing metadata JSON file '%s'", parsingContext.getMetadataUrl())));
         }
         result.setValidationErrors(validationErrors);
         return result;

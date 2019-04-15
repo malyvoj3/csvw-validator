@@ -1,4 +1,4 @@
-package com.malyvoj3.csvwvalidator.parser.csv;
+package com.malyvoj3.csvwvalidator.parser.tabular;
 
 import com.malyvoj3.csvwvalidator.domain.ValidationError;
 import lombok.AllArgsConstructor;

@@ -4,5 +4,5 @@ import java.io.InputStream;
 
 public interface MetadataParser {
 
-    MetadataParsingResult parseJson(InputStream inputStream, String metadataUrl);
+    MetadataParsingResult parseJson(InputStream inputStream, ParsingContext parsingContext);
 }
