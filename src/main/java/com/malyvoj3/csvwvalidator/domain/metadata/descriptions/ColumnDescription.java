@@ -29,10 +29,10 @@ public class ColumnDescription extends InheritanceDescription implements Compati
         boolean compatible;
         if (name == null && titles == null && other.getName() == null && other.getTitles() == null) {
             compatible = true;
-        } else if ((name == null && other.getName() == null) || name.equals(other.getName())) {
-            compatible = true;
         } else if (titles != null) {
             compatible = titles.hasIntersectionWith(other.getTitles());
+        } else if ((name == null && other.getName() == null) || name.equals(other.getName())) {
+            compatible = true;
         } else {
             compatible = false;
         }

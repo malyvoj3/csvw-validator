@@ -255,6 +255,11 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
                 processingErrors.addAll(validateCsvFileResponse(tabularResponse));
                 processingErrors.addAll(csvParsingResult.getParsingErrors());
                 csvParsingResults.add(csvParsingResult);
+                if (!tableDesc.isCompatibleWith(csvParsingResult.getTableDescription())) {
+                    processingErrors.add(
+                        ValidationError.fatal("Embedded metadata are not compatible with metadata - table '%s'.", tableDesc.getUrl().getValue())
+                    );
+                }
             }
             if (hasNoFatalError(processingErrors)) {
                 TableGroup annotatedTableGroup = annotationCreator.createAnnotations(csvParsingResults, tableGroupDescription);

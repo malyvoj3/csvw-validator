@@ -56,4 +56,9 @@ public class ValidationConfig {
     public DataTypesValidationRule dataTypesValidationRule() {
         return new DataTypesValidationRule(dataTypeFactory);
     }
+
+    @Bean
+    public VirtualColumnOrderRule virtualColumnOrderRule() {
+        return new VirtualColumnOrderRule();
+    }
 }

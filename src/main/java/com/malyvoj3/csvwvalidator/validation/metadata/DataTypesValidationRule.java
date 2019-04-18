@@ -2,6 +2,7 @@ package com.malyvoj3.csvwvalidator.validation.metadata;
 
 import com.malyvoj3.csvwvalidator.domain.DataTypeFactory;
 import com.malyvoj3.csvwvalidator.domain.ValidationError;
+import com.malyvoj3.csvwvalidator.domain.metadata.Property;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.DataTypeDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.FormatDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.InheritanceDescription;
@@ -37,12 +38,25 @@ public class DataTypesValidationRule extends TableDescriptionValidationRule {
         for (InheritanceDescription desc : inheritanceDescriptions) {
             if (desc.getDataType() != null && desc.getDataType().getValue() != null) {
                 DataTypeDescription dataType = desc.getDataType().getValue();
+                errors.addAll(validateId(dataType));
                 errors.addAll(validateFormat(dataType));
                 errors.addAll(validateLengthConstraints(dataType));
                 errors.addAll(validateValueConstraints(dataType));
             }
         }
         return errors;
+    }
+
+    private List<? extends ValidationError> validateId(DataTypeDescription desc) {
+        List<ValidationError> validationErrors = new ArrayList<>();
+        String id = Optional.of(desc)
+            .map(DataTypeDescription::getId)
+            .map(Property::getValue)
+            .orElse(null);
+        if (id != null && DataTypeDefinition.getByUrl(id) != null) {
+            validationErrors.add(ValidationError.error("Datatype has URL of built-in datatype in @id property."));
+        }
+        return validationErrors;
     }
 
     private List<? extends ValidationError> validateFormat(DataTypeDescription desc) {

@@ -1,5 +1,14 @@
 package com.malyvoj3.csvwvalidator.web.view;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.vaadin.olli.FileDownloadWrapper;
+
 import com.malyvoj3.csvwvalidator.domain.ValidationError;
 import com.malyvoj3.csvwvalidator.processor.CsvwProcessor;
 import com.malyvoj3.csvwvalidator.processor.ProcessingSettings;
@@ -7,6 +16,7 @@ import com.malyvoj3.csvwvalidator.processor.result.CsvResultWriter;
 import com.malyvoj3.csvwvalidator.processor.result.ProcessingResult;
 import com.malyvoj3.csvwvalidator.processor.result.RdfResultWriter;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.notification.Notification;
@@ -17,14 +27,6 @@ import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.vaadin.olli.FileDownloadWrapper;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 @Route
 public class MainView extends VerticalLayout {
@@ -52,6 +54,8 @@ public class MainView extends VerticalLayout {
     private Upload metadataUpload;
     private TextField metadataTextfield;
 
+    private Checkbox strictMode;
+
     public MainView() {
         showUpload();
     }
@@ -62,10 +66,12 @@ public class MainView extends VerticalLayout {
         add(createTabularMode());
         tabularUpload = createTabularUpload();
         add(tabularUpload);
-        add(createLabel("Insert metadata files via:"));
+        add(createLabel("Insert metadata file via:"));
         add(createMetadataMode());
         metadataUpload = createMetadataUpload();
         add(metadataUpload);
+        strictMode = createStrictMode();
+        add(strictMode);
         add(createValidationButton());
     }
 
@@ -79,6 +85,7 @@ public class MainView extends VerticalLayout {
         metadataTextfield = null;
         tabularUpload = null;
         metadataUpload = null;
+        strictMode = null;
     }
 
     private void showResult(ProcessingResult result) {
@@ -112,9 +119,10 @@ public class MainView extends VerticalLayout {
 
     private Button createValidationButton() {
         Button validationButton = new Button("Validate");
-        ProcessingSettings settings = new ProcessingSettings(); // default strict mode
+        ProcessingSettings settings = new ProcessingSettings();
         validationButton.addClickListener(e -> {
             try {
+                settings.setStrictMode(strictMode == null ? false : strictMode.getValue());
                 boolean isTabularUpload = tabularUpload != null && tabularDataFile != null;
                 boolean isMetadataUpload = metadataUpload != null && metadataFile != null;
                 boolean isTabularUrl = tabularTextfield != null && StringUtils.isNotBlank(tabularTextfield.getValue());
@@ -149,9 +157,7 @@ public class MainView extends VerticalLayout {
 
     private Button createBackButton() {
         Button backButton = new Button("Back");
-        backButton.addClickListener(e -> {
-            showUpload();
-        });
+        backButton.addClickListener(e -> showUpload());
         return backButton;
     }
 
@@ -218,6 +224,12 @@ public class MainView extends VerticalLayout {
             metadataFileName = buffer.getFileName();
         });
         return upload;
+    }
+
+    private Checkbox createStrictMode() {
+        Checkbox checkbox = new Checkbox();
+        checkbox.setLabel("Strict mode");
+        return checkbox;
     }
 
     private TextField createTabularTextField() {

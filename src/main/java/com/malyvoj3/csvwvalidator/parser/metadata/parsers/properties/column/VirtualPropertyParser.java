@@ -23,7 +23,7 @@ public class VirtualPropertyParser<T extends ColumnDescription> implements Prope
             jsonProperty.addError(JsonParserError.invalidPropertyType(jsonProperty.getName()));
             virtual = new BooleanAtomicProperty(VIRTUAL_DEFAULT_VALUE);
         }
-        description.setSuppressOutput(virtual);
+        description.setVirtual(virtual);
     }
 
 }
