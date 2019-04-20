@@ -45,7 +45,7 @@ public class TableGroupDescription extends TopLevelDescription implements Compat
 
     @Override
     public boolean describesTabularData(String tabularUrl) {
-        return tables.getValue().stream()
+        return tables != null && tables.getValue().stream()
                 .anyMatch(table -> UriUtils.uriEquals(table.getUrl().getValue(), tabularUrl));
     }
 }

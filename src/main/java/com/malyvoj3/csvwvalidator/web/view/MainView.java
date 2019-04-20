@@ -1,14 +1,5 @@
 package com.malyvoj3.csvwvalidator.web.view;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.vaadin.olli.FileDownloadWrapper;
-
 import com.malyvoj3.csvwvalidator.domain.ValidationError;
 import com.malyvoj3.csvwvalidator.processor.CsvwProcessor;
 import com.malyvoj3.csvwvalidator.processor.ProcessingSettings;
@@ -27,6 +18,14 @@ import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.vaadin.olli.FileDownloadWrapper;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 @Route
 public class MainView extends VerticalLayout {
@@ -111,6 +110,11 @@ public class MainView extends VerticalLayout {
         if (result.getMetadataUrl() != null) {
             add(new Label(String.format("Metadata file: %s", result.getMetadataUrl())));
         }
+        grid.getColumnByKey("severity")
+                .setResizable(true);
+        grid.getColumnByKey("formattedMessage")
+                .setFlexGrow(2);
+        grid.setHeightByRows(true);
         add(csvButtonWrapper);
         add(rdfButtonWrapper);
         add(grid);
