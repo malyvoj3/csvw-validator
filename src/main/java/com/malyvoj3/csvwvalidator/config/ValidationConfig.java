@@ -61,4 +61,19 @@ public class ValidationConfig {
     public VirtualColumnOrderRule virtualColumnOrderRule() {
         return new VirtualColumnOrderRule();
     }
+
+    @Bean
+    public CommonPropertiesSyntaxRule commonPropertiesSyntaxRule() {
+        return new CommonPropertiesSyntaxRule();
+    }
+
+    @Bean
+    public ColumnNamesRule columnNamesRule() {
+        return new ColumnNamesRule();
+    }
+
+    @Bean
+    public PrimaryKeyReferenceRule primaryKeyReferenceRule() {
+        return new PrimaryKeyReferenceRule();
+    }
 }

@@ -59,7 +59,6 @@ public class CsvParser implements TabularDataParser {
                 if (!FileUtils.isUtf8(file)) {
                     parsingErrors.add(ValidationError.strictWarn("Invalid encoding: file has not 'UTF-8' encoding."));
                 }
-
                 com.univocity.parsers.csv.CsvParser csvParser = new com.univocity.parsers.csv.CsvParser(defaultSettings(dialect));
                 List<String[]> records = csvParser.parseAll(reader);
                 createColumns(csvParser, table, columns, columnDescriptions);
@@ -85,17 +84,19 @@ public class CsvParser implements TabularDataParser {
     private void createColumns(com.univocity.parsers.csv.CsvParser parser, Table table, List<Column> columns, List<ColumnDescription> columnDescriptions) {
         int columnNumber = 1;
         for (String header : parser.getContext().headers()) {
+            // By default we are trimming.
+            String trimmedHeader = StringUtils.trim(header);
             List<String> headerTitles = new ArrayList<>();
-            headerTitles.add(header);
+            headerTitles.add(trimmedHeader);
             Map<String, List<String>> titles = new HashMap<>();
             titles.put(CsvwKeywords.NATURAL_LANGUAGE_CODE, headerTitles);
             columns.add(Column.builder()
                     .titles(titles)
-                    .name(header)
+                    .name(trimmedHeader)
                     .cells(new ArrayList<>())
                     .number(columnNumber)
                     .table(table).build());
-            columnDescriptions.add(createColumnDescription(header));
+            columnDescriptions.add(createColumnDescription(trimmedHeader));
             columnNumber++;
         }
     }

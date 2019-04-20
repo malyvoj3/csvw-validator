@@ -15,16 +15,10 @@ public abstract class AbstractJsonProperty<T> {
 
     private String name;
     private T jsonValue;
-    private List<JsonParserError> parsingErrors = new ArrayList<>();
+    private List<JsonParserError> errors = new ArrayList<>();
 
     public void addError(JsonParserError error) {
-        parsingErrors.add(error);
-    }
-
-    public void addKeyToErrors(String jsonKey) {
-        for (JsonParserError error : parsingErrors) {
-            error.addKey(jsonKey);
-        }
+        errors.add(error);
     }
 
 }

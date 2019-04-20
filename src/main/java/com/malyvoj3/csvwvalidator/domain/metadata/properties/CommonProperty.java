@@ -19,6 +19,8 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class CommonProperty extends Property<JsonNode> {
 
+    private static final String BLANK_NODE_PREFIX = "_";
+
     /**
      * Normalized absolute iri of common properties
      */
@@ -80,9 +82,11 @@ public class CommonProperty extends Property<JsonNode> {
                     // Transform compact URI to absolute.
                     idValue = UriUtils.resolveCommonProperty(idValue);
                     idValue = idValue != null ? idValue : entry.getValue().textValue();
-                    // Resolve URI against base URL.
-                    idValue = UriUtils.resolveUri(context.getBase().getValue(), idValue);
-                    entryNormalizedValue = new TextNode(idValue);
+                    if (!idValue.startsWith(BLANK_NODE_PREFIX)) {
+                        // Resolve URI against base URL.
+                        idValue = UriUtils.resolveUri(context.getBase().getValue(), idValue);
+                        entryNormalizedValue = new TextNode(idValue);
+                    }
                 } else {
                     // TODO Id must not be blank node (just string is possible)
                 }

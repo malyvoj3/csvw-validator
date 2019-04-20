@@ -27,7 +27,7 @@ public class FormatPropertyParser<T extends DataTypeDescription> implements Prop
         if (property.isObject()) {
             JsonObject jsonObject = new JsonObject(jsonProperty.getName(), (ObjectNode) property);
             FormatDescription formatDescription = formatDescriptionParser.parse(jsonObject);
-            jsonObject.getParsingErrors().forEach(jsonProperty::addError);
+            jsonObject.getErrors().forEach(jsonProperty::addError);
             format = new AtomicProperty<>(formatDescription);
         } else if (property.isTextual()) {
             FormatDescription formatDescription = new FormatDescription();

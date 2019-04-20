@@ -28,7 +28,7 @@ public class TableSchemaPropertyParser<T extends TopLevelDescription> implements
         if (property.isObject()) {
             JsonObject jsonObject = new JsonObject(jsonProperty.getName(), (ObjectNode) property);
             SchemaDescription schemaDescription = schemaDescriptionParser.parse(jsonObject);
-            jsonObject.getParsingErrors().forEach(jsonProperty::addError);
+            jsonObject.getErrors().forEach(jsonProperty::addError);
             tableSchema = new ObjectProperty<>(schemaDescription);
         } else if (property.isTextual()) {
             tableSchema = new ObjectProperty<>(property.textValue(), schemaDescriptionParser);

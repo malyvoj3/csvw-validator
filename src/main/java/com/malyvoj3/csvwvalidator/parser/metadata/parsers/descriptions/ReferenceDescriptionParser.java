@@ -5,7 +5,7 @@ import com.malyvoj3.csvwvalidator.parser.metadata.ParserFactory;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class ReferenceDescriptionParser extends DefaultDescriptionParser<ReferenceDescription> {
+public class ReferenceDescriptionParser extends StrictDescriptionParser<ReferenceDescription> {
 
     public ReferenceDescriptionParser(ParserFactory<ReferenceDescription> factory) {
         super(factory);

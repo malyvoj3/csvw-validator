@@ -25,11 +25,13 @@ public class JsonParserError extends ValidationError {
 
     @Override
     public String getFormattedMessage() {
-        return new StringBuilder(getMessage())
-                .append(" '")
-                .append(createPropertyPath(jsonKeys))
-                .append("'.")
-                .toString();
+        StringBuilder stringBuilder = new StringBuilder(getMessage());
+        if (jsonKeys != null && !jsonKeys.isEmpty()) {
+            stringBuilder.append(" '")
+                    .append(createPropertyPath(jsonKeys))
+                    .append("'.");
+        }
+        return stringBuilder.toString();
     }
 
     public static JsonParserError invalidType(String jsonKey, String correctType) {
@@ -54,6 +56,16 @@ public class JsonParserError extends ValidationError {
         JsonParserError jsonParserError = new JsonParserError(Severity.WARNING, "Unknown property");
         jsonParserError.addKey(jsonKey);
         return jsonParserError;
+    }
+
+    public static JsonParserError forbiddenProperty(String jsonKey) {
+        JsonParserError jsonParserError = new JsonParserError(Severity.FATAL, "Forbidden property");
+        jsonParserError.addKey(jsonKey);
+        return jsonParserError;
+    }
+
+    public static JsonParserError fatal(String msg) {
+        return new JsonParserError(Severity.FATAL, msg);
     }
 
     private String createPropertyPath(@NonNull List<String> jsonKeys) {

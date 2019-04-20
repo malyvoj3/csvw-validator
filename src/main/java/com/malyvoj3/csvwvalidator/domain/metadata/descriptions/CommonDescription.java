@@ -4,10 +4,14 @@ import com.malyvoj3.csvwvalidator.domain.ValidationError;
 import com.malyvoj3.csvwvalidator.domain.metadata.Context;
 import com.malyvoj3.csvwvalidator.domain.metadata.ObjectDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.CommonProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Data
+@EqualsAndHashCode(callSuper = true)
 public abstract class CommonDescription extends ObjectDescription {
 
     private List<CommonProperty> commonProperties = new ArrayList<>();

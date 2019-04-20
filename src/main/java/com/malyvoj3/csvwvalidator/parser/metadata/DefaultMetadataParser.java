@@ -61,7 +61,7 @@ public class DefaultMetadataParser implements MetadataParser {
                     // Normalize.
                     List<ValidationError> normalizationErrors = topLevelDescription.normalize(topLevelDescription.getContext());
                     result.setTopLevelDescription(topLevelDescription);
-                    result.setParsingErrors(jsonObject.getParsingErrors());
+                    result.setParsingErrors(jsonObject.getErrors());
                     result.setNormalizationErrors(normalizationErrors);
                 } else {
                     validationErrors.add(ValidationError.fatal("Metadata JSON does not contain valid 'url' or 'tables' property, or it contains both."));

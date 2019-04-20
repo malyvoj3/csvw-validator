@@ -28,7 +28,7 @@ public class DialectPropertyParser<T extends TopLevelDescription> implements Pro
         if (property.isObject()) {
             JsonObject jsonObject = new JsonObject(jsonProperty.getName(), (ObjectNode) property);
             DialectDescription dialectDescription = dialectDescriptionParser.parse(jsonObject);
-            jsonObject.getParsingErrors().forEach(jsonProperty::addError);
+            jsonObject.getErrors().forEach(jsonProperty::addError);
             dialect = new ObjectProperty<>(dialectDescription);
         } else if (property.isTextual()) {
             dialect = new ObjectProperty<>(property.textValue(), dialectDescriptionParser);

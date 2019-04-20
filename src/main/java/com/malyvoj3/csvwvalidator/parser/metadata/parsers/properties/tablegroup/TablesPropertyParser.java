@@ -41,7 +41,7 @@ public class TablesPropertyParser<T extends TableGroupDescription> implements Pr
                     if (tableDesc != null) {
                         tablesList.add(tableDesc);
                     }
-                    jsonObject.getParsingErrors().forEach(error -> {
+                    jsonObject.getErrors().forEach(error -> {
                         error.addKey(jsonProperty.getName());
                         jsonProperty.addError(error);
                     });

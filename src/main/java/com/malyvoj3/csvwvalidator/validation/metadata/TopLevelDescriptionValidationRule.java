@@ -5,6 +5,7 @@ import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.InheritanceDescri
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.SchemaDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.TableDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.TopLevelDescription;
+import com.malyvoj3.csvwvalidator.domain.metadata.properties.CommonProperty;
 import com.malyvoj3.csvwvalidator.validation.ValidationRule;
 
 import java.util.ArrayList;
@@ -29,6 +30,19 @@ public abstract class TopLevelDescriptionValidationRule<T extends TopLevelDescri
                 .map(Property::getValue)
                 .ifPresent(inheritanceDescriptions::addAll);
         return inheritanceDescriptions;
+    }
+
+    protected List<CommonProperty> getCommonProperties(TableDescription table) {
+        List<InheritanceDescription> inheritanceDescriptions = getInheritanceDescriptions(table);
+        List<CommonProperty> commonProperties = new ArrayList<>(table.getCommonProperties());
+        for (InheritanceDescription desc : inheritanceDescriptions) {
+            commonProperties.addAll(desc.getCommonProperties());
+            Optional.of(desc)
+                    .map(InheritanceDescription::getDataType)
+                    .map(Property::getValue)
+                    .ifPresent(dataType -> commonProperties.addAll(dataType.getCommonProperties()));
+        }
+        return commonProperties;
     }
 
 }

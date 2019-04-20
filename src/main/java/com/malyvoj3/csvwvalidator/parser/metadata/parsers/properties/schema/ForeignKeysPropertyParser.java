@@ -41,7 +41,7 @@ public class ForeignKeysPropertyParser<T extends SchemaDescription> implements P
                     if (foreignKeyDesc != null) {
                         foreignKeyList.add(foreignKeyDesc);
                     }
-                    jsonObject.getParsingErrors().forEach(error -> {
+                    jsonObject.getErrors().forEach(error -> {
                         error.addKey(jsonProperty.getName());
                         jsonProperty.addError(error);
                     });

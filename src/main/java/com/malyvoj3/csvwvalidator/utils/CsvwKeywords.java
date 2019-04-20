@@ -2,6 +2,10 @@ package com.malyvoj3.csvwvalidator.utils;
 
 import lombok.experimental.UtilityClass;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 @UtilityClass
 public class CsvwKeywords {
 
@@ -142,4 +146,28 @@ public class CsvwKeywords {
     public final String UNSIGNED_SHORT_DATA_TYPE = "unsignedShort";
     public final String XML_DATA_TYPE = "xml";
     public final String YEAR_MONTH_DURATION_DATA_TYPE = "yearMonthDuration";
+
+    public final String LIST = "@list";
+    public final String SET = "@set";
+
+    public final Set<String> terms = Stream.of("Cell", "Column", "Datatype", "Dialect", "Direction", "ForeignKey",
+            "JSON", "NCName", "NMTOKEN", "Name", "NumericFormat", "QName", "Row", "Schema", "Table", "TableGroup",
+            "TableReference", "Transformation", "aboutUrl", "any", "anyAtomicType", "anyURI", "as", "base",
+            "base64Binary", "binary", "boolean", "byte", "cc", "columnReference", "columns", "commentPrefix",
+            "csvw", "ctag", "datatype", "date", "dateTime", "dateTimeStamp", "datetime", "dayTimeDuration", "dc",
+            "dc11", "dcat", "dcterms", "dctypes", "decimal", "decimalChar", "default", "delimiter", "describedby",
+            "describes", "dialect", "double", "doubleQuote", "dqv", "duration", "duv", "encoding", "float", "foaf",
+            "foreignKeys", "format", "gDay", "gMonth", "gMonthDay", "gYear", "gYearMonth", "gr", "grddl", "groupChar",
+            "header", "headerRowCount", "hexBinary", "html", "ical", "int", "integer", "json", "lang", "language",
+            "ldp", "length", "license", "lineTerminators", "long", "ma", "maxExclusive", "maxInclusive", "maxLength",
+            "maximum", "minExclusive", "minInclusive", "minLength", "minimum", "name", "negativeInteger",
+            "nonNegativeInteger", "nonPositiveInteger", "normalizedString", "notes", "null", "number", "oa", "og",
+            "ordered", "org", "owl", "pattern", "positiveInteger", "primaryKey", "propertyUrl", "prov", "qb",
+            "quoteChar", "rdf", "rdfa", "rdfs", "reference", "referencedRows", "required", "resource", "rev", "rif",
+            "role", "row", "rowTitles", "rownum", "rr", "schema", "schemaReference", "scriptFormat", "sd", "separator",
+            "short", "sioc", "skipBlankRows", "skipColumns", "skipInitialSpace", "skipRows", "skos", "skosxl", "source",
+            "string", "suppressOutput", "tableDirection", "tableSchema", "tables", "targetFormat", "textDirection",
+            "time", "titles", "token", "transformations", "trim", "unsignedByte", "unsignedInt", "unsignedLong",
+            "unsignedShort", "uriTemplate", "url", "v", "valueUrl", "vcard", "virtual", "void", "wdr", "wrds",
+            "xhv", "xml", "xsd", "yearMonthDuration").collect(Collectors.toSet());
 }

@@ -28,7 +28,7 @@ public class TitlesPropertyParser<T extends ColumnDescription> implements Proper
             ArrayNode arrayNode = (ArrayNode) property;
             JsonProperty tmp = new JsonProperty(jsonProperty.getName(), arrayNode);
             titlesMap.put(CsvwKeywords.NATURAL_LANGUAGE_CODE, titlesFromArray(arrayNode, tmp));
-            tmp.getParsingErrors().forEach(error -> {
+            tmp.getErrors().forEach(error -> {
                 error.addKey(jsonProperty.getName());
                 jsonProperty.addError(error);
             });
@@ -36,7 +36,7 @@ public class TitlesPropertyParser<T extends ColumnDescription> implements Proper
             ObjectNode objectNode = (ObjectNode) property;
             JsonProperty tmp = new JsonProperty(jsonProperty.getName(), objectNode);
             titlesMap = titlesFromObject(objectNode, jsonProperty);
-            tmp.getParsingErrors().forEach(error -> {
+            tmp.getErrors().forEach(error -> {
                 error.addKey(jsonProperty.getName());
                 jsonProperty.addError(error);
             });
@@ -61,7 +61,7 @@ public class TitlesPropertyParser<T extends ColumnDescription> implements Proper
                 } else if (value.isArray()) {
                     JsonProperty tmp = new JsonProperty(key, null);
                     putToMap(key, titlesFromArray((ArrayNode) value, tmp), map);
-                    tmp.getParsingErrors().forEach(error -> {
+                    tmp.getErrors().forEach(error -> {
                         error.addKey(key);
                         jsonProperty.addError(error);
                     });

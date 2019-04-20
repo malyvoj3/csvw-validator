@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor
-public abstract class DefaultDescriptionParser<T extends ObjectDescription> implements ObjectDescriptionParser<T> {
+public abstract class StrictDescriptionParser<T extends ObjectDescription> implements ObjectDescriptionParser<T> {
 
     private final ParserFactory<T> factory;
 
@@ -33,7 +33,7 @@ public abstract class DefaultDescriptionParser<T extends ObjectDescription> impl
                 });
             } else {
                 log.warn("Unknown property {}.", entry.getKey());
-                JsonParserError error = JsonParserError.unknownProperty(entry.getKey());
+                JsonParserError error = JsonParserError.forbiddenProperty(entry.getKey());
                 if (jsonObject.getName() != null) {
                     error.addKey(jsonObject.getName());
                 }
@@ -44,4 +44,5 @@ public abstract class DefaultDescriptionParser<T extends ObjectDescription> impl
     }
 
     protected abstract T createNewDescription();
+
 }

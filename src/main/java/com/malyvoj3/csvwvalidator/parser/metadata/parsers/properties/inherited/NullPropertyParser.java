@@ -11,6 +11,7 @@ import lombok.NonNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 public class NullPropertyParser<T extends InheritanceDescription> implements PropertyParser<T> {
@@ -27,12 +28,15 @@ public class NullPropertyParser<T extends InheritanceDescription> implements Pro
         } else if (property.isArray()) {
             nullValues = new ArrayList<>();
             ArrayNode arrayNode = (ArrayNode) property;
-            // TODO: Maybe deduplicate this array using the set?
-            arrayNode.elements().forEachRemaining(jsonNode -> {
-                if (jsonNode.isTextual()) {
-                    nullValues.add(jsonNode.textValue());
+            int arrayCounter = 0;
+            for (Iterator<JsonNode> iter = arrayNode.elements(); iter.hasNext(); arrayCounter++) {
+                JsonNode element = iter.next();
+                if (element.isTextual()) {
+                    nullValues.add(element.textValue());
+                } else {
+                    jsonProperty.addError(JsonParserError.invalidPropertyType(jsonProperty.getName() + String.valueOf(arrayCounter)));
                 }
-            });
+            }
         } else {
             jsonProperty.addError(JsonParserError.invalidPropertyType(jsonProperty.getName()));
             nullValues = Collections.singletonList(NULL_VALUE_DEFAULT_VALUE);

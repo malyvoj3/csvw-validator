@@ -32,13 +32,23 @@ public class ContextParser {
                 JsonNode first = arrayNode.get(0);
                 JsonNode second = arrayNode.get(1);
                 if (first.isTextual() && CsvwKeywords.CSVW_VOCABULARY_URL.equals(first.textValue()) && second.isObject()) {
-                    context = new Context();
+                    Context newContext = new Context();
                     ObjectNode objectNode = (ObjectNode) second;
-                    JsonNode base = objectNode.get(CsvwKeywords.BASE_PROPERTY);
-                    JsonNode language = objectNode.get(CsvwKeywords.LANGUAGE_PROPERTY);
-                    addBase(context, base, jsonProperty);
-                    addLanguage(context, language, jsonProperty);
+                    objectNode.fields().forEachRemaining(entry -> {
+                        if (CsvwKeywords.BASE_PROPERTY.equals(entry.getKey())) {
+                            addBase(newContext, entry.getValue(), jsonProperty);
+                        } else if (CsvwKeywords.LANGUAGE_PROPERTY.equals(entry.getKey())) {
+                            addLanguage(newContext, entry.getValue(), jsonProperty);
+                        } else {
+                            jsonProperty.addError(JsonParserError.fatal("Property @context has invalid property."));
+                        }
+                    });
+                    context = newContext;
+                } else {
+                    jsonProperty.addError(JsonParserError.fatal("Property @context is invalid."));
                 }
+            } else {
+                jsonProperty.addError(JsonParserError.fatal("Property @context is invalid."));
             }
         }
         return context;

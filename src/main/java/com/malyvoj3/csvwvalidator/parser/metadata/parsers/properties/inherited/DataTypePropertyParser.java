@@ -28,7 +28,7 @@ public class DataTypePropertyParser<T extends InheritanceDescription> implements
         if (property.isObject()) {
             JsonObject jsonObject = new JsonObject(jsonProperty.getName(), (ObjectNode) property);
             dataType = dataTypeDescriptionParser.parse(jsonObject);
-            jsonObject.getParsingErrors().forEach(jsonProperty::addError);
+            jsonObject.getErrors().forEach(jsonProperty::addError);
         } else if (property.isTextual() && DataTypeDefinition.getByName(property.textValue()) != null) {
             dataType = new DataTypeDescription();
             dataType.setBase(new StringAtomicProperty(property.textValue()));

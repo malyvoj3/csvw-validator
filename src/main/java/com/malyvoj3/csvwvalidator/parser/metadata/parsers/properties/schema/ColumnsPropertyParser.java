@@ -40,7 +40,7 @@ public class ColumnsPropertyParser<T extends SchemaDescription> implements Prope
                     if (columnDesc != null) {
                         columnsList.add(columnDesc);
                     }
-                    jsonObject.getParsingErrors().forEach(error -> {
+                    jsonObject.getErrors().forEach(error -> {
                         error.addKey(jsonProperty.getName());
                         jsonProperty.addError(error);
                     });

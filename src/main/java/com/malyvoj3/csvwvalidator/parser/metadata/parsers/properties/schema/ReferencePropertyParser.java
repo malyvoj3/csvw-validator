@@ -26,7 +26,7 @@ public class ReferencePropertyParser<T extends ForeignKeyDescription> implements
         if (property.isObject()) {
             JsonObject jsonObject = new JsonObject(jsonProperty.getName(), (ObjectNode) property);
             ReferenceDescription referenceDescription = referenceDescriptionParser.parse(jsonObject);
-            jsonObject.getParsingErrors().forEach(jsonProperty::addError);
+            jsonObject.getErrors().forEach(jsonProperty::addError);
             reference = new ObjectProperty<>(referenceDescription);
         } else if (property.isTextual()) {
             reference = new ObjectProperty<>(property.textValue(), referenceDescriptionParser);

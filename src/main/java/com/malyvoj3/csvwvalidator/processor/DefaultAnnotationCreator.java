@@ -5,10 +5,7 @@ import com.malyvoj3.csvwvalidator.domain.metadata.Context;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.*;
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.*;
 import com.malyvoj3.csvwvalidator.domain.model.*;
-import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeDefinition;
-import com.malyvoj3.csvwvalidator.domain.model.datatypes.DataTypeFormatException;
-import com.malyvoj3.csvwvalidator.domain.model.datatypes.IncomparableDataTypeException;
-import com.malyvoj3.csvwvalidator.domain.model.datatypes.ValueType;
+import com.malyvoj3.csvwvalidator.domain.model.datatypes.*;
 import com.malyvoj3.csvwvalidator.domain.model.datatypes.string.StringType;
 import com.malyvoj3.csvwvalidator.parser.tabular.TabularParsingResult;
 import com.malyvoj3.csvwvalidator.utils.CsvwKeywords;
@@ -116,37 +113,64 @@ public class DefaultAnnotationCreator implements AnnotationCreator {
         List<Cell> cells = annotatedColumn.getCells();
         DataType dataType = annotatedColumn.getDatatype() != null ? annotatedColumn.getDatatype() : createDefaultDataType();
         for (Cell cell : cells) {
-            ValueType value;
             String normalizedValue = normalizeCellValue(cell.getStringValue(), dataType);
             normalizedValue = StringUtils.isNotEmpty(normalizedValue) ? normalizedValue : cell.getColumn().getDefaultValue();
-            // TODO LIST values
-            if (isNullValue(normalizedValue, cell)) {
-                value = null;
-                if (cell.getColumn().isRequired()) {
-                    String errorMsg = String.format("Cell value (row %d column %d) is null, but column is required.",
-                            cell.getRow().getNumber(), cell.getColumn().getNumber());
-                    cell.getErrors().add(new CellError("REQUIRED", errorMsg));
+            ValueType value;
+            if (annotatedColumn.getSeparator() != null) {
+                if (isNullValue(normalizedValue, cell)) {
+                    value = null;
+                    if (cell.getColumn().isRequired()) {
+                        String errorMsg = String.format("Cell value (row %d column %d) is null, but column is required.",
+                                cell.getRow().getNumber(), cell.getColumn().getNumber());
+                        cell.getErrors().add(new CellError("REQUIRED", errorMsg));
+                    }
+                } else {
+                    String[] stringValues = normalizedValue.split(annotatedColumn.getSeparator());
+                    ListType list = new ListType(normalizedValue);
+                    for (String stringValue : stringValues) {
+                        if (CsvwKeywords.STRING_DATA_TYPE.equals(dataType.getBase())
+                                || CsvwKeywords.ANY_ATOMIC_DATA_TYPE.equals(dataType.getBase())) {
+                            stringValue = StringUtils.trim(stringValue);
+                        }
+                        list.add(createValue(stringValue, cell, dataType));
+                    }
+                    value = list;
                 }
             } else {
-                try {
-                    value = dataTypeFactory.createDataType(cell.getStringValue(), dataType);
-                    boolean isValid = validateConstraints(value, dataType);
-                    if (!isValid) {
-                        String errorMsg = String.format("Cell value (row %d column %d) does not satisfy the " +
-                                "constraints of datatype.", cell.getRow().getNumber(), cell.getColumn().getNumber());
-                        cell.getErrors().add(new CellError("INVALID VALUE", errorMsg));
-                    }
-                } catch (DataTypeFormatException | IncomparableDataTypeException e) {
-                    String errorMsg = String.format("Cell (row %d column %d) cannot be formatted as '%s' " +
-                            "datatype.", cell.getRow().getNumber(), cell.getColumn().getNumber(), dataType.getBase());
-                    cell.getErrors().add(new CellError("INVALID VALUE FORMAT", errorMsg));
-                    value = new StringType(normalizedValue);
-                }
+                value = createValue(normalizedValue, cell, dataType);
             }
             cell.setValue(value);
             // TODO URI templates - propertyURL, valueURL
         }
         return cells;
+    }
+
+    private ValueType createValue(String normalizedValue, Cell cell, DataType dataType) {
+        ValueType value;
+        if (isNullValue(normalizedValue, cell)) {
+            value = null;
+            if (cell.getColumn().isRequired()) {
+                String errorMsg = String.format("Cell value (row %d column %d) is null, but column is required.",
+                        cell.getRow().getNumber(), cell.getColumn().getNumber());
+                cell.getErrors().add(new CellError("REQUIRED", errorMsg));
+            }
+        } else {
+            try {
+                value = dataTypeFactory.createDataType(normalizedValue, dataType);
+                boolean isValid = validateConstraints(value, dataType);
+                if (!isValid) {
+                    String errorMsg = String.format("Cell value (row %d column %d) does not satisfy the " +
+                            "constraints of datatype.", cell.getRow().getNumber(), cell.getColumn().getNumber());
+                    cell.getErrors().add(new CellError("INVALID VALUE", errorMsg));
+                }
+            } catch (DataTypeFormatException | IncomparableDataTypeException e) {
+                String errorMsg = String.format("Cell (row %d column %d) cannot be formatted as '%s' " +
+                        "datatype.", cell.getRow().getNumber(), cell.getColumn().getNumber(), dataType.getBase());
+                cell.getErrors().add(new CellError("INVALID VALUE FORMAT", errorMsg));
+                value = new StringType(normalizedValue);
+            }
+        }
+        return value;
     }
 
     private DataType createDefaultDataType() {

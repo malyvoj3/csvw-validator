@@ -5,7 +5,7 @@ import com.malyvoj3.csvwvalidator.parser.metadata.ParserFactory;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class ForeignKeyDescriptionParser extends DefaultDescriptionParser<ForeignKeyDescription> {
+public class ForeignKeyDescriptionParser extends StrictDescriptionParser<ForeignKeyDescription> {
 
     public ForeignKeyDescriptionParser(ParserFactory<ForeignKeyDescription> factory) {
         super(factory);
