@@ -1,0 +1,199 @@
+#%RAML 1.0
+title: csvw-validator validating API
+version: 1.0
+mediaType: application/json
+description: |
+  APIs related to validating tabular data and metadata based on W3C CSV on the Web specification.
+
+traits:
+  Default:
+    responses:
+      500:
+        description: Server error.
+        body:
+          application/json:
+            type: string
+      400:
+        description: API entry validation error.
+        body:
+          application/json:
+            type: string
+
+types:
+
+  ValidationStatus:
+    type: string
+    description: |
+      Result of the validation.
+      * PASSED - If validator find any warning or error.
+      * WARNING - If validator raise some warning.
+      * ERROR - If validator raise some error.
+    enum:
+      - PASSED
+      - WARNING
+      - ERROR
+
+  ErrorSeverity:
+    type: string
+    description: |
+      Severity of the error.
+      * WARNING - Some minor issue, which just creates warning.
+      * ERROR - Major error.
+      * FATAL - Major error, which is so important, that validating must be stopped.
+    enum:
+      - WARNING
+      - ERROR
+      - FATAL
+
+  ProcessingInput:
+    type: object
+    description: Input for validator, consists of tabular data file URL and/or metadata file URL.
+    properties:
+      tabularUrl:
+        type: string
+        required: false
+        description: URL of tabular data file. Must be absolute URL with HTTP/HTTPS or file schema.
+        maxLength: 300
+      metadataUrl:
+        type: string
+        required: false
+        description: URL of metadata file. Must be absolute URL with HTTP/HTTPS or file schema.
+        maxLength: 300
+
+  ValidationError:
+    type: object
+    description: Validation error, which consists of error message and its severity.
+    properties:
+      severity: ErrorSeverity
+      message:
+        type: string
+        description:
+        maxLength: 1000
+
+  ValidationRequest:
+    type: ProcessingInput
+    description: Request for validating one tabular data file or/and metadata file. At least one of tabularUrl or metadataUrl must be specified.
+    properties:
+      strictMode:
+        type: boolean
+        required: false
+        description: If true, then strict mode is enabled for validating. By default it is true.
+
+  ValidationResponse:
+    type: object
+    description: Response for result of one file validating.
+    properties:
+      validationStatus:
+        type: ValidationStatus
+        required: true
+        description: Result of the validation.
+      tabularUrl:
+        type: string
+        required: true
+        description: URL of inserted (and validated) tabular data file.
+        maxLength: 300
+      metadataUrl:
+        type: string
+        required: false
+        description: URL of inserted (and validated) metadata file.
+        maxLength: 300
+      validationErrors:
+        type: ValidationError[]
+        required: false
+        description: List of all validation errors.
+      warningCount:
+        type: integer
+        minimum: 0
+        required: true
+        description: Number of created warning errors in this validation.
+      errorCount:
+        type: integer
+        minimum: 0
+        required: true
+        description: Number of created error errors in this validation.
+      fatalCount:
+        type: integer
+        minimum: 0
+        required: true
+        description: Number of created fatal errors in this validation.
+      totalErrorsCount:
+        type: integer
+        minimum: 0
+        required: true
+        description: Number of all created errors in this validation.
+
+  BatchValidationRequest:
+    type: object
+    description: Request for validatin multiple files.
+    properties:
+      filesToProcess:
+        type: ProcessingInput[]
+        description:
+        required: true
+      strictMode:
+        type: boolean
+        required: false
+        description: If true, then strict mode is enabled for validating. By default it is true.
+      filesResults:
+        type: boolean
+        required: false
+        description: If true, then response for this request will contains filesResults. Otherwise there won't be filesResults. By default it is true.
+
+  BatchValidationResponse:
+    type: object
+    description: Response for result of multiple files validating.
+    properties:
+      filesCount:
+        type: integer
+        minimum: 0
+        required: true
+        description: Number of validated files.
+      passedFilesCount:
+        type: integer
+        minimum: 0
+        required: true
+        description: Number of files with ValidationStatus PASSED.
+      warningFilesCount:
+        type: integer
+        minimum: 0
+        required: true
+        description: Number of files with ValidationStatus WARNING.
+      errorFilesCount:
+        type: integer
+        minimum: 0
+        required: true
+        description: Number of files with ValidationStatus ERROR.
+      filesResults:
+        type: ValidationResponse[]
+        required: false
+        description: Validation response for each file.
+
+/validate:
+  post:
+    description: Validates one tabular data file and/or metadata file.
+    is:
+      - Default
+    body:
+      application/json:
+        type: ValidationRequest
+    responses:
+      200:
+        body:
+          application/json:
+            type: ValidationResponse
+        description: Input was successfully validated.
+
+/validateBatch:
+  post:
+    description: Validates multiple tabular data files and/or metadata files.
+    is:
+      - Default
+    body:
+      application/json:
+        type: BatchValidationRequest
+    responses:
+      200:
+        body:
+          application/json:
+            type: BatchValidationResponse
+        description: Inputs were successfully validated.
