@@ -162,7 +162,7 @@ property was set to true in the request.
 
 In project there is Shell script ```batchValidate.sh``` which runs batchValidation with over 1000 files.
 
-### Command-line application
+## Command-line application
 
 Command-line application is located in module ```csvw-validator-cli-app```.
 Take generated JAR (eg. ```csvw-validator-cli-app-0.0.1-SNAPSHOT.jar```.) and start the application with command:
