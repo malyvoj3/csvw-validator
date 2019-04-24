@@ -13,8 +13,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @RestController
 public class CsvwController {
@@ -26,27 +30,51 @@ public class CsvwController {
         this.csvwProcessor = csvwProcessor;
     }
 
+    private boolean isConnected(HttpServletResponse servletResponse) {
+        try {
+            servletResponse.getOutputStream().println("data");
+            servletResponse.flushBuffer();
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
     @PostMapping(path = "/validate",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ValidationResponse> validate(@RequestBody ValidationRequest request) {
-        String metadataUrl = request.getMetadataUrl();
-        String tabularUrl = request.getTabularUrl();
-        ProcessingSettings settings = new ProcessingSettings();
-        settings.setStrictMode(request.isStrictMode());
-        ProcessingResult processingResult;
+    public ResponseEntity<ValidationResponse> validate(HttpServletResponse servletResponse, @RequestBody ValidationRequest request) {
+        new ControlSubThread(700, servletResponse) {
+            @Override
+            public void run() {
+                super.run();
+            }
+        };
+        final ProcessingResult[] processingResult = new ProcessingResult[1];
+        new Thread(() -> {
+            String metadataUrl = request.getMetadataUrl();
+            String tabularUrl = request.getTabularUrl();
+            ProcessingSettings settings = new ProcessingSettings();
+            settings.setStrictMode(request.isStrictMode());
 
-        if (StringUtils.isNotEmpty(metadataUrl) && StringUtils.isNotEmpty(tabularUrl)) {
-            processingResult = csvwProcessor.processTabularData(settings, tabularUrl, metadataUrl);
-        } else if (StringUtils.isNotEmpty(metadataUrl)) {
-            processingResult = csvwProcessor.processMetadata(settings, metadataUrl);
-        } else if (StringUtils.isNotEmpty(tabularUrl)) {
-            processingResult = csvwProcessor.processTabularData(settings, tabularUrl);
+            if (StringUtils.isNotEmpty(metadataUrl) && StringUtils.isNotEmpty(tabularUrl)) {
+                processingResult[0] = csvwProcessor.processTabularData(settings, tabularUrl, metadataUrl);
+            } else if (StringUtils.isNotEmpty(metadataUrl)) {
+                processingResult[0] = csvwProcessor.processMetadata(settings, metadataUrl);
+            } else if (StringUtils.isNotEmpty(tabularUrl)) {
+                processingResult[0] = csvwProcessor.processTabularData(settings, tabularUrl);
+            } else {
+                entity[0] =
+            }
+            if (processingResult != null) {
+                entity[0] = ResponseEntity.ok(createResponse(processingResult));
+            }
+        });
+        if (processingResult[0] != null) {
+            return ResponseEntity.ok(createResponse(processingResult[1]));
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+           return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-
-        return ResponseEntity.ok(createResponse(processingResult));
     }
 
     @PostMapping(path = "/validateBatch",

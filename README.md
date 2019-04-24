@@ -31,7 +31,14 @@ or you can take generated JAR (eg. csvw-validator-web-app-0.0.1-SNAPSHOT.jar) an
 ```
 java -jar csvw-validator-web-app-0.0.1-SNAPSHOT.jar
 ```
-Both commands will start the application server. After startup open ```http://localhost:8080/``` in your browser.
+Both commands will start the application server on port ```8080```. After startup open ```http://localhost:8080/``` in your browser.
+If you want to specify the port, use these command instead:
+
+```
+mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=XXXX
+java -jar csvw-validator-web-app-0.0.1-SNAPSHOT.jar --server.port=XXXX
+```
+where instead ```XXXX``` you can insert the port number.
 
 ## Web service
 
@@ -46,7 +53,14 @@ or you can take generated JAR (eg. csvw-validator-web-app-0.0.1-SNAPSHOT.jar) an
 ```
 java -jar csvw-validator-web-app-0.0.1-SNAPSHOT.jar
 ```
-Both commands will start the application server. After startup you will have ready REST web service at ```http://localhost:8080/```.
+Both commands will start the application server on port ```8080```. After startup you will have ready REST web service at ```http://localhost:8080/```.
+If you want to specify the port, use these command instead:
+
+```
+mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=XXXX
+java -jar csvw-validator-web-app-0.0.1-SNAPSHOT.jar --server.port=XXXX
+```
+where instead ```XXXX``` you can insert the port number.
 
 Web service has two endpoints:
 
