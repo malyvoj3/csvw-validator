@@ -90,19 +90,15 @@ public class MainView extends VerticalLayout {
     private void showResult(ProcessingResult result) {
         removeAll();
 
-        Button csvButton = new Button("Download CSV");
+        Button csvButton = new Button("Results in CSV");
         FileDownloadWrapper csvButtonWrapper = new FileDownloadWrapper(
                 new StreamResource("result.csv", () -> new ByteArrayInputStream(csvResultWriter.writeResult(result))));
         csvButtonWrapper.wrapComponent(csvButton);
-        Button rdfButton = new Button("Download RDF");
+        Button rdfButton = new Button("Results in RDF");
         FileDownloadWrapper rdfButtonWrapper = new FileDownloadWrapper(
                 new StreamResource("result.ttl", () -> new ByteArrayInputStream(rdfResultWriter.writeResult(result))));
         rdfButtonWrapper.wrapComponent(rdfButton);
 
-        Grid<ValidationError> grid = new Grid<>(ValidationError.class);
-        List<ValidationError> items = new ArrayList<>(result.getErrors());
-        grid.setItems(items);
-        grid.setColumns("severity", "formattedMessage");
         add(new Label(String.format("Validation result: %s", result.getValidationStatus().name())));
         if (result.getTabularUrl() != null) {
             add(new Label(String.format("Tabular file: %s", result.getTabularUrl())));
@@ -110,14 +106,20 @@ public class MainView extends VerticalLayout {
         if (result.getMetadataUrl() != null) {
             add(new Label(String.format("Metadata file: %s", result.getMetadataUrl())));
         }
-        grid.getColumnByKey("severity")
-                .setResizable(true);
-        grid.getColumnByKey("formattedMessage")
-                .setFlexGrow(2);
-        grid.setHeightByRows(true);
         add(csvButtonWrapper);
         add(rdfButtonWrapper);
-        add(grid);
+        List<ValidationError> items = new ArrayList<>(result.getErrors());
+        if (!items.isEmpty()) {
+            Grid<ValidationError> grid = new Grid<>(ValidationError.class);
+            grid.setItems(items);
+            grid.setColumns("severity", "formattedMessage");
+            grid.getColumnByKey("severity")
+                .setResizable(true);
+            grid.getColumnByKey("formattedMessage")
+                .setFlexGrow(2);
+            grid.setHeightByRows(true);
+            add(grid);
+        }
         add(createBackButton());
     }
 
