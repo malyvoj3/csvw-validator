@@ -1,5 +1,8 @@
 package com.malyvoj3.csvwvalidator.web.view.pages;
 
+import com.malyvoj3.csvwvalidator.web.view.components.LocalizedCheckbox;
+import com.malyvoj3.csvwvalidator.web.view.components.LocalizedTextField;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -17,26 +20,25 @@ public class RemoteValidationPage extends FormLayout {
         add(metadataTextfield);
         add(csvTextfield);
         add(strictMode);
-        addFormItem(new TextField(), "Test input");
+
+        Button validateButton = new Button("Validate");
+        validateButton.addClickListener(e -> {
+            getUI().get().getPage().executeJavaScript("history.pushState(history.state,'','" + "result" + "');");
+            removeAll();
+        });
+        add(validateButton);
     }
 
     private Checkbox createStrictMode() {
-        Checkbox checkbox = new Checkbox();
-        checkbox.setLabel("Strict mode");
-        return checkbox;
+        return new LocalizedCheckbox("validate.strictMode", true);
     }
 
     private TextField createCsvTextField() {
-        TextField textField = new TextField();
-        textField.setLabel("CSV file URL");
-        textField.addThemeVariants();
-        return textField;
+        return new LocalizedTextField("validate.csvUrl");
     }
 
     private TextField createMetadataTextField() {
-        TextField textField = new TextField();
-        textField.setLabel("CSV on the Web descriptor URL");
-        return textField;
+        return new LocalizedTextField("validate.metadataUrl");
     }
 
 }

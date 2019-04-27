@@ -18,7 +18,6 @@ public class CsvwLayout extends AbstractAppRouterLayout {
         Anchor banner = new Anchor("/", "csvw-validator");
         banner.addClassName("banner-style");
         appLayout.setBranding(banner);
-
         LocalizedAppLayoutMenuItem about = new LocalizedAppLayoutMenuItem("menu-item.about",
                 "About", "about");
         LocalizedAppLayoutMenuItem validation = new LocalizedAppLayoutMenuItem("menu-item.validation",

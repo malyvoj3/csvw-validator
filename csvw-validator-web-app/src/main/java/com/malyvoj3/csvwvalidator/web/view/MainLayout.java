@@ -2,8 +2,8 @@ package com.malyvoj3.csvwvalidator.web.view;
 
 import com.malyvoj3.csvwvalidator.web.view.components.LocalizedDiv;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Header;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
 public class MainLayout extends VerticalLayout {
@@ -13,7 +13,7 @@ public class MainLayout extends VerticalLayout {
                 event -> getUI().get().getSession().setLocale(TranslationProvider.LOCALE_CZ));
         Button en = new Button("EN",
                 event -> getUI().get().getSession().setLocale(TranslationProvider.LOCALE_EN));
-        Div languages = new Div(cz, en);
+        Span languages = new Span(cz, en);
         languages.addClassName("page-header-languages");
         LocalizedDiv headerText = new LocalizedDiv(propertyName);
         headerText.addClassName("page-header-text");

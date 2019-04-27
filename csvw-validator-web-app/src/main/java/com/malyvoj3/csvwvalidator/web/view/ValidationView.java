@@ -1,10 +1,10 @@
 package com.malyvoj3.csvwvalidator.web.view;
 
 import com.malyvoj3.csvwvalidator.web.view.components.LocalizedTab;
+import com.malyvoj3.csvwvalidator.web.view.pages.LocalValidationPage;
 import com.malyvoj3.csvwvalidator.web.view.pages.RemoteValidationPage;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.dependency.HtmlImport;
-import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
@@ -28,11 +28,10 @@ public class ValidationView extends MainLayout {
         add(createHeader("header.validation"));
 
         LocalizedTab tab1 = new LocalizedTab("validate-tab.remote");
-        FormLayout page1 = new RemoteValidationPage();
+        Component page1 = new RemoteValidationPage();
 
         LocalizedTab tab2 = new LocalizedTab("validate-tab.local");
-        Div page2 = new Div();
-        page2.setText("Page#2");
+        Component page2 = new LocalValidationPage();
 
         Map<Tab, Component> tabsToPages = new HashMap<>();
         tabsToPages.put(tab1, page1);
@@ -41,6 +40,7 @@ public class ValidationView extends MainLayout {
         Div pages = new Div(page1, page2);
         Set<Component> pagesShown = Stream.of(page1)
                 .collect(Collectors.toSet());
+        page2.setVisible(false);
         tabs.addSelectedChangeListener(event -> {
             pagesShown.forEach(page -> page.setVisible(false));
             pagesShown.clear();
@@ -53,5 +53,6 @@ public class ValidationView extends MainLayout {
         setAlignItems(Alignment.CENTER);
         setJustifyContentMode(JustifyContentMode.CENTER);
     }
+
 
 }

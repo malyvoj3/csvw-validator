@@ -2,6 +2,7 @@ package com.malyvoj3.csvwvalidator.web.view;
 
 import com.vaadin.flow.i18n.I18NProvider;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.support.MessageSourceResourceBundle;
 import org.springframework.stereotype.Component;
 
 import java.text.MessageFormat;
@@ -67,7 +68,7 @@ public class TranslationProvider implements I18NProvider {
 
         ResourceBundle propertiesBundle = null;
         try {
-            propertiesBundle = ResourceBundle.getBundle(BUNDLE_PREFIX, locale,
+            propertiesBundle = MessageSourceResourceBundle.getBundle(BUNDLE_PREFIX, locale,
                     cl);
         } catch (final MissingResourceException e) {
             log.warn("Missing resource", e);
