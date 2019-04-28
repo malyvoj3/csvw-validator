@@ -1,5 +1,6 @@
 package com.malyvoj3.csvwvalidator.web.view;
 
+import com.malyvoj3.csvwvalidator.processor.CsvwProcessor;
 import com.malyvoj3.csvwvalidator.web.view.components.LocalizedButton;
 import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -8,11 +9,15 @@ import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @HtmlImport("styles/validator-styles.html")
 @Route(value = "", layout = CsvwLayout.class)
 @PageTitle("cssw-validator")
 public class Main2View extends MainLayout implements LocaleChangeObserver {
+
+    @Autowired
+    private CsvwProcessor csvwProcessor;
 
     public Main2View() {
         buildView();
@@ -24,7 +29,7 @@ public class Main2View extends MainLayout implements LocaleChangeObserver {
         buildView();
     }
 
-    private void buildView(){
+    private void buildView() {
         add(createHeader("header.main"));
         add(new Html(getTranslation("pageText.main")));
         LocalizedButton validationButton = new LocalizedButton("main.startValidation");
