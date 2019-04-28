@@ -7,19 +7,23 @@ import com.vaadin.flow.i18n.LocaleChangeObserver;
 public class LocalizedTextField extends TextField implements LocaleChangeObserver {
 
     private String propertyName;
+    private String placeholderName;
 
     public LocalizedTextField(String propertyName) {
         this.propertyName = propertyName;
     }
 
-    public LocalizedTextField(String label, String propertyName) {
-        super(label);
+    public LocalizedTextField(String propertyName, String placeholderName) {
         this.propertyName = propertyName;
+        this.placeholderName = placeholderName;
     }
 
     @Override
     public void localeChange(LocaleChangeEvent localeChangeEvent) {
         setLabel(getTranslation(propertyName));
+        if (placeholderName != null) {
+            setPlaceholder(getTranslation(placeholderName));
+        }
     }
 
 }

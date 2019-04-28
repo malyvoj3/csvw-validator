@@ -1,7 +1,11 @@
 package com.malyvoj3.csvwvalidator.web.view.pages;
 
+import com.malyvoj3.csvwvalidator.web.view.components.LocalizedButton;
+import com.malyvoj3.csvwvalidator.web.view.components.LocalizedCheckbox;
+import com.malyvoj3.csvwvalidator.web.view.components.LocalizedLabel;
 import com.malyvoj3.csvwvalidator.web.view.components.LocalizedUpload;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
@@ -10,6 +14,8 @@ import java.io.InputStream;
 
 public class LocalValidationPage extends VerticalLayout {
 
+    private Checkbox strictMode;
+
     private InputStream csvDataFile;
     private String csvDataFileName;
 
@@ -17,10 +23,20 @@ public class LocalValidationPage extends VerticalLayout {
     private String metadataFileName;
 
     public LocalValidationPage() {
-        add(new Label("Upload CSV file from your computer"));
+        add(new LocalizedLabel("upload.csv"));
         add(createTabularUpload());
-        add(new Label("Upload metadata from your computer:"));
+        add(new LocalizedLabel("upload.metadata"));
         add(createMetadataUpload());
+        strictMode = createStrictMode();
+        add(strictMode);
+        LocalizedButton validationButton = new LocalizedButton("validation.validate");
+        validationButton.addClassName("page-middle-button");
+        validationButton.addThemeVariants(ButtonVariant.MATERIAL_CONTAINED);
+        add(validationButton);
+    }
+
+    private Checkbox createStrictMode() {
+        return new LocalizedCheckbox("validation.strictMode", true);
     }
 
     private Upload createTabularUpload() {
