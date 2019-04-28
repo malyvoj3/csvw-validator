@@ -6,9 +6,12 @@ import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.AppLayoutMenu;
 import com.vaadin.flow.component.dependency.HtmlImport;
 import com.vaadin.flow.component.html.Anchor;
+import com.vaadin.flow.component.page.Push;
+import com.vaadin.flow.shared.communication.PushMode;
 import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.material.Material;
 
+@Push(PushMode.MANUAL)
 @HtmlImport("styles/validator-styles.html")
 @Theme(value = Material.class, variant = Material.LIGHT)
 public class CsvwLayout extends AbstractAppRouterLayout {

@@ -6,11 +6,14 @@ import com.malyvoj3.csvwvalidator.processor.ProcessingSettings;
 import com.malyvoj3.csvwvalidator.processor.result.CsvResultWriter;
 import com.malyvoj3.csvwvalidator.processor.result.ProcessingResult;
 import com.malyvoj3.csvwvalidator.processor.result.RdfResultWriter;
+import com.malyvoj3.csvwvalidator.web.view.components.ErrorGrid;
 import com.malyvoj3.csvwvalidator.web.view.components.LocalizedButton;
 import com.malyvoj3.csvwvalidator.web.view.components.LocalizedParamLabel;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.server.StreamResource;
@@ -49,19 +52,19 @@ public class ValidationThread extends Thread {
         boolean isMetadataUpload = false;/*metadataUpload != null && metadataFile != null;*/
         boolean isCsvUrl = StringUtils.isNotBlank(inputData.getCsvUrl());
         boolean isMetadataUrl = StringUtils.isNotBlank(inputData.getMetadataUrl());
-        VerticalLayout result = null;
+        ProcessingResult processingResult = null;
         if (isTabularUpload && isMetadataUpload) {
             //showResult(csvwProcessor.processTabularData(settings, tabularDataFile, tabularDataFileName, metadataFile, metadataFileName));
         } else if (isCsvUrl && isMetadataUrl) {
-            result = createResult(csvwProcessor.processTabularData(settings, inputData.getCsvUrl(), inputData.getMetadataUrl()));
+            processingResult = csvwProcessor.processTabularData(settings, inputData.getCsvUrl(), inputData.getMetadataUrl());
         } else if (isTabularUpload && isMetadataUrl) {
             //Notification.show("Unsupported combination: uploaded tabular data file and metadata url!");
         } else if (isCsvUrl && isMetadataUpload) {
             //showResult(csvwProcessor.processTabularData(settings, tabularTextfield.getValue(), metadataFile, metadataFileName));
         } else if (isMetadataUrl) {
-            result = createResult(csvwProcessor.processMetadata(settings, inputData.getMetadataUrl()));
+            processingResult = csvwProcessor.processMetadata(settings, inputData.getMetadataUrl());
         } else if (isCsvUrl) {
-            result = createResult(csvwProcessor.processTabularData(settings, inputData.getCsvUrl()));
+            processingResult = csvwProcessor.processTabularData(settings, inputData.getCsvUrl());
         } else if (isTabularUpload) {
             //showResult(csvwProcessor.processTabularData(settings, tabularDataFile, tabularDataFileName));
         } else if (isMetadataUpload) {
@@ -69,15 +72,18 @@ public class ValidationThread extends Thread {
         } else {
             Notification.show("Insert some files!");
         }
-        VerticalLayout finalResult = result;
+        ProcessingResult finalProcessingResult = processingResult;
         ui.access(() -> {
-            resultView.add(finalResult);
+            Component result = createResult(finalProcessingResult);
+            resultView.clearProgressBar();
+            resultView.add(result);
+            ui.push();
         });
     }
 
-    private VerticalLayout createResult(ProcessingResult result) {
+    private Component createResult(ProcessingResult result) {
         VerticalLayout resultDiv = new VerticalLayout();
-        resultDiv.setSpacing(true);
+        VerticalLayout upperGrid = new VerticalLayout();
 
         LocalizedButton csvButton = new LocalizedButton("result.csvResults");
         FileDownloadWrapper csvButtonWrapper = new FileDownloadWrapper(
@@ -89,26 +95,48 @@ public class ValidationThread extends Thread {
         rdfButtonWrapper.wrapComponent(rdfButton);
 
         LocalizedParamLabel resultLabel = new LocalizedParamLabel("result.status", result.getValidationStatus().name());
-        resultDiv.add(resultLabel);
+        upperGrid.add(resultLabel);
+        upperGrid.setHorizontalComponentAlignment(FlexComponent.Alignment.START,
+                resultLabel);
         if (result.getTabularUrl() != null) {
             LocalizedParamLabel csvLabel = new LocalizedParamLabel("result.csvUrl", result.getTabularUrl());
-            resultDiv.add(csvLabel);
+            upperGrid.add(csvLabel);
+            upperGrid.setHorizontalComponentAlignment(FlexComponent.Alignment.START,
+                    csvLabel);
         }
         if (result.getMetadataUrl() != null) {
             LocalizedParamLabel metadataLabel = new LocalizedParamLabel("result.metadataUrl", result.getMetadataUrl());
-            resultDiv.add(metadataLabel);
+            upperGrid.add(metadataLabel);
+            upperGrid.setHorizontalComponentAlignment(FlexComponent.Alignment.START,
+                    metadataLabel);
         }
-        resultDiv.add(new HorizontalLayout(csvButtonWrapper, rdfButtonWrapper));
+        HorizontalLayout downloadButtons = new HorizontalLayout(csvButtonWrapper, rdfButtonWrapper);
+        upperGrid.add(downloadButtons);
+        upperGrid.setHorizontalComponentAlignment(FlexComponent.Alignment.CENTER,
+                downloadButtons);
+        upperGrid.setClassName("validation-upperGrid");
+        resultDiv.setHorizontalComponentAlignment(FlexComponent.Alignment.CENTER,
+                upperGrid);
+        resultDiv.add(upperGrid);
         List<ValidationError> items = new ArrayList<>(result.getErrors());
         if (!items.isEmpty()) {
-            Grid<ValidationError> grid = new Grid<>(ValidationError.class);
-            grid.setItems(items);
-            grid.setColumns("severity", "formattedMessage");
-            grid.getColumns().get(0).setResizable(true).setHeader("result.grid.severity");
-            grid.getColumns().get(1).setFlexGrow(2).setHeader("result.grid.message");
-            grid.setHeightByRows(true);
-            resultDiv.add(grid);
+            ErrorGrid errorGrid = new ErrorGrid(items);
+            resultDiv.setHorizontalComponentAlignment(FlexComponent.Alignment.STRETCH,
+                    errorGrid);
+            resultDiv.add(errorGrid);
         }
+        resultDiv.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
+        upperGrid.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
+
+        LocalizedButton validationButton = new LocalizedButton("result.validationAgain");
+        validationButton.addClassName("page-middle-button");
+        validationButton.addThemeVariants(ButtonVariant.MATERIAL_CONTAINED);
+        validationButton.addClickListener(event -> {
+            validationButton.getUI().ifPresent(ui -> ui.navigate("validation"));
+        });
+        resultDiv.add(validationButton);
+        resultDiv.setHorizontalComponentAlignment(FlexComponent.Alignment.CENTER,
+                validationButton);
         return resultDiv;
     }
 }
