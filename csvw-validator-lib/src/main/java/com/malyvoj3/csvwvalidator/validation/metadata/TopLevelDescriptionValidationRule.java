@@ -6,13 +6,12 @@ import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.SchemaDescription
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.TableDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.TopLevelDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.CommonProperty;
-import com.malyvoj3.csvwvalidator.validation.ValidationRule;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public abstract class TopLevelDescriptionValidationRule<T extends TopLevelDescription> implements ValidationRule<T> {
+public abstract class TopLevelDescriptionValidationRule<T extends TopLevelDescription> implements MetadataValidationRule<T> {
 
     protected List<InheritanceDescription> getInheritanceDescriptions(TableDescription table) {
         List<InheritanceDescription> inheritanceDescriptions = new ArrayList<>();

@@ -11,7 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -67,17 +66,11 @@ public class FileUtils {
     private static FileResponse getLocalFile(@NonNull String stringUrl) {
         FileResponse fileResponse = null;
         String normalizedUrl = UriUtils.normalizeUri(stringUrl);
-        URL url;
-        try {
-            url = new URL(normalizedUrl);
-            log.info("Opening local file {}.", normalizedUrl);
-            fileResponse = new FileResponse();
-            fileResponse.setFilePath(normalizedUrl);
-            fileResponse.setUrl(normalizedUrl);
-            fileResponse.setRemoteFile(false);
-        } catch (IOException e) {
-            log.error("Cannot open local file with url {}.", stringUrl);
-        }
+        log.info("Not downloading file - it is local file {}.", normalizedUrl);
+        fileResponse = new FileResponse();
+        fileResponse.setFilePath(normalizedUrl);
+        fileResponse.setUrl(normalizedUrl);
+        fileResponse.setRemoteFile(false);
         return fileResponse;
     }
 

@@ -3,8 +3,7 @@ package com.malyvoj3.csvwvalidator.config;
 import com.malyvoj3.csvwvalidator.domain.DataTypeFactory;
 import com.malyvoj3.csvwvalidator.validation.metadata.*;
 import com.malyvoj3.csvwvalidator.validation.model.DefaultModelValidator;
-import com.malyvoj3.csvwvalidator.validation.model.PrimaryKeyRule;
-import com.malyvoj3.csvwvalidator.validation.model.RequiredColumnRule;
+import com.malyvoj3.csvwvalidator.validation.model.PrimaryKeyRuleFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +23,7 @@ public class ValidationConfig {
 
     @Bean
     public DefaultModelValidator modelValidator() {
-        return new DefaultModelValidator();
+        return new DefaultModelValidator(dataTypeFactory);
     }
 
     @Bean
@@ -38,13 +37,8 @@ public class ValidationConfig {
     }
 
     @Bean
-    public RequiredColumnRule requiredColumnRule() {
-        return new RequiredColumnRule();
-    }
-
-    @Bean
-    public PrimaryKeyRule primaryKeyRule() {
-        return new PrimaryKeyRule();
+    public PrimaryKeyRuleFactory primaryKeyRuleFactory() {
+        return new PrimaryKeyRuleFactory();
     }
 
     @Bean
