@@ -212,22 +212,26 @@ public class CsvParser implements TabularDataParser {
         List<ValidationError> errorList = new ArrayList<>();
         if (!LINE_SEPARATOR_DEFAULT.equals(detectedFormat.getLineSeparatorString())) {
             errorList.add(ValidationError.strictWarn(
-                    invalidMsg("line separator", escapeLineSeparator(detectedFormat.getLineSeparatorString()), escapeLineSeparator(LINE_SEPARATOR_DEFAULT))
+                    "error.csvFormat.lineSeparator",
+                    escapeLineSeparator(detectedFormat.getLineSeparatorString()), escapeLineSeparator(LINE_SEPARATOR_DEFAULT)
             ));
         }
         if (!FIELD_DELIMITER_DEFAULT.equals(detectedFormat.getDelimiterString())) {
             errorList.add(ValidationError.strictWarn(
-                    invalidMsg("field delimiter", detectedFormat.getDelimiter() == '\t' ? "\\t" : detectedFormat.getDelimiterString(), FIELD_DELIMITER_DEFAULT)
+                    "error.csvFormat.fieldDelimiter",
+                    detectedFormat.getDelimiter() == '\t' ? "\\t" : detectedFormat.getDelimiterString(), FIELD_DELIMITER_DEFAULT
             ));
         }
         if (QUOTE_CHAR_DEFAULT != detectedFormat.getQuote()) {
             errorList.add(ValidationError.strictWarn(
-                    invalidMsg("quote character", String.valueOf(detectedFormat.getQuote()), String.valueOf(QUOTE_CHAR_DEFAULT))
+                    "error.csvFormat.quote",
+                    String.valueOf(detectedFormat.getQuote()), String.valueOf(QUOTE_CHAR_DEFAULT)
             ));
         }
         if (QUOTE_ESCAPE_CHAR_DEFAULT != detectedFormat.getQuoteEscape()) {
             errorList.add(ValidationError.strictWarn(
-                    invalidMsg("quote escape character", String.valueOf(detectedFormat.getQuoteEscape()), String.valueOf(QUOTE_CHAR_DEFAULT))
+                    "error.csvFormat.quoteEscape",
+                    String.valueOf(detectedFormat.getQuoteEscape()), String.valueOf(QUOTE_CHAR_DEFAULT)
             ));
         }
         return errorList;
@@ -239,11 +243,6 @@ public class CsvParser implements TabularDataParser {
             result = string.replace("\r", "\\r").replace("\n", "\\n");
         }
         return result;
-    }
-
-    private static String invalidMsg(String fieldName, String invalidValue, String defaultValue) {
-        return String.format("Invalid %s: it looks like %s is '%s' instead '%s'.",
-                fieldName, fieldName, invalidValue, defaultValue);
     }
 
     private static CsvParserSettings defaultSettings(Dialect dialect) {
