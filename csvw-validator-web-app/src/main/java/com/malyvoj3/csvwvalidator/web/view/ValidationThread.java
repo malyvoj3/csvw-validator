@@ -48,13 +48,15 @@ public class ValidationThread extends Thread {
     public void run() {
         ProcessingSettings settings = new ProcessingSettings();
         settings.setStrictMode(inputData.getStrictMode() == null ? true : inputData.getStrictMode());
-        boolean isTabularUpload = false;/*tabularUpload != null && tabularDataFile != null;*/
-        boolean isMetadataUpload = false;/*metadataUpload != null && metadataFile != null;*/
+        boolean isTabularUpload = StringUtils.isNotBlank(inputData.getCsvFilePath())
+                && StringUtils.isNotBlank(inputData.getCsvFileName());
+        boolean isMetadataUpload = StringUtils.isNotBlank(inputData.getMetadatFilePath())
+                && StringUtils.isNotBlank(inputData.getMetadataFileName());
         boolean isCsvUrl = StringUtils.isNotBlank(inputData.getCsvUrl());
         boolean isMetadataUrl = StringUtils.isNotBlank(inputData.getMetadataUrl());
         ProcessingResult processingResult = null;
         if (isTabularUpload && isMetadataUpload) {
-            //showResult(csvwProcessor.processTabularData(settings, tabularDataFile, tabularDataFileName, metadataFile, metadataFileName));
+            //processingResult = csvwProcessor.processTabularData(settings, tabularDataFile, tabularDataFileName, metadataFile, metadataFileName);
         } else if (isCsvUrl && isMetadataUrl) {
             processingResult = csvwProcessor.processTabularData(settings, inputData.getCsvUrl(), inputData.getMetadataUrl());
         } else if (isTabularUpload && isMetadataUrl) {

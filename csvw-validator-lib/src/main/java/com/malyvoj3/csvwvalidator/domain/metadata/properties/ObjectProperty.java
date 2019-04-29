@@ -53,7 +53,7 @@ public class ObjectProperty<T extends ObjectDescription> extends Property<T> {
 
     private void normalizeUrlObject(Context context) {
         String normalizedUrl = UriUtils.resolveUri(context.getBase().getValue(), objectUrl);
-        FileResponse fileResponse = FileUtils.downloadFile(normalizedUrl);
+        FileResponse fileResponse = FileUtils.downloadMetadataFile(normalizedUrl);
         JsonNode node = null;
         try {
             node = objectMapper.readTree(fileResponse.getContent());
