@@ -10,6 +10,6 @@ public interface TabularDataParser {
 
     TabularParsingResult parse(Dialect dialect, String url, InputStream inputStream) throws IOException;
 
-    TabularParsingResult parse(Dialect dialect, String url, byte[] file);
+    TabularParsingResult parse(Dialect dialect, String url, String filePath);
 
 }

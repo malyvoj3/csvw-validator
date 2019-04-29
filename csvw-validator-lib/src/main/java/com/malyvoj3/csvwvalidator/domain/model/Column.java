@@ -32,4 +32,5 @@ public class Column {
     private Map<String, List<String>> titles = new HashMap<>();
     private String valueUrl;
     private boolean virtual;
+    private boolean empty = true;
 }
