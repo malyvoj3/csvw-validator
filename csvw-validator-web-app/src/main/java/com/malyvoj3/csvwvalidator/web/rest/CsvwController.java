@@ -37,7 +37,7 @@ public class CsvwController {
         ProcessingResult processingResult;
 
         if (StringUtils.isNotEmpty(metadataUrl) && StringUtils.isNotEmpty(tabularUrl)) {
-            processingResult = csvwProcessor.processTabularData(settings, tabularUrl, metadataUrl);
+            processingResult = csvwProcessor.process(settings, tabularUrl, metadataUrl);
         } else if (StringUtils.isNotEmpty(metadataUrl)) {
             processingResult = csvwProcessor.processMetadata(settings, metadataUrl);
         } else if (StringUtils.isNotEmpty(tabularUrl)) {
@@ -55,7 +55,7 @@ public class CsvwController {
     public ResponseEntity<BatchValidationResponse> validateBatch(@RequestBody BatchValidationRequest request) {
         ProcessingSettings settings = new ProcessingSettings();
         settings.setStrictMode(request.isStrictMode());
-        BatchProcessingResult result = csvwProcessor.processTabularData(settings, request.getFilesToProcess());
+        BatchProcessingResult result = csvwProcessor.process(settings, request.getFilesToProcess());
 
         List<ValidationResponse> filesResults = result.getFilesResults().stream()
                 .map(this::createResponse)

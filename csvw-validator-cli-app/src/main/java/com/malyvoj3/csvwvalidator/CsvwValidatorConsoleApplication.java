@@ -87,7 +87,7 @@ public class CsvwValidatorConsoleApplication {
         ProcessingSettings settings = new ProcessingSettings();
         settings.setStrictMode(isStrict);
         if (fileAbsoluteUrl != null && schemaAbsoluteUrl != null) {
-            processingResult = csvwProcessor.processTabularData(settings, fileAbsoluteUrl, schemaAbsoluteUrl);
+            processingResult = csvwProcessor.process(settings, fileAbsoluteUrl, schemaAbsoluteUrl);
         } else if (fileAbsoluteUrl != null) {
             processingResult = csvwProcessor.processTabularData(settings, fileAbsoluteUrl);
         } else if (schemaAbsoluteUrl != null) {

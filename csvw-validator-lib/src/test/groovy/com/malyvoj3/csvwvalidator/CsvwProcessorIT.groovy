@@ -39,7 +39,7 @@ class CsvwProcessorIT extends Specification {
         ProcessingSettings settings = new ProcessingSettings()
         settings.setStrictMode(false)
         if (tabularUrl != null && metadataUrl != null) {
-            result = csvwProcessor.processTabularData(settings, tabularUrl, metadataUrl)
+            result = csvwProcessor.process(settings, tabularUrl, metadataUrl)
         } else if (tabularUrl != null) {
             result = csvwProcessor.processTabularData(settings, tabularUrl)
         } else if (metadataUrl != null) {

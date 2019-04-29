@@ -25,7 +25,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +51,7 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
     private final ResultCreator<ProcessingResult, BatchProcessingResult> resultCreator;
 
     @Override
-    public BatchProcessingResult processTabularData(ProcessingSettings settings, List<ProcessingInput> inputs) {
+    public BatchProcessingResult process(ProcessingSettings settings, List<ProcessingInput> inputs) {
         List<ProcessingResult> processingResults = new ArrayList<>();
         for (ProcessingInput input : inputs) {
             log.info("Processing file {}", input.getTabularUrl());
@@ -70,33 +69,29 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
     /**
      * Processing just upload tabular data file, which means that this file is validated without scheme.
      *
-     * @param file
+     * @param tabularFile
      * @param fileName
      */
     @Override
-    public ProcessingResult processTabularData(ProcessingSettings settings, InputStream file, String fileName) {
+    public ProcessingResult processTabularData(ProcessingSettings settings, String tabularFile, String fileName) {
         Dialect dialect = Dialect.builder().header(true).build();
         List<ValidationError> errors = new ArrayList<>();
         TabularParsingResult csvParsingResult;
-        try {
-            csvParsingResult = tabularParser.parse(dialect, fileName, file);
-            errors = csvParsingResult.getParsingErrors();
-        } catch (IOException e) {
-            errors.add(ValidationError.fatal("Error during parsing file %s.", fileName));
-        }
+        csvParsingResult = tabularParser.parse(dialect, fileName, tabularFile);
+        errors = csvParsingResult.getParsingErrors();
         return resultCreator.createResult(settings, errors, fileName, null);
     }
 
     /**
      * Processing just upload metadata file, which means that this file is just validated, that it is valid CSVW metadata.
      *
-     * @param file
+     * @param metadataFile
      * @param fileName
      */
     @Override
-    public ProcessingResult processMetadata(ProcessingSettings settings, InputStream file, String fileName) {
+    public ProcessingResult processMetadata(ProcessingSettings settings, String metadataFile, String fileName) {
         String metadataUrl = DEFAULT_URL + fileName;
-        MetadataParsingResult metadataParsingResult = metadataParser.parseJson(file, new ParsingContext(metadataUrl));
+        MetadataParsingResult metadataParsingResult = metadataParser.parseJson(metadataFile, new ParsingContext(metadataUrl));
         List<ValidationError> processingErrors = new ArrayList<>(metadataParsingResult.getErrors());
         if (hasNoFatalError(processingErrors)) {
             processingErrors.addAll(validateMetadata(metadataParsingResult));
@@ -105,22 +100,20 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
     }
 
     @Override
-    public ProcessingResult processTabularData(ProcessingSettings settings, InputStream tabularFile, String tabularFileName, InputStream metadataFile, String metadataFileName) {
+    public ProcessingResult process(ProcessingSettings settings, String tabularFile, String tabularFileName,
+                                    String metadataFile, String metadataFileName) {
         String tabularUrl = DEFAULT_URL + tabularFileName;
         String metadataUrl = DEFAULT_URL + metadataFileName;
         Dialect dialect = Dialect.builder().header(true).build();
         TabularParsingResult csvParsingResult;
-        List<ValidationError> processingErrors = new ArrayList<>();
-        try {
-            csvParsingResult = tabularParser.parse(dialect, tabularUrl, tabularFile);
-            processingErrors.addAll(csvParsingResult.getParsingErrors());
+        csvParsingResult = tabularParser.parse(dialect, tabularUrl, tabularFile);
+        List<ValidationError> processingErrors = new ArrayList<>(csvParsingResult.getParsingErrors());
+        if (hasNoFatalError(processingErrors)) {
             MetadataParsingResult metadataParsingResult = metadataParser.parseJson(metadataFile,
                     new ParsingContext(metadataUrl));
             if (hasNoFatalError(processingErrors)) {
                 processingErrors.addAll(process(csvParsingResult, metadataParsingResult));
             }
-        } catch (IOException e) {
-            processingErrors.add(ValidationError.fatal("Cannot parse CSV file '%s'", tabularFileName));
         }
         return resultCreator.createResult(settings, processingErrors, tabularFileName, metadataFileName);
     }
@@ -181,7 +174,7 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
     }
 
     @Override
-    public ProcessingResult processTabularData(ProcessingSettings settings, String tabularUrl, String metadataUrl) {
+    public ProcessingResult process(ProcessingSettings settings, String tabularUrl, String metadataUrl) {
         MetadataParsingResult metadataParsingResult = downloadAndParseMetadata(metadataUrl);
         List<ValidationError> processingErrors = new ArrayList<>();
         if (metadataParsingResult != null && metadataParsingResult.getTopLevelDescription() != null) {
