@@ -142,7 +142,7 @@ public class CsvParser implements TabularDataParser {
                     .titles(titles)
                     .name(trimmedHeader)
                     .number(columnNumber)
-                    .table(table).build());
+                    .build());
             columnDescriptions.add(createColumnDescription(trimmedHeader));
             columnNumber++;
         }

@@ -1,14 +1,18 @@
 package com.malyvoj3.csvwvalidator.validation.model;
 
 import com.malyvoj3.csvwvalidator.domain.ValidationError;
-import com.malyvoj3.csvwvalidator.domain.model.Table;
-import com.malyvoj3.csvwvalidator.domain.model.TableGroup;
+import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.TableDescription;
+import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.TableGroupDescription;
+import com.malyvoj3.csvwvalidator.parser.tabular.TabularParsingResult;
 
 import java.util.List;
 
 public interface ModelValidator {
 
-    public List<? extends ValidationError> validateTable(Table table);
+    List<? extends ValidationError> validateTableGroup(List<TabularParsingResult> csvParsingResults,
+                                                       TableGroupDescription tableGroupDescription);
 
-    public List<? extends ValidationError> validateTableGroup(TableGroup tableGroup);
+    List<? extends ValidationError> validateTable(TabularParsingResult csvParsingResult,
+                                                  TableDescription tableDescription);
+
 }
