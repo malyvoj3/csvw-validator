@@ -54,7 +54,7 @@ public class DataTypesValidationRule extends TableDescriptionValidationRule {
             .map(Property::getValue)
             .orElse(null);
         if (id != null && DataTypeDefinition.getByUrl(id) != null) {
-            validationErrors.add(ValidationError.error("Datatype has URL of built-in datatype in @id property."));
+            validationErrors.add(ValidationError.error("error.datatype.invalidId"));
         }
         return validationErrors;
     }
@@ -86,13 +86,13 @@ public class DataTypesValidationRule extends TableDescriptionValidationRule {
                             .orElse(null);
                     String numericPatter = createNumericPattern(groupChar, decimalChar);
                     if (!matchPattern(format, numericPatter)) {
-                        validationErrors.add(ValidationError.warn("Property 'format' is invalid NUMERIC format."));
+                        validationErrors.add(ValidationError.warn("error.datatype.invalidFormat.numeric", format));
                         desc.getFormat().getValue().setPattern(null);
                     }
                     break;
                 case BOOLEAN:
                     if (!matchPattern(format, BOOLEAN_FORMAT_PATTERN)) {
-                        validationErrors.add(ValidationError.warn("Property 'format' is invalid BOOLEAN format."));
+                        validationErrors.add(ValidationError.warn("error.datatype.invalidFormat.boolean", format));
                         desc.getFormat().getValue().setPattern(null);
                     }
                     break;
@@ -141,16 +141,16 @@ public class DataTypesValidationRule extends TableDescriptionValidationRule {
         if (DataTypeConstraintGroup.VALUE == DataTypeDefinition.getByName(base).getConstraintGroup()) {
             // Validate logic without datatypes.
             if (minimum != null && minInclusive != null && !minimum.equals(minInclusive)) {
-                validationErrors.add(ValidationError.error("Datatype has 'minimum' and 'minInclusive' properties with different values."));
+                validationErrors.add(ValidationError.error("error.datatype.constraint.minimum", base));
             }
             if (maximum != null && maxInclusive != null && !maximum.equals(maxInclusive)) {
-                validationErrors.add(ValidationError.error("Datatype has 'maximum' and 'maxInclusive' properties with different values."));
+                validationErrors.add(ValidationError.error("error.datatype.constraint.maximum", base));
             }
             if (minInclusive != null && minExclusive != null) {
-                validationErrors.add(ValidationError.error("Datatype has specified both 'minInclusive' and 'minExclusive' properties."));
+                validationErrors.add(ValidationError.error("error.datatype.constraint.minExIn", base));
             }
             if (maxInclusive != null && maxExclusive != null) {
-                validationErrors.add(ValidationError.error("Datatype has specified both 'maxInclusive' and 'maxExclusive' properties."));
+                validationErrors.add(ValidationError.error("error.datatype.constraint.maxExIn", base));
             }
 
             DataType dataType = DataType.builder()
@@ -172,8 +172,7 @@ public class DataTypesValidationRule extends TableDescriptionValidationRule {
                 try {
                     minInclusiveValue = dataTypeFactory.createDataType(minInclusive, dataType);
                 } catch (DataTypeFormatException ex) {
-                    String errorMsg = String.format("Property 'minInclusive' doesn't have valid format for datatype '%s'.", dataType.getBase());
-                    validationErrors.add(ValidationError.error(errorMsg));
+                    validationErrors.add(ValidationError.error("error.datatype.constraint.minIn", minInclusive, dataType.getBase()));
                 }
             }
             ValueType maxInclusiveValue = null;
@@ -181,8 +180,7 @@ public class DataTypesValidationRule extends TableDescriptionValidationRule {
                 try {
                     maxInclusiveValue = dataTypeFactory.createDataType(maxInclusive, dataType);
                 } catch (DataTypeFormatException ex) {
-                    String errorMsg = String.format("Property 'maxInclusive' doesn't have valid format for datatype '%s'.", dataType.getBase());
-                    validationErrors.add(ValidationError.error(errorMsg));
+                    validationErrors.add(ValidationError.error("error.datatype.constraint.maxIn", maxInclusive, dataType.getBase()));
                 }
             }
             ValueType minExclusiveValue = null;
@@ -190,8 +188,7 @@ public class DataTypesValidationRule extends TableDescriptionValidationRule {
                 try {
                     minExclusiveValue = dataTypeFactory.createDataType(minExclusive, dataType);
                 } catch (DataTypeFormatException ex) {
-                    String errorMsg = String.format("Property 'minExclusive' doesn't have valid format for datatype '%s'.", dataType.getBase());
-                    validationErrors.add(ValidationError.error(errorMsg));
+                    validationErrors.add(ValidationError.error("error.datatype.constraint.minEx", minExclusive, dataType.getBase()));
                 }
             }
             ValueType maxExclusiveValue = null;
@@ -199,27 +196,22 @@ public class DataTypesValidationRule extends TableDescriptionValidationRule {
                 try {
                     maxExclusiveValue = dataTypeFactory.createDataType(maxExclusive, dataType);
                 } catch (DataTypeFormatException ex) {
-                    String errorMsg = String.format("Property 'maxExclusive' doesn't have valid format for datatype '%s'.", dataType.getBase());
-                    validationErrors.add(ValidationError.error(errorMsg));
+                    validationErrors.add(ValidationError.error("error.datatype.constraint.maxEx", maxExclusive, dataType.getBase()));
                 }
             }
 
             try {
                 if (minInclusiveValue != null && maxInclusiveValue != null && maxInclusiveValue.isLower(minInclusiveValue)) {
-                    String errorMsg = "Property 'maxInclusive' is less than property 'minInclusive'.";
-                    validationErrors.add(ValidationError.error(errorMsg));
+                    validationErrors.add(ValidationError.error("error.datatype.constraint.maxInMinIn", maxInclusive, minInclusive));
                 }
                 if (minInclusiveValue != null && maxExclusiveValue != null && maxExclusiveValue.isLowerEq(minInclusiveValue)) {
-                    String errorMsg = "Property 'maxExclusive' is less than or equal to property 'minInclusive'.";
-                    validationErrors.add(ValidationError.error(errorMsg));
+                    validationErrors.add(ValidationError.error("error.datatype.constraint.maxExMinIn", maxExclusive, minInclusive));
                 }
                 if (minExclusiveValue != null && maxExclusiveValue != null && maxExclusiveValue.isLower(minExclusiveValue)) {
-                    String errorMsg = "Property 'maxExclusive' is less than or equal to property 'minExclusive'.";
-                    validationErrors.add(ValidationError.error(errorMsg));
+                    validationErrors.add(ValidationError.error("error.datatype.constraint.maxExMinEx", maxExclusive, minExclusive));
                 }
                 if (minExclusiveValue != null && maxInclusiveValue != null && maxInclusiveValue.isLowerEq(minExclusiveValue)) {
-                    String errorMsg = "Property 'maxInclusive' is less than or equal to property 'minExclusive'.";
-                    validationErrors.add(ValidationError.error(errorMsg));
+                    validationErrors.add(ValidationError.error("error.datatype.constraint.maxInMinEx", maxInclusive, maxExclusive));
                 }
             } catch (IncomparableDataTypeException e) {
                 log.error("Problem during comparing.");
@@ -227,22 +219,22 @@ public class DataTypesValidationRule extends TableDescriptionValidationRule {
             }
         } else {
             if (minimum != null) {
-                validationErrors.add(ValidationError.error("Not numeric, date/time or duration datatype has defined 'minimum' property."));
+                validationErrors.add(ValidationError.error("error.datatype.constraint.notConstraintType", base, "minimum"));
             }
             if (minInclusive != null) {
-                validationErrors.add(ValidationError.error("Not numeric, date/time or duration datatype has defined 'minInclusive' property."));
+                validationErrors.add(ValidationError.error("error.datatype.constraint.notConstraintType", base, "minInclusive"));
             }
             if (minExclusive != null) {
-                validationErrors.add(ValidationError.error("Not numeric, date/time or duration datatype has defined 'minExclusive' property."));
+                validationErrors.add(ValidationError.error("error.datatype.constraint.notConstraintType", base, "minExclusive"));
             }
             if (maximum != null) {
-                validationErrors.add(ValidationError.error("Not numeric, date/time or duration datatype has defined 'maximum' property."));
+                validationErrors.add(ValidationError.error("error.datatype.constraint.notConstraintType", base, "maximum"));
             }
             if (maxInclusive != null) {
-                validationErrors.add(ValidationError.error("Not numeric, date/time or duration datatype has defined 'maxInclusive' property."));
+                validationErrors.add(ValidationError.error("error.datatype.constraint.notConstraintType", base, "maxInclusive"));
             }
             if (maxExclusive != null) {
-                validationErrors.add(ValidationError.error("Not numeric, date/time or duration datatype has defined 'maxExclusive' property."));
+                validationErrors.add(ValidationError.error("error.datatype.constraint.notConstraintType", base, "property"));
             }
         }
 
@@ -258,23 +250,23 @@ public class DataTypesValidationRule extends TableDescriptionValidationRule {
         base = base != null ? base : CsvwKeywords.STRING_DATA_TYPE;
         if (DataTypeConstraintGroup.LENGTH == DataTypeDefinition.getByName(base).getConstraintGroup()) {
             if (length != null && minLength != null && length < minLength) {
-                validationErrors.add(ValidationError.error("Datatype has 'length' property lower than 'minLength'."));
+                validationErrors.add(ValidationError.error("error.datatype.constraint.lengthLower", base));
             }
             if (length != null && maxLength != null && length > maxLength) {
-                validationErrors.add(ValidationError.error("Datatype has 'length' property greater than 'maxLength'"));
+                validationErrors.add(ValidationError.error("error.datatype.constraint.lengthGreater", base));
             }
             if (minLength != null && maxLength != null && minLength > maxLength) {
-                validationErrors.add(ValidationError.error("Datatype has 'minLength' property greater than 'maxLength'"));
+                validationErrors.add(ValidationError.error("error.datatype.constraint.minGreaterMax", base));
             }
         } else {
             if (length != null) {
-                validationErrors.add(ValidationError.error("Not string or binary datatype has defined 'length' property."));
+                validationErrors.add(ValidationError.error("error.datatype.constraint.notLengthType", base, "length"));
             }
             if (minLength != null) {
-                validationErrors.add(ValidationError.error("Not string or binary  datatype has defined 'minLength' property."));
+                validationErrors.add(ValidationError.error("error.datatype.constraint.notLengthType", base, "minLength"));
             }
             if (maxLength != null) {
-                validationErrors.add(ValidationError.error("Not string or binary  datatype has defined 'maxLength' property."));
+                validationErrors.add(ValidationError.error("error.datatype.constraint.notLengthType", base, "maxLength"));
             }
         }
         return validationErrors;

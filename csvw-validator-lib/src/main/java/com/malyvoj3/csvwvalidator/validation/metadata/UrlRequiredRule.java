@@ -12,7 +12,7 @@ public class UrlRequiredRule extends TableDescriptionValidationRule {
     public List<ValidationError> validate(TableDescription description) {
         List<ValidationError> errors = new ArrayList<>();
         if (description.getUrl() == null) {
-            errors.add(ValidationError.fatal("Table property 'url' is required."));
+            errors.add(ValidationError.fatal("error.requiredUrl"));
         }
         return errors;
     }

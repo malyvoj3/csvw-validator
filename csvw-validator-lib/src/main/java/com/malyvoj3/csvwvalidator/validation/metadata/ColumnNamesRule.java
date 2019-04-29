@@ -28,7 +28,7 @@ public class ColumnNamesRule extends TableDescriptionValidationRule {
                     .orElse(null);
             if (columnName != null) {
                 if (columnNames.contains(columnName)) {
-                    errors.add(ValidationError.fatal("There are more columns with name '%s'", columnName));
+                    errors.add(ValidationError.fatal("error.duplicatedColumn", columnName));
                 } else {
                     columnNames.add(columnName);
                 }

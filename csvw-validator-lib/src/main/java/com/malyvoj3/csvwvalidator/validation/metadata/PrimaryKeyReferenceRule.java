@@ -33,7 +33,7 @@ public class PrimaryKeyReferenceRule extends TableDescriptionValidationRule {
                 .orElse(Collections.emptyList());
         for (String primaryKey : primaryKeys) {
             if (columnMap.get(primaryKey) == null) {
-                errors.add(ValidationError.warn("Primary key '%s' doesn't reference to existing column", primaryKey));
+                errors.add(ValidationError.warn("error.invalidReference", primaryKey));
             }
         }
         return errors;

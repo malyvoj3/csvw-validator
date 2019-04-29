@@ -15,7 +15,7 @@ public class TablesRequiredRule extends TableGroupDescriptionValidationRule {
                 && description.getTables().getValue() != null
                 && description.getTables().getValue().size() > 0;
         if (!isValid) {
-            errors.add(ValidationError.fatal("Table group property 'tables' is required and must contain at least one table."));
+            errors.add(ValidationError.fatal("error.requiredTables"));
         }
         return errors;
     }

@@ -7,9 +7,7 @@ import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.ColumnDescription
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.SchemaDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.TableDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.properties.*;
-import com.malyvoj3.csvwvalidator.domain.model.Cell;
 import com.malyvoj3.csvwvalidator.domain.model.Column;
-import com.malyvoj3.csvwvalidator.domain.model.Row;
 import com.malyvoj3.csvwvalidator.domain.model.Table;
 import com.malyvoj3.csvwvalidator.utils.CsvwKeywords;
 import com.malyvoj3.csvwvalidator.utils.FileUtils;
@@ -21,7 +19,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -34,20 +31,6 @@ public class CsvParser implements TabularDataParser {
     private static final String LINE_SEPARATOR_DEFAULT = "\r\n";
     private static final char QUOTE_CHAR_DEFAULT = '"';
     private static final char QUOTE_ESCAPE_CHAR_DEFAULT = '"';
-
-    @Override
-    public TabularParsingResult parse(Dialect dialect, String url) throws URISyntaxException, IOException {
-       /* byte[] fileArray = IOUtils.toByteArray(new URI(url));
-        return parse(dialect, url, fileArray);*/
-       return null;
-    }
-
-    @Override
-    public TabularParsingResult parse(Dialect dialect, String url, InputStream inputStream) throws IOException {
-       /* byte[] fileArray = IOUtils.toByteArray(inputStream);
-        return parse(dialect, url, fileArray);*/
-        return null;
-    }
 
     @Override
     public TabularParsingResult parse(Dialect dialect, String url, String filePath) {
@@ -76,7 +59,7 @@ public class CsvParser implements TabularDataParser {
         System.out.println("222: UTF stop");
 
         if (!isUtf) {
-            parsingErrors.add(ValidationError.strictWarn("Invalid encoding: file has not 'UTF-8' encoding."));
+            parsingErrors.add(ValidationError.strictWarn("error.notUtf"));
         }
 
         try {
@@ -119,7 +102,7 @@ public class CsvParser implements TabularDataParser {
                 parsingErrors.add(ex.getValidationError());
             } catch (Exception ex) {
                 log.error(String.format("Error during CSV parsing of file '%s'.", url), ex);
-                parsingErrors.add(ValidationError.fatal("File '%s' is not valid CSV file.", url));
+                parsingErrors.add(ValidationError.fatal("error.invalidCsv", url));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -164,41 +147,7 @@ public class CsvParser implements TabularDataParser {
                 }
             }
         } else {
-            parsingErrors.add(ValidationError.strictWarn("Empty row number %d.", rowNumber));
-        }
-        return parsingErrors;
-    }
-
-    private List<ValidationError> createRows(List<String[]> records, Table table, List<Column> columns, boolean hasHeader) throws CsvFormatException {
-        List<ValidationError> parsingErrors = new ArrayList<>();
-        int rowNumber = hasHeader ? 2 : 1;
-        int columnLength = columns.size();
-        for (String[] record : records) {
-            if (record.length > 0) {
-                Row row = new Row();
-                row.setNumber(rowNumber);
-                parsingErrors.addAll(validateRowLength(record.length, rowNumber, columnLength));
-                for (int i = 0; i < record.length; i++) {
-                    String value = record[i];
-                    parsingErrors.addAll(validateValue(value, rowNumber, i));
-                    Column cellColumn = i < columns.size() ? columns.get(i) : null;
-                    Cell cell = Cell.builder()
-                            .column(cellColumn)
-                            .row(row)
-                            .table(table)
-                            .stringValue(value)
-                            .errors(new ArrayList<>())
-                            .build();
-                    row.getCells().add(cell);
-                    if (cellColumn != null) {
-                        cellColumn.getCells().add(cell);
-                    }
-                }
-                table.getRows().add(row);
-            } else {
-                parsingErrors.add(ValidationError.strictWarn("Empty row number %d.", rowNumber));
-            }
-            rowNumber++;
+            parsingErrors.add(ValidationError.strictWarn("error.emptyRow", rowNumber));
         }
         return parsingErrors;
     }
@@ -207,13 +156,11 @@ public class CsvParser implements TabularDataParser {
         List<ValidationError> errors = new ArrayList<>();
         if (recordLength > columnLength) {
             errors.add(ValidationError.fatal(
-                    "Row %d has more cells than columns." +
-                            " Possible problems: wrong quote of cell, wrong escape of quote character, extra delimiter/value.", rowNumber)
+                    "error.extraCell", rowNumber)
             );
         } else if (recordLength < columnLength) {
             errors.add(ValidationError.fatal(
-                    "Row %d has fewer cells than columns." +
-                            " Possible problems: missing header, wrong quoting of cell, missing delimiters/values.", rowNumber)
+                    "error.missingCell", rowNumber)
             );
         }
         return errors;
@@ -223,7 +170,7 @@ public class CsvParser implements TabularDataParser {
         List<ValidationError> errors = new ArrayList<>();
         for (Column column : columns) {
             if (column.isEmpty()) {
-                errors.add(ValidationError.strictWarn("Column '%s' is empty column.", column.getName()));
+                errors.add(ValidationError.strictWarn("error.emptyColumn", column.getName()));
             }
         }
         return errors;
@@ -235,19 +182,19 @@ public class CsvParser implements TabularDataParser {
             errors = Collections.emptyList();
         } else if (StringUtils.isWhitespace(value)) {
             errors = Collections.singletonList(ValidationError.strictWarn(
-                    "Value in row %d column %d is just whitespace.", rowNumber, columnNumber
+                    "error.justWhitespaces", rowNumber, columnNumber
             ));
         } else if ("null".equals(value)) {
             errors = Collections.singletonList(ValidationError.strictWarn(
-                    "Value in row %d column %d is equal to 'null', should be empty string.", rowNumber, columnNumber
+                    "error.nullValue", rowNumber, columnNumber
             ));
         } else if (containsLeadingSpaces(value)) {
             errors = Collections.singletonList(ValidationError.strictWarn(
-                    "Value in row %d column %d has leading spaces.", rowNumber, columnNumber
+                    "error.leadingSpaces", rowNumber, columnNumber
             ));
         } else if (containsTrailingSpaces(value)) {
             errors = Collections.singletonList(ValidationError.strictWarn(
-                    "Value in row %d column %d has trailing spaces.", rowNumber, columnNumber
+                    "error.trailingSpaces", rowNumber, columnNumber
             ));
         }
         return errors;

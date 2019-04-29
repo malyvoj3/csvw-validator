@@ -40,7 +40,7 @@ public class VirtualColumnOrderRule extends TableDescriptionValidationRule {
 
     if (!isValid) {
       errors.add(ValidationError.error(
-          "Table '%s' does not have virtual columns after all non-virtual columns.", tableDescription.getUrl().getValue()
+          "error.virtualColumnsOrder", tableDescription.getUrl().getValue()
       ));
     }
     return errors;
