@@ -1,49 +1,60 @@
 package com.malyvoj3.csvwvalidator.domain;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-@AllArgsConstructor
 public class ValidationError {
 
-    private Severity severity;
-    private String message;
+    private final Severity severity;
+    private final String messageCode;
+    private final Object[] params;
 
-    public static ValidationError strictWarn(String message, Object... args) {
-        return ValidationError.strictWarn(String.format(message, args));
+    public ValidationError(Severity severity, String messageCode) {
+        this.severity = severity;
+        this.messageCode = messageCode;
+        this.params = null;
     }
 
-    public static ValidationError warn(String message, Object... args) {
-        return ValidationError.warn(String.format(message, args));
+    public ValidationError(Severity severity, String messageCode, Object[] params) {
+        this.severity = severity;
+        this.messageCode = messageCode;
+        this.params = params;
     }
 
-    public static ValidationError error(String message, Object... args) {
-        return ValidationError.error(String.format(message, args));
+    public static ValidationError strictWarn(String messageCode, Object... args) {
+        return new ValidationError(Severity.STRICT_WARNING, messageCode, args);
     }
 
-    public static ValidationError fatal(String message, Object... args) {
-        return ValidationError.fatal(String.format(message, args));
+    public static ValidationError warn(String messageCode, Object... args) {
+        return new ValidationError(Severity.WARNING, messageCode, args);
     }
 
-    public static ValidationError strictWarn(String message) {
-        return new ValidationError(Severity.STRICT_WARNING, message);
+    public static ValidationError error(String messageCode, Object... args) {
+        return new ValidationError(Severity.ERROR, messageCode, args);
     }
 
-    public static ValidationError warn(String message) {
-        return new ValidationError(Severity.WARNING, message);
+    public static ValidationError fatal(String messageCode, Object... args) {
+        return new ValidationError(Severity.FATAL, messageCode, args);
     }
 
-    public static ValidationError error(String message) {
-        return new ValidationError(Severity.ERROR, message);
+    public static ValidationError strictWarn(String messageCode) {
+        return new ValidationError(Severity.STRICT_WARNING, messageCode);
     }
 
-    public static ValidationError fatal(String message) {
-        return new ValidationError(Severity.FATAL, message);
+    public static ValidationError warn(String messageCode) {
+        return new ValidationError(Severity.WARNING, messageCode);
     }
 
-    public String getFormattedMessage() {
-        return message;
+    public static ValidationError error(String messageCode) {
+        return new ValidationError(Severity.ERROR, messageCode);
+    }
+
+    public static ValidationError fatal(String messageCode) {
+        return new ValidationError(Severity.FATAL, messageCode);
+    }
+
+    public ValidationError getFormattedMessage() {
+        return this;
     }
 
 }

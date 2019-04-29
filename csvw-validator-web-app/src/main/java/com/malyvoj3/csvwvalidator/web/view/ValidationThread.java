@@ -1,13 +1,9 @@
 package com.malyvoj3.csvwvalidator.web.view;
 
-import com.malyvoj3.csvwvalidator.domain.ValidationError;
 import com.malyvoj3.csvwvalidator.processor.CsvwProcessor;
 import com.malyvoj3.csvwvalidator.processor.ProcessingSettings;
 import com.malyvoj3.csvwvalidator.processor.Processor;
-import com.malyvoj3.csvwvalidator.processor.result.BatchProcessingResult;
-import com.malyvoj3.csvwvalidator.processor.result.CsvResultWriter;
-import com.malyvoj3.csvwvalidator.processor.result.ProcessingResult;
-import com.malyvoj3.csvwvalidator.processor.result.RdfResultWriter;
+import com.malyvoj3.csvwvalidator.processor.result.*;
 import com.malyvoj3.csvwvalidator.web.view.components.ErrorGrid;
 import com.malyvoj3.csvwvalidator.web.view.components.LocalizedButton;
 import com.malyvoj3.csvwvalidator.web.view.components.LocalizedParamLabel;
@@ -49,6 +45,9 @@ public class ValidationThread extends Thread {
     public void run() {
         ProcessingSettings settings = new ProcessingSettings();
         settings.setStrictMode(inputData.getStrictMode() == null ? true : inputData.getStrictMode());
+        if (inputData.getLocale() != null) {
+            settings.setLocale(inputData.getLocale());
+        }
         boolean isTabularUpload = StringUtils.isNotBlank(inputData.getCsvFilePath())
                 && StringUtils.isNotBlank(inputData.getCsvFileName());
         boolean isMetadataUpload = StringUtils.isNotBlank(inputData.getMetadatFilePath())
@@ -120,7 +119,7 @@ public class ValidationThread extends Thread {
         resultDiv.setHorizontalComponentAlignment(FlexComponent.Alignment.CENTER,
                 upperGrid);
         resultDiv.add(upperGrid);
-        List<ValidationError> items = new ArrayList<>(result.getErrors());
+        List<LocalizedError> items = new ArrayList<>(result.getErrors());
         if (!items.isEmpty()) {
             ErrorGrid errorGrid = new ErrorGrid(items);
             resultDiv.setHorizontalComponentAlignment(FlexComponent.Alignment.STRETCH,

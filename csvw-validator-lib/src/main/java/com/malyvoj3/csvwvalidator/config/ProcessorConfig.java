@@ -5,6 +5,7 @@ import com.malyvoj3.csvwvalidator.parser.metadata.DefaultMetadataParser;
 import com.malyvoj3.csvwvalidator.parser.tabular.CsvParser;
 import com.malyvoj3.csvwvalidator.processor.CsvwProcessor;
 import com.malyvoj3.csvwvalidator.processor.CsvwShemaLocator;
+import com.malyvoj3.csvwvalidator.processor.Translator;
 import com.malyvoj3.csvwvalidator.processor.result.CsvResultWriter;
 import com.malyvoj3.csvwvalidator.processor.result.ProcessingResultCreator;
 import com.malyvoj3.csvwvalidator.processor.result.RdfResultWriter;
@@ -42,8 +43,13 @@ public class ProcessorConfig {
     }
 
     @Bean
+    public Translator translator() {
+        return new Translator();
+    }
+
+    @Bean
     public ProcessingResultCreator resultCreator() {
-        return new ProcessingResultCreator();
+        return new ProcessingResultCreator(translator());
     }
 
     @Bean

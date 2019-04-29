@@ -1,6 +1,5 @@
 package com.malyvoj3.csvwvalidator.processor.result;
 
-import com.malyvoj3.csvwvalidator.domain.ValidationError;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedWriter;
@@ -47,8 +46,8 @@ public class TextResultWriter implements ResultWriter {
         writer.newLine();
         writer.write("Errors:");
         writer.newLine();
-        for (ValidationError error : result.getErrors()) {
-            writer.write("  " + error.getSeverity().name()+ ": " + error.getFormattedMessage());
+        for (LocalizedError error : result.getErrors()) {
+            writer.write("  " + error.getSeverity()+ ": " + error.getMessage());
             writer.newLine();
         }
         writer.flush();

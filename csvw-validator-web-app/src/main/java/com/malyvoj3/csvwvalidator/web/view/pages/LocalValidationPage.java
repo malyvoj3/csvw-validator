@@ -56,7 +56,9 @@ public class LocalValidationPage extends VerticalLayout {
 
             if (bean != null) {
                 bean.setStrictMode(strictMode.getValue());
-                ComponentUtil.setData(UI.getCurrent(), ValidatingDataDTO.class, bean);
+                ValidatingDataDTO finalBean = bean;
+                validationButton.getUI().ifPresent(ui -> finalBean.setLocale(ui.getLocale()));
+                ComponentUtil.setData(UI.getCurrent(), ValidatingDataDTO.class, finalBean);
                 validationButton.getUI().ifPresent(ui -> ui.navigate("result"));
             } else {
                 Notification.show(getTranslation("upload.emptyInput"), 10000, Notification.Position.TOP_END);

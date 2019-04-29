@@ -1,18 +1,15 @@
-package com.malyvoj3.csvwvalidator.web.view;
+package com.malyvoj3.csvwvalidator.processor;
 
-import com.vaadin.flow.i18n.I18NProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.MessageSourceResourceBundle;
-import org.springframework.stereotype.Component;
 
 import java.text.MessageFormat;
 import java.util.*;
 
 @Slf4j
-@Component
-public class TranslationProvider implements I18NProvider {
+public class Translator {
 
-    public static final String BUNDLE_PREFIX = "translate_web";
+    public static final String BUNDLE_PREFIX = "translate_lib";
 
     public static final Locale LOCALE_CZ = new Locale("cs", "CZ");
     public static final Locale LOCALE_EN = new Locale("en", "GB");
@@ -28,12 +25,10 @@ public class TranslationProvider implements I18NProvider {
         bundleCache.put(LOCALE_CZ, initializeBundle(LOCALE_CZ));
     }
 
-    @Override
     public List<Locale> getProvidedLocales() {
         return locales;
     }
 
-    @Override
     public String getTranslation(String key, Locale locale, Object... params) {
         if (key == null) {
             log.warn("Got lang request for key with null value!");
@@ -53,7 +48,7 @@ public class TranslationProvider implements I18NProvider {
             log.warn("Missing resource", e);
             return "!" + locale.getLanguage() + ": " + key;
         }
-        if (params.length > 0) {
+        if (params != null && params.length > 0) {
             value = MessageFormat.format(value, params);
         }
         return value;
@@ -64,7 +59,7 @@ public class TranslationProvider implements I18NProvider {
     }
 
     protected static ResourceBundle readProperties(final Locale locale) {
-        final ClassLoader cl = TranslationProvider.class.getClassLoader();
+        final ClassLoader cl = Translator.class.getClassLoader();
 
         ResourceBundle propertiesBundle = null;
         try {
@@ -75,4 +70,5 @@ public class TranslationProvider implements I18NProvider {
         }
         return propertiesBundle;
     }
+
 }

@@ -1,7 +1,6 @@
 package com.malyvoj3.csvwvalidator.processor.result;
 
 import com.malyvoj3.csvwvalidator.domain.Severity;
-import com.malyvoj3.csvwvalidator.domain.ValidationError;
 import com.malyvoj3.csvwvalidator.domain.ValidationStatus;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -89,13 +88,13 @@ public class RdfResultWriter implements ResultWriter {
         }
         assertion.addProperty(EARL.result, mainResult);
 
-        for (ValidationError error : result.getErrors()) {
+        for (LocalizedError error : result.getErrors()) {
             Resource errorResult = model.createResource()
                     .addProperty(RDF.type, EARL.TestResult)
                     .addProperty(DC.date, model.createTypedLiteral(Calendar.getInstance()))
                     .addProperty(EARL.mode, EARL.automatic)
-                    .addProperty(EARL.info, model.createLiteral(error.getFormattedMessage(), "en"))
-                    .addProperty(EARL.outcome, outcomeMap.get(error.getSeverity().name()));
+                    .addProperty(EARL.info, model.createLiteral(error.getMessage(), result.getUsedLanguage()))
+                    .addProperty(EARL.outcome, outcomeMap.get(error.getSeverity()));
             if (result.getSettings().isStrictMode()) {
                 errorResult.addProperty(EARL.mode, strictMode);
             }

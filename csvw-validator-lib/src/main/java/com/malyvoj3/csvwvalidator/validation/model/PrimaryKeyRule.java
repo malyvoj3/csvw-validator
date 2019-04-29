@@ -81,8 +81,7 @@ public class PrimaryKeyRule implements TableValidationRule {
         if (isValid) {
             return Collections.emptyList();
         } else {
-            return Collections.singletonList(ValidationError.fatal(String.format(
-                    "Primary key violation. Duplicated primary key in row %d.", failedRow)));
+            return Collections.singletonList(ValidationError.fatal("error.primaryKey", failedRow));
         }
     }
 }

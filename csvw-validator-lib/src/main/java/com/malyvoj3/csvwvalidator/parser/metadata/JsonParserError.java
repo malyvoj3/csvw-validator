@@ -15,8 +15,12 @@ public class JsonParserError extends ValidationError {
 
     private List<String> jsonKeys = new ArrayList<>();
 
-    public JsonParserError(Severity severity, String message) {
-        super(severity, message);
+    public JsonParserError(Severity severity, String messageCode) {
+        super(severity, messageCode);
+    }
+
+    public JsonParserError(Severity severity, String messageCode, Object[] params) {
+        super(severity, messageCode, params);
     }
 
     public void addKey(String key) {
@@ -24,42 +28,36 @@ public class JsonParserError extends ValidationError {
     }
 
     @Override
-    public String getFormattedMessage() {
-        StringBuilder stringBuilder = new StringBuilder(getMessage());
-        if (jsonKeys != null && !jsonKeys.isEmpty()) {
-            stringBuilder.append(" '")
-                    .append(createPropertyPath(jsonKeys))
-                    .append("'.");
-        }
-        return stringBuilder.toString();
+    public ValidationError getFormattedMessage() {
+        return new ValidationError(getSeverity(), getMessageCode(), new Object[]{createPropertyPath(jsonKeys), getParams()});
     }
 
     public static JsonParserError invalidType(String jsonKey, String correctType) {
-        JsonParserError jsonParserError = new JsonParserError(Severity.FATAL, String.format("Invalid type. It should be %s.", correctType));
+        JsonParserError jsonParserError = new JsonParserError(Severity.FATAL, "error.invalidType", new Object[]{correctType});
         jsonParserError.addKey(jsonKey);
         return jsonParserError;
     }
 
     public static JsonParserError isBlankNode(String jsonKey) {
-        JsonParserError jsonParserError = new JsonParserError(Severity.FATAL, "Property is blank node");
+        JsonParserError jsonParserError = new JsonParserError(Severity.FATAL, "error.blankNode");
         jsonParserError.addKey(jsonKey);
         return jsonParserError;
     }
 
     public static JsonParserError invalidPropertyType(String jsonKey) {
-        JsonParserError jsonParserError = new JsonParserError(Severity.WARNING, "Invalid property type");
+        JsonParserError jsonParserError = new JsonParserError(Severity.WARNING, "error.invalidPropertyType");
         jsonParserError.addKey(jsonKey);
         return jsonParserError;
     }
 
     public static JsonParserError unknownProperty(String jsonKey) {
-        JsonParserError jsonParserError = new JsonParserError(Severity.WARNING, "Unknown property");
+        JsonParserError jsonParserError = new JsonParserError(Severity.WARNING, "error.unknownProperty");
         jsonParserError.addKey(jsonKey);
         return jsonParserError;
     }
 
     public static JsonParserError forbiddenProperty(String jsonKey) {
-        JsonParserError jsonParserError = new JsonParserError(Severity.FATAL, "Forbidden property");
+        JsonParserError jsonParserError = new JsonParserError(Severity.FATAL, "error.forbiddenProperty");
         jsonParserError.addKey(jsonKey);
         return jsonParserError;
     }

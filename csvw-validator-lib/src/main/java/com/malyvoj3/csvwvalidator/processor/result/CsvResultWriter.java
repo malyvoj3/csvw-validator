@@ -1,6 +1,5 @@
 package com.malyvoj3.csvwvalidator.processor.result;
 
-import com.malyvoj3.csvwvalidator.domain.ValidationError;
 import com.univocity.parsers.csv.CsvFormat;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
@@ -15,8 +14,8 @@ public class CsvResultWriter implements ResultWriter {
         CsvWriter writer = new CsvWriter(outputStream, "UTF-8", createSettings());
         try {
             writer.writeHeaders("Error severity", "Error message");
-            for (ValidationError error : processingResult.getErrors()) {
-                writer.writeRow(error.getSeverity(), error.getFormattedMessage());
+            for (LocalizedError error : processingResult.getErrors()) {
+                writer.writeRow(error.getSeverity(), error.getMessage());
             }
         } finally {
             writer.close();

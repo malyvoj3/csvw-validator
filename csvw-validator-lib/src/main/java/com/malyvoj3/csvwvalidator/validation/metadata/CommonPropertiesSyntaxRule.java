@@ -31,22 +31,22 @@ public class CommonPropertiesSyntaxRule extends TableDescriptionValidationRule {
     public List<? extends ValidationError> validate(TableDescription tableDescription) {
         List<ValidationError> errors = new ArrayList<>();
         for (CommonProperty commonProperty : getCommonProperties(tableDescription)) {
-            errors.addAll(validateCommonProperty(commonProperty.getValue()));
+            errors.addAll(validateCommonProperty(commonProperty.getValue(), commonProperty.getIri()));
         }
         return errors;
     }
 
-    private List<? extends ValidationError> validateCommonProperty(JsonNode jsonNode) {
+    private List<? extends ValidationError> validateCommonProperty(JsonNode jsonNode, String iri) {
         List<ValidationError> errors = new ArrayList<>();
         if (jsonNode.isObject()) {
             ObjectNode object = (ObjectNode) jsonNode;
-            errors.addAll(validateValue(object));
+            errors.addAll(validateValue(object, iri));
             object.fields().forEachRemaining(entry -> {
                 if (CsvwKeywords.ID_PROPERTY.equals(entry.getKey())) {
                     boolean isValid = entry.getValue().isTextual()
                             && !entry.getValue().textValue().startsWith(BLANK_NODE_PREFIX);
                     if (!isValid) {
-                        errors.add(ValidationError.fatal("Common property's @id property is invalid."));
+                        errors.add(ValidationError.fatal("error.commonProperty.invalidId", iri));
                     }
                 } else if (CsvwKeywords.TYPE_PROPERTY.equals(entry.getKey())) {
                     boolean isValid = entry.getValue().isTextual()
@@ -54,26 +54,29 @@ public class CommonPropertiesSyntaxRule extends TableDescriptionValidationRule {
                                 || CsvwKeywords.terms.contains(entry.getValue().textValue()))
                             && !entry.getValue().textValue().startsWith(BLANK_NODE_PREFIX);
                     if (!isValid) {
-                        errors.add(ValidationError.fatal("Common property's @type property is invalid."));
+                        errors.add(ValidationError.fatal("error.commonProperty.invalidType", iri));
                     }
                 } else if (CsvwKeywords.CONTEXT_PROPERTY.equals(entry.getKey())) {
-                    errors.add(ValidationError.fatal("Common property must not have a context."));
+                    errors.add(ValidationError.fatal("error.commonProperty.hasContext", iri));
                 } else if (CsvwKeywords.LIST.equals(entry.getKey())) {
-                    errors.add(ValidationError.fatal("Common property must not have a list objects."));
+                    errors.add(ValidationError.fatal("error.commonProperty.hasList", iri));
                 } else if (CsvwKeywords.SET.equals(entry.getKey())) {
-                    errors.add(ValidationError.fatal("Common property must not have a set objects."));
+                    errors.add(ValidationError.fatal("error.commonProperty.hasSet", iri));
                 } else if (entry.getKey().startsWith(SPECIAL_NODE_PREFIX) && !possibleSpecialKeys.contains(entry.getKey())) {
-                    errors.add(ValidationError.fatal("Common property has faux-keyword '%s'", entry.getKey()));
+                    errors.add(ValidationError.fatal("error.commonProperty.fauxKeyword", iri, entry.getKey()));
                 }
             });
         } else if (jsonNode.isArray()) {
             ArrayNode array = (ArrayNode) jsonNode;
-            array.elements().forEachRemaining(element -> errors.addAll(validateCommonProperty(element)));
+            int i = 0;
+            array.elements().forEachRemaining(element -> {
+                errors.addAll(validateCommonProperty(element, iri + "." + String.valueOf(i)));
+            });
         }
         return errors;
     }
 
-    private List<? extends ValidationError> validateValue(ObjectNode object) {
+    private List<? extends ValidationError> validateValue(ObjectNode object, String iri) {
         List<ValidationError> errors = new ArrayList<>();
         JsonNode type = object.get(CsvwKeywords.TYPE_PROPERTY);
         JsonNode language = object.get(CsvwKeywords.LANGUAGE_PROPERTY);
@@ -81,10 +84,10 @@ public class CommonPropertiesSyntaxRule extends TableDescriptionValidationRule {
         if (value != null) {
             int numberOfProperties = object.size() - 1;
             if (!(value.isTextual() || value.isNumber() || value.isBoolean())) {
-                errors.add(ValidationError.fatal("Common property's @value property is invalid."));
+                errors.add(ValidationError.fatal("error.commonProperty.invalidValue", iri));
             }
             if (language != null && type != null) {
-                errors.add(ValidationError.fatal("Common property has defined property @value and also both @type and @language"));
+                errors.add(ValidationError.fatal("error.commonProperty.invalidCombination", iri));
             }
 
             if (type != null) {
@@ -93,15 +96,15 @@ public class CommonPropertiesSyntaxRule extends TableDescriptionValidationRule {
             if (language != null) {
                 numberOfProperties--;
                 if (!language.isTextual() || !LanguageUtils.isLanguageTag(language.textValue())) {
-                    errors.add(ValidationError.fatal("Common property's @language property is invalid."));
+                    errors.add(ValidationError.fatal("error.commonProperty.invalidLanguage", iri));
                 }
             }
             if (numberOfProperties > 0) {
-                errors.add(ValidationError.fatal("Common property has defined property @value and also some other property except @type or @language"));
+                errors.add(ValidationError.fatal("error.commonProperty.unknownProperties", iri));
             }
         }
         if (value == null && language != null) {
-            errors.add(ValidationError.fatal("Common property has defined property @language without @value"));
+            errors.add(ValidationError.fatal("error.commonProperty.missingValue", iri));
         }
         return errors;
     }

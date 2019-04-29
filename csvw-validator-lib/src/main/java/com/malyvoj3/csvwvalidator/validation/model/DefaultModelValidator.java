@@ -102,11 +102,11 @@ public class DefaultModelValidator implements ModelValidator {
                 .collect(Collectors.toList());
 
         System.out.println("XXX: Start validating");
+        int rowNumber = 1;
         try (Reader reader = new InputStreamReader(new FileInputStream(new File(new URI(resultFilePath))))) {
             com.univocity.parsers.csv.CsvParser csvParser = new com.univocity.parsers.csv.CsvParser(defaultSettings());
             csvParser.beginParsing(reader);
             int columnsLength = columns.size();
-            int rowNumber = 1;
             String[] record;
             while ((record = csvParser.parseNext()) != null) {
                 for (int i = 0; i < columnsLength; i++) {
@@ -159,7 +159,7 @@ public class DefaultModelValidator implements ModelValidator {
         return settings;
     }
 
-    private List<ValidationError> validateCell(String cellValue, Column annotatedColumn, int rowNumber, int columNumber) {
+    private List<ValidationError> validateCell(String cellValue, Column annotatedColumn, int rowNumber, int columnNumber) {
         List<ValidationError> errors = new ArrayList<>();
         DataType dataType = annotatedColumn.getDatatype() != null ? annotatedColumn.getDatatype() : createDefaultDataType();
         String normalizedValue = normalizeCellValue(cellValue, dataType);
@@ -167,9 +167,7 @@ public class DefaultModelValidator implements ModelValidator {
         if (annotatedColumn.getSeparator() != null) {
             if (isNullValue(normalizedValue, annotatedColumn)) {
                 if (annotatedColumn.isRequired()) {
-                    String errorMsg = String.format("Cell value (row %d column %d) is null, but column is required.",
-                            rowNumber, columNumber);
-                    errors.add(ValidationError.error(errorMsg));
+                    errors.add(ValidationError.error("error.requiredValue", rowNumber, columnNumber));
                 }
             } else {
                 String[] stringValues = normalizedValue.split(annotatedColumn.getSeparator());
@@ -178,11 +176,11 @@ public class DefaultModelValidator implements ModelValidator {
                             || CsvwKeywords.ANY_ATOMIC_DATA_TYPE.equals(dataType.getBase())) {
                         stringValue = StringUtils.trim(stringValue);
                     }
-                    errors.addAll(validateValue(stringValue, annotatedColumn, rowNumber, columNumber, dataType));
+                    errors.addAll(validateValue(stringValue, annotatedColumn, rowNumber, columnNumber, dataType));
                 }
             }
         } else {
-            errors.addAll(validateValue(normalizedValue, annotatedColumn, rowNumber, columNumber, dataType));
+            errors.addAll(validateValue(normalizedValue, annotatedColumn, rowNumber, columnNumber, dataType));
         }
         normalizedValue = null;
         return errors;
@@ -192,24 +190,18 @@ public class DefaultModelValidator implements ModelValidator {
         List<ValidationError> errors = new ArrayList<>();
         if (isNullValue(normalizedValue, column)) {
             if (column.isRequired()) {
-                String errorMsg = String.format("Cell value (row %d column %d) is null, but column is required.",
-                        rowNumber, columnNumber);
-                errors.add(ValidationError.error(errorMsg));
+                errors.add(ValidationError.error("error.requiredValue", rowNumber, columnNumber));
             }
         } else {
             try {
                 ValueType value = dataTypeFactory.createDataType(normalizedValue, dataType);
                 boolean isValid = validateConstraints(value, dataType);
                 if (!isValid) {
-                    String errorMsg = String.format("Cell value (row %d column %d) does not satisfy the " +
-                            "constraints of datatype.", rowNumber, columnNumber);
-                    errors.add(ValidationError.error(errorMsg));
+                    errors.add(ValidationError.error("error.unsatisfiedConstraints", rowNumber, columnNumber));
                 }
                 value = null;
             } catch (DataTypeFormatException | IncomparableDataTypeException e) {
-                String errorMsg = String.format("Cell (row %d column %d) cannot be formatted as '%s' " +
-                        "datatype.", rowNumber, columnNumber, dataType.getBase());
-                errors.add(ValidationError.error(errorMsg));
+                errors.add(ValidationError.error("error.invalidDatatypeFormat", rowNumber, columnNumber, dataType.getBase()));
             }
         }
         return errors;
