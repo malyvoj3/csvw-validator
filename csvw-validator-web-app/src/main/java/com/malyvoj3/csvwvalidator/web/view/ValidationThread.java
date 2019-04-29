@@ -3,6 +3,8 @@ package com.malyvoj3.csvwvalidator.web.view;
 import com.malyvoj3.csvwvalidator.domain.ValidationError;
 import com.malyvoj3.csvwvalidator.processor.CsvwProcessor;
 import com.malyvoj3.csvwvalidator.processor.ProcessingSettings;
+import com.malyvoj3.csvwvalidator.processor.Processor;
+import com.malyvoj3.csvwvalidator.processor.result.BatchProcessingResult;
 import com.malyvoj3.csvwvalidator.processor.result.CsvResultWriter;
 import com.malyvoj3.csvwvalidator.processor.result.ProcessingResult;
 import com.malyvoj3.csvwvalidator.processor.result.RdfResultWriter;
@@ -12,7 +14,6 @@ import com.malyvoj3.csvwvalidator.web.view.components.LocalizedParamLabel;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -29,7 +30,7 @@ public class ValidationThread extends Thread {
     private final UI ui;
     private final ResultView resultView;
     private final ValidatingDataDTO inputData;
-    private final CsvwProcessor csvwProcessor;
+    private final Processor<ProcessingResult, BatchProcessingResult> csvwProcessor;
     private final CsvResultWriter csvResultWriter;
     private final RdfResultWriter rdfResultWriter;
 
@@ -56,23 +57,22 @@ public class ValidationThread extends Thread {
         boolean isMetadataUrl = StringUtils.isNotBlank(inputData.getMetadataUrl());
         ProcessingResult processingResult = null;
         if (isTabularUpload && isMetadataUpload) {
-            //processingResult = csvwProcessor.processTabularData(settings, tabularDataFile, tabularDataFileName, metadataFile, metadataFileName);
+            processingResult = csvwProcessor.process(settings, inputData.getCsvFilePath(), inputData.getCsvFileName(),
+                    inputData.getMetadatFilePath(), inputData.getMetadataFileName());
         } else if (isCsvUrl && isMetadataUrl) {
-            processingResult = csvwProcessor.processTabularData(settings, inputData.getCsvUrl(), inputData.getMetadataUrl());
-        } else if (isTabularUpload && isMetadataUrl) {
-            //Notification.show("Unsupported combination: uploaded tabular data file and metadata url!");
-        } else if (isCsvUrl && isMetadataUpload) {
-            //showResult(csvwProcessor.processTabularData(settings, tabularTextfield.getValue(), metadataFile, metadataFileName));
+            processingResult = csvwProcessor.process(settings, inputData.getCsvUrl(), inputData.getMetadataUrl());
         } else if (isMetadataUrl) {
             processingResult = csvwProcessor.processMetadata(settings, inputData.getMetadataUrl());
         } else if (isCsvUrl) {
             processingResult = csvwProcessor.processTabularData(settings, inputData.getCsvUrl());
         } else if (isTabularUpload) {
-            //showResult(csvwProcessor.processTabularData(settings, tabularDataFile, tabularDataFileName));
+            processingResult = csvwProcessor.processTabularData(settings, inputData.getCsvFilePath(),
+                    inputData.getCsvFileName());
         } else if (isMetadataUpload) {
-            //showResult(csvwProcessor.processMetadata(settings, metadataFile, metadataFileName));
+            processingResult = csvwProcessor.processMetadata(settings, inputData.getMetadatFilePath(),
+                    inputData.getMetadataFileName());
         } else {
-            Notification.show("Insert some files!");
+            throw new IllegalStateException("Invalid combination of inputs for processing.");
         }
         ProcessingResult finalProcessingResult = processingResult;
         ui.access(() -> {
