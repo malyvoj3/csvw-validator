@@ -9,12 +9,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.URL;
 import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.StandardCharsets;
@@ -26,14 +30,15 @@ import java.util.Optional;
 @Slf4j
 public class FileUtils {
 
-    public boolean isUtf8(URI uri) {
-        boolean isUtf;
+    public boolean isUtf8(ByteBuffer byteBuffer) {
+        CharsetDecoder decoder =
+                StandardCharsets.UTF_8.newDecoder();
         try {
-            isUtf = isUtf8(IOUtils.toByteArray(uri));
-        } catch (IOException e) {
-            isUtf = false;
+            decoder.decode(byteBuffer);
+        } catch (CharacterCodingException ex) {
+            return false;
         }
-        return isUtf;
+        return true;
     }
 
     public boolean isUtf8(byte[] array) {
@@ -66,9 +71,8 @@ public class FileUtils {
         try {
             url = new URL(normalizedUrl);
             log.info("Opening local file {}.", normalizedUrl);
-            byte[] byteArray = IOUtils.toByteArray(url);
             fileResponse = new FileResponse();
-            fileResponse.setContent(byteArray);
+            fileResponse.setFilePath(normalizedUrl);
             fileResponse.setUrl(normalizedUrl);
             fileResponse.setRemoteFile(false);
         } catch (IOException e) {
@@ -77,7 +81,7 @@ public class FileUtils {
         return fileResponse;
     }
 
-    private FileResponse downloadRemoteFile(@NonNull String stringUrl) {
+    public FileResponse downloadMetadataFile(@NonNull String stringUrl) {
         String normalizedUrl = UriUtils.normalizeUri(stringUrl);
         URL url;
         FileResponse fileResponse = null;
@@ -106,6 +110,57 @@ public class FileUtils {
                     fileResponse.setContent(IOUtils.toByteArray(inputStream));
                     fileResponse.setContentType(createContentType(connection.getContentType()));
                     fileResponse.setLink(createLink(connection.getHeaderFields().get("Link"), normalizedUrl));
+                }
+            }
+        } catch (Exception ex) {
+            log.error("Cannot download file with url {}.", stringUrl);
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+        return fileResponse;
+    }
+
+    private FileResponse downloadRemoteFile(@NonNull String stringUrl) {
+        String normalizedUrl = UriUtils.normalizeUri(stringUrl);
+        URL url;
+        FileResponse fileResponse = null;
+        HttpURLConnection connection = null;
+        try {
+            url = new URL(normalizedUrl);
+            connection = (HttpURLConnection) url.openConnection();
+            log.info("Downloading file {}.", normalizedUrl);
+            connection.setInstanceFollowRedirects(true);
+            connection.setRequestMethod("GET");
+            int responseCode = connection.getResponseCode();
+            log.info("{} responded with response code {}.", normalizedUrl, responseCode);
+            if (responseCode == HttpURLConnection.HTTP_MOVED_PERM
+                    || responseCode == HttpURLConnection.HTTP_MOVED_TEMP) {
+                connection.disconnect();
+                normalizedUrl = UriUtils.normalizeUri(connection.getHeaderField("Location"));
+                url = new URL(normalizedUrl);
+                connection = (HttpURLConnection) url.openConnection();
+                responseCode = connection.getResponseCode();
+            }
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                fileResponse = new FileResponse();
+                fileResponse.setResponseCode(responseCode);
+                fileResponse.setUrl(normalizedUrl);
+                fileResponse.setContentType(createContentType(connection.getContentType()));
+                fileResponse.setLink(createLink(connection.getHeaderFields().get("Link"), normalizedUrl));
+                File tmpFile = File.createTempFile("tmp", null, new File("tmp"));
+                tmpFile.setReadable(true);
+                tmpFile.deleteOnExit();
+                try (ReadableByteChannel readerChannel = Channels.newChannel(connection.getInputStream());
+                     WritableByteChannel writerChannel = Channels.newChannel(new FileOutputStream(tmpFile))) {
+                    fileResponse.setFilePath(UriUtils.normalizeUri(tmpFile.toURI().toString()));
+                    ByteBuffer buffer = ByteBuffer.allocate(10000);
+                    while (readerChannel.read(buffer) != -1) {
+                        buffer.flip();
+                        writerChannel.write(buffer);
+                        buffer.clear();
+                    }
                 }
             }
         } catch (Exception ex) {

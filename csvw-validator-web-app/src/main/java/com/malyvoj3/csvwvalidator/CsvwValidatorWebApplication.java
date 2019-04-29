@@ -24,22 +24,23 @@ public class CsvwValidatorWebApplication extends SpringBootServletInitializer {
 //        File a = new File(new URI(s));
 //        Dialect dialect = Dialect.builder().header(true).build();
 //        new CsvParser().parse(dialect, "file:/c:/Users/Vojta/IdeaProjects/csvw-validator/2007-quote.csv");
-//        new Thread(() -> {
-//            while (true) {
-//                // Get current size of heap in bytes
-//                long heapSize = Runtime.getRuntime().totalMemory();
-//
-//                // Get maximum size of heap in bytes. The heap cannot grow beyond this size.// Any attempt will result in an OutOfMemoryException.
-//                long heapMaxSize = Runtime.getRuntime().maxMemory();
-//                System.out.println(String.format("Heap size: %d/%d", heapSize, heapMaxSize));
-//                try {
-//                    Thread.sleep(2000);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//
-//        }).start();
+        new Thread(() -> {
+            while (true) {
+                // Get current size of heap in bytes
+                long heapSize = Runtime.getRuntime().totalMemory();
+
+                // Get maximum size of heap in bytes. The heap cannot grow beyond this size.// Any attempt will result in an OutOfMemoryException.
+                long heapMaxSize = Runtime.getRuntime().maxMemory();
+                long heapFreeSize = Runtime.getRuntime().freeMemory();
+                System.out.println(String.format("Heap size: free %d, total %d, max: %d", heapFreeSize, heapSize, heapMaxSize));
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }).start();
     }
 
 }

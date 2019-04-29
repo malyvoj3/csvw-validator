@@ -158,7 +158,7 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
      */
     @Override
     public ProcessingResult processMetadata(ProcessingSettings settings, String metadataUrl) {
-        FileResponse metadataResponse = FileUtils.downloadFile(metadataUrl);
+        FileResponse metadataResponse = FileUtils.downloadMetadataFile(metadataUrl);
         List<ValidationError> processingErrors = new ArrayList<>();
         if (metadataResponse != null && metadataResponse.getContent() != null) {
             InputStream inputStream = new ByteArrayInputStream(metadataResponse.getContent());
@@ -212,12 +212,14 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
         FileResponse tabularResponse = FileUtils.downloadFile(tabularUrl);
         List<ValidationError> processingErrors = validateCsvFileResponse(tabularResponse);
         TabularParsingResult csvParsingResult = parseCsv(tabularResponse);
+        System.out.println("EEE: return from parsing");
         processingErrors.addAll(csvParsingResult.getParsingErrors());
+        System.out.println("FFF: adding erros to result");
 
-        if (hasNoFatalError(processingErrors)) {
+        /*if (hasNoFatalError(processingErrors)) {
             MetadataParsingResult metadataParsingResult = locateMetadata(tabularResponse, csvParsingResult.getTableDescription());
             processingErrors.addAll(process(csvParsingResult, metadataParsingResult));
-        }
+        }*/
         return resultCreator.createResult(settings, processingErrors, tabularUrl, null);
     }
 
@@ -257,7 +259,7 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
                 csvParsingResults.add(csvParsingResult);
                 if (!tableDesc.isCompatibleWith(csvParsingResult.getTableDescription())) {
                     processingErrors.add(
-                        ValidationError.fatal("Embedded metadata are not compatible with metadata - table '%s'.", tableDesc.getUrl().getValue())
+                            ValidationError.fatal("Embedded metadata are not compatible with metadata - table '%s'.", tableDesc.getUrl().getValue())
                     );
                 }
             }
@@ -301,7 +303,7 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
 
     private TabularParsingResult parseCsv(FileResponse tabularResponse) {
         TabularParsingResult csvParsingResult = null;
-        if (tabularResponse != null && tabularResponse.getContent() != null) {
+        if (tabularResponse != null && tabularResponse.getFilePath() != null) {
             String header = Optional.of(tabularResponse)
                     .map(FileResponse::getContentType)
                     .map(ContentType::getHeader)
@@ -309,7 +311,7 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
             Dialect dialect = Dialect.builder()
                     .header(!HEADER_ABSENT.equals(header))
                     .build();
-            csvParsingResult = tabularParser.parse(dialect, tabularResponse.getUrl(), tabularResponse.getContent());
+            csvParsingResult = tabularParser.parse(dialect, tabularResponse.getUrl(), tabularResponse.getFilePath());
         } else {
             csvParsingResult = new TabularParsingResult();
             csvParsingResult.getParsingErrors().add(ValidationError.fatal("Cannot download CSV file."));
@@ -366,7 +368,7 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
     }
 
     private MetadataParsingResult downloadAndParseMetadata(String metadataUrl) {
-        FileResponse metadataResponse = FileUtils.downloadFile(metadataUrl);
+        FileResponse metadataResponse = FileUtils.downloadMetadataFile(metadataUrl);
         MetadataParsingResult metadataParsingResult = null;
         try {
             InputStream inputStream = new ByteArrayInputStream(metadataResponse.getContent());
