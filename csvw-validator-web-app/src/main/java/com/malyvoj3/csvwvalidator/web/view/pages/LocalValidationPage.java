@@ -1,5 +1,6 @@
 package com.malyvoj3.csvwvalidator.web.view.pages;
 
+import com.malyvoj3.csvwvalidator.utils.UriUtils;
 import com.malyvoj3.csvwvalidator.web.view.ValidatingDataDTO;
 import com.malyvoj3.csvwvalidator.web.view.components.*;
 import com.vaadin.flow.component.ComponentUtil;
@@ -72,7 +73,7 @@ public class LocalValidationPage extends VerticalLayout {
         FileReceiver receiver = new FileReceiver();
         LocalizedUpload upload = new LocalizedUpload(receiver);
         upload.addSucceededListener(event -> {
-            csvFilePath = receiver.getFile().toURI().toString();
+            csvFilePath = UriUtils.normalizeUri(receiver.getFile().toURI().toString());
             csvFileName = receiver.getFileName();
         });
         return upload;
@@ -87,7 +88,7 @@ public class LocalValidationPage extends VerticalLayout {
                 receiver.getFile().delete();
                 upload.getElement().setPropertyJson("files", Json.createArray());
             } else {
-                metadataFilePath = receiver.getFile().toURI().toString();
+                metadataFilePath = UriUtils.normalizeUri(receiver.getFile().toURI().toString());
                 metadataFileName = receiver.getFileName();
             }
         });

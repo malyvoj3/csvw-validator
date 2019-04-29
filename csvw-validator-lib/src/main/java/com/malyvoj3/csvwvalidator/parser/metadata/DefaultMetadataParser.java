@@ -14,8 +14,11 @@ import com.malyvoj3.csvwvalidator.utils.UriUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +28,22 @@ public class DefaultMetadataParser implements MetadataParser {
 
     private final TableDescriptionParser tableParser;
     private final TableGroupDescriptionParser tableGroupParser;
+
+    @Override
+    public MetadataParsingResult parseJson(String filePath, ParsingContext parsingContext) {
+        MetadataParsingResult result = new MetadataParsingResult();
+        result.setMetadataUrl(parsingContext.getMetadataUrl());
+        try {
+            File file = new File(new URI(filePath));
+            result = parseJson(new FileInputStream(file), parsingContext);
+        } catch (Exception ex) {
+            List<ValidationError> validationErrors = new ArrayList<>();
+            validationErrors.add(ValidationError.fatal(String.format("Error during parsing metadata JSON file '%s'", parsingContext.getMetadataUrl())));
+            result.setValidationErrors(validationErrors);
+        }
+        return result;
+
+    }
 
     @Override
     public MetadataParsingResult parseJson(InputStream inputStream, ParsingContext parsingContext) {

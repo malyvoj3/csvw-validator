@@ -118,7 +118,7 @@ public class DefaultModelValidator implements ModelValidator {
                 rowNumber++;
             }
         } catch (Exception ex) {
-            log.error("Error during model validation.");
+            log.error("Error during model validation.", ex);
         }
         System.out.println("YYY: End validating");
         tableRules.stream()
