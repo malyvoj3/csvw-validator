@@ -6,8 +6,6 @@ import com.malyvoj3.csvwvalidator.domain.Severity;
 import com.malyvoj3.csvwvalidator.domain.ValidationError;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.TableDescription;
 import com.malyvoj3.csvwvalidator.domain.metadata.descriptions.TableGroupDescription;
-import com.malyvoj3.csvwvalidator.domain.model.Table;
-import com.malyvoj3.csvwvalidator.domain.model.TableGroup;
 import com.malyvoj3.csvwvalidator.parser.metadata.MetadataParser;
 import com.malyvoj3.csvwvalidator.parser.metadata.MetadataParsingResult;
 import com.malyvoj3.csvwvalidator.parser.metadata.ParsingContext;
@@ -49,7 +47,6 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
     private final TabularDataParser tabularParser;
     private final MetadataParser metadataParser;
     private final SchemaLocator schemaLocator;
-    private final AnnotationCreator annotationCreator;
     private final MetadataValidator metadataValidator;
     private final ModelValidator modelValidator;
     private final ResultCreator<ProcessingResult, BatchProcessingResult> resultCreator;
@@ -216,10 +213,10 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
         processingErrors.addAll(csvParsingResult.getParsingErrors());
         System.out.println("FFF: adding erros to result");
 
-        /*if (hasNoFatalError(processingErrors)) {
+        if (hasNoFatalError(processingErrors)) {
             MetadataParsingResult metadataParsingResult = locateMetadata(tabularResponse, csvParsingResult.getTableDescription());
             processingErrors.addAll(process(csvParsingResult, metadataParsingResult));
-        }*/
+        }
         return resultCreator.createResult(settings, processingErrors, tabularUrl, null);
     }
 
@@ -234,8 +231,7 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
             if (hasNoFatalError(processingErrors)) {
                 TableDescription embeddedMetadata = csvParsingResult.getTableDescription();
                 if (tableDescription.isCompatibleWith(embeddedMetadata)) {
-                    Table annotatedTable = annotationCreator.createAnnotations(csvParsingResult, tableDescription);
-                    processingErrors.addAll(modelValidator.validateTable(annotatedTable));
+                    processingErrors.addAll(modelValidator.validateTable(csvParsingResult, tableDescription));
                 } else {
                     processingErrors.add(ValidationError.fatal("Embedded metadata are not compatible with metadata."));
                 }
@@ -264,8 +260,7 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
                 }
             }
             if (hasNoFatalError(processingErrors)) {
-                TableGroup annotatedTableGroup = annotationCreator.createAnnotations(csvParsingResults, tableGroupDescription);
-                processingErrors.addAll(modelValidator.validateTableGroup(annotatedTableGroup));
+                processingErrors.addAll(modelValidator.validateTableGroup(csvParsingResults, tableGroupDescription));
             }
         }
         return processingErrors;
@@ -281,8 +276,7 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
                 TableDescription tableDesc = getTableDescription(metadataParsingResult, csvParsingResult.getTabularUrl());
                 // Embedded metadata has to be compatible with metadata.
                 if (tableDesc != null && tableDesc.isCompatibleWith(embeddedMetadata)) {
-                    Table annotatedTable = annotationCreator.createAnnotations(csvParsingResult, tableDesc);
-                    processingErrors.addAll(modelValidator.validateTable(annotatedTable));
+                    processingErrors.addAll(modelValidator.validateTable(csvParsingResult, tableDesc));
                 } else {
                     processingErrors.add(ValidationError.fatal("Embedded metadata are not compatible with metadata."));
                 }

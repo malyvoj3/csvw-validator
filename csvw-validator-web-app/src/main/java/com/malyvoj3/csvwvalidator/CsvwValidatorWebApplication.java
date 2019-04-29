@@ -1,12 +1,14 @@
 package com.malyvoj3.csvwvalidator;
 
 import com.malyvoj3.csvwvalidator.config.ProcessorConfig;
+import org.apache.commons.io.FileUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
@@ -20,10 +22,12 @@ public class CsvwValidatorWebApplication extends SpringBootServletInitializer {
 
     @PostConstruct
     public void init() throws URISyntaxException, IOException {
-//        String s = "file:/c/Users/Vojta/IdeaProjects/csvw-validator/test015-user-metadata.json";
-//        File a = new File(new URI(s));
-//        Dialect dialect = Dialect.builder().header(true).build();
-//        new CsvParser().parse(dialect, "file:/c:/Users/Vojta/IdeaProjects/csvw-validator/2007-quote.csv");
+        File file = new File("tmp");
+        if (file.exists()) {
+            FileUtils.deleteDirectory(file);
+        }
+        file.mkdir();
+
         new Thread(() -> {
             while (true) {
                 // Get current size of heap in bytes

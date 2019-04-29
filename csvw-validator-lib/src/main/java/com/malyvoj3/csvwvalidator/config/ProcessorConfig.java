@@ -5,7 +5,6 @@ import com.malyvoj3.csvwvalidator.parser.metadata.DefaultMetadataParser;
 import com.malyvoj3.csvwvalidator.parser.tabular.CsvParser;
 import com.malyvoj3.csvwvalidator.processor.CsvwProcessor;
 import com.malyvoj3.csvwvalidator.processor.CsvwShemaLocator;
-import com.malyvoj3.csvwvalidator.processor.DefaultAnnotationCreator;
 import com.malyvoj3.csvwvalidator.processor.result.CsvResultWriter;
 import com.malyvoj3.csvwvalidator.processor.result.ProcessingResultCreator;
 import com.malyvoj3.csvwvalidator.processor.result.RdfResultWriter;
@@ -34,17 +33,12 @@ public class ProcessorConfig {
     @Bean
     public CsvwProcessor csvwProcessor() {
         return new CsvwProcessor(csvParser, metadataParser, siteWideLocator(),
-                annotationCreator(), metadataValidator, modelValidator, resultCreator());
+                metadataValidator, modelValidator, resultCreator());
     }
 
     @Bean
     public CsvwShemaLocator siteWideLocator() {
         return new CsvwShemaLocator();
-    }
-
-    @Bean
-    public DefaultAnnotationCreator annotationCreator() {
-        return new DefaultAnnotationCreator(dataTypeFactory);
     }
 
     @Bean

@@ -20,7 +20,7 @@ public class LocalizedUpload extends Upload implements LocaleChangeObserver {
         setI18n(createUpload());
     }
 
-    public UploadI18N createUpload() {
+    private UploadI18N createUpload() {
         UploadI18N i18N = new UploadI18N();
 
         UploadI18N.AddFiles addFiles = new UploadI18N.AddFiles();

@@ -33,4 +33,5 @@ public class Column {
     private String valueUrl;
     private boolean virtual;
     private boolean empty = true;
+    private boolean primaryKey;
 }

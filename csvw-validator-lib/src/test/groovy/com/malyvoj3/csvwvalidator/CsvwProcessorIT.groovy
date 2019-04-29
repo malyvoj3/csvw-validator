@@ -18,6 +18,20 @@ class CsvwProcessorIT extends Specification {
     @Autowired
     private CsvwProcessor csvwProcessor
 
+    def setupSpec() {
+        def file = new File("tmp")
+        if (!file.exists()) {
+            file.mkdir();
+        }
+    }
+
+    def cleanupSpec() {
+        def file = new File("tmp")
+        if (file.exists()) {
+            file.deleteDir();
+        }
+    }
+
     @Unroll
     def "#name - CSVW implementation report"() {
         when: "Receive URL of tabular data and/or its metadata"
