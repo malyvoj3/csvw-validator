@@ -30,6 +30,17 @@ import java.util.Optional;
 @Slf4j
 public class FileUtils {
 
+    public boolean isUtf8(ByteBuffer byteBuffer) {
+        CharsetDecoder decoder =
+                StandardCharsets.UTF_8.newDecoder();
+        try {
+            decoder.decode(byteBuffer);
+        } catch (CharacterCodingException ex) {
+            return false;
+        }
+        return true;
+    }
+
     public boolean isUtf8(byte[] array) {
         CharsetDecoder decoder =
                 StandardCharsets.UTF_8.newDecoder();
