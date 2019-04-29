@@ -14,6 +14,7 @@ public class ProcessingResultCreator implements ResultCreator<ProcessingResult, 
 
     @Override
     public ProcessingResult createResult(ProcessingSettings settings, List<? extends ValidationError> errors, String tabularUrl, String metadataUrl) {
+        System.out.println("GGG: creating processing resuslt");
         List<? extends ValidationError> validationErrors;
         if (!settings.isStrictMode()) {
             validationErrors = errors.stream()
@@ -49,7 +50,7 @@ public class ProcessingResultCreator implements ResultCreator<ProcessingResult, 
         } else if (warningCount > 0) {
             status = ValidationStatus.WARNING;
         }
-
+        System.out.println("HHH: last result");
         return ProcessingResult.builder()
                 .tabularUrl(tabularUrl)
                 .metadataUrl(metadataUrl)

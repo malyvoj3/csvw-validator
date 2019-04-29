@@ -19,5 +19,6 @@ public class TabularParsingResult {
     private List<ValidationError> parsingErrors = new ArrayList<>();
     private Table table;
     private TableDescription tableDescription;
+    private String resultFilePath;
 
 }

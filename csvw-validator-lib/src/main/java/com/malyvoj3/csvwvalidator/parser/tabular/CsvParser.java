@@ -12,11 +12,10 @@ import com.malyvoj3.csvwvalidator.domain.model.Column;
 import com.malyvoj3.csvwvalidator.domain.model.Row;
 import com.malyvoj3.csvwvalidator.domain.model.Table;
 import com.malyvoj3.csvwvalidator.utils.CsvwKeywords;
-import com.malyvoj3.csvwvalidator.utils.FileUtils;
+import com.malyvoj3.csvwvalidator.utils.UriUtils;
 import com.univocity.parsers.csv.CsvFormat;
 import com.univocity.parsers.csv.CsvParserSettings;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
@@ -34,51 +33,75 @@ public class CsvParser implements TabularDataParser {
 
     @Override
     public TabularParsingResult parse(Dialect dialect, String url) throws URISyntaxException, IOException {
-        byte[] fileArray = IOUtils.toByteArray(new URI(url));
-        return parse(dialect, url, fileArray);
+       /* byte[] fileArray = IOUtils.toByteArray(new URI(url));
+        return parse(dialect, url, fileArray);*/
+       return null;
     }
 
     @Override
     public TabularParsingResult parse(Dialect dialect, String url, InputStream inputStream) throws IOException {
-        byte[] fileArray = IOUtils.toByteArray(inputStream);
-        return parse(dialect, url, fileArray);
+       /* byte[] fileArray = IOUtils.toByteArray(inputStream);
+        return parse(dialect, url, fileArray);*/
+        return null;
     }
 
     @Override
-    public TabularParsingResult parse(Dialect dialect, String url, byte[] file) {
+    public TabularParsingResult parse(Dialect dialect, String url, String filePath) {
         Table table = new Table();
         table.setUrl(url);
         List<Column> columns = new ArrayList<>();
         List<ColumnDescription> columnDescriptions = new ArrayList<>();
         TableDescription tableDescription = null;
         List<ValidationError> parsingErrors = new ArrayList<>();
+        String resultFilePath = null;
 
-        if (file.length > 0) {
-            try {
-                Reader reader = new InputStreamReader(new ByteArrayInputStream(file));
-                if (!FileUtils.isUtf8(file)) {
-                    parsingErrors.add(ValidationError.strictWarn("Invalid encoding: file has not 'UTF-8' encoding."));
-                }
+        try {
+            File tmpFile = File.createTempFile("tmp", null, new File("tmp"));
+            tmpFile.deleteOnExit();
+            System.out.println("AAA: start parsing");
+            try (Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(new URI(filePath)))));
+                 BufferedWriter writer = new BufferedWriter(new FileWriter(tmpFile))) {
                 com.univocity.parsers.csv.CsvParser csvParser = new com.univocity.parsers.csv.CsvParser(defaultSettings(dialect));
-                List<String[]> records = csvParser.parseAll(reader);
+                csvParser.beginParsing(reader);
                 createColumns(csvParser, table, columns, columnDescriptions);
-                parsingErrors.addAll(createRows(records, table, columns, dialect.isHeader()));
+                int rowNumber = dialect.isHeader() ? 2 : 1;
+                boolean isUtf = true;
+                String[] record;
+                while ((record = csvParser.parseNext()) != null) {
+                    /*parsingErrors.addAll(createRow(record, columns, rowNumber));
+                    String joinedRecord = Stream.of(record)
+                            .map(string -> '"' + string + '"')
+                            .collect(Collectors.joining(","));
+                    if (isUtf && !FileUtils.isUtf8(joinedRecord.getBytes())) {
+                        isUtf = false;
+                    }
+                    writer.write(joinedRecord);
+                    writer.newLine();
+                    rowNumber++;*/
+                }
+                System.out.println("BBB: after while");
                 parsingErrors.addAll(validateColumns(columns));
                 parsingErrors.addAll(validateCsvFormat(csvParser.getDetectedFormat()));
                 table.setColumns(columns);
                 tableDescription = createTableDescription(columnDescriptions, url);
-            } catch (CsvFormatException ex) {
+                if (!isUtf) {
+                    parsingErrors.add(ValidationError.strictWarn("Invalid encoding: file has not 'UTF-8' encoding."));
+                }
+                resultFilePath = UriUtils.normalizeUri(tmpFile.toURI().toString());
+                System.out.println("CCC: after validating");
+            }/* catch (CsvFormatException ex) {
                 log.error("Invalid CSF file format. Stop parsing.");
                 parsingErrors.add(ex.getValidationError());
-            } catch (Exception ex) {
+            }*/ catch (Exception ex) {
                 log.error(String.format("Error during CSV parsing of file '%s'.", url), ex);
                 parsingErrors.add(ValidationError.fatal("File '%s' is not valid CSV file.", url));
             }
-        } else {
-            parsingErrors.add(ValidationError.fatal("The CSV file is empty."));
+        } catch (IOException e) {
+            e.printStackTrace();
+            // TODO
         }
-
-        return new TabularParsingResult(url, parsingErrors, table, tableDescription);
+        System.out.println("DDD: creating parsing result");
+        return new TabularParsingResult(url, parsingErrors, table, tableDescription, resultFilePath);
     }
 
     private void createColumns(com.univocity.parsers.csv.CsvParser parser, Table table, List<Column> columns, List<ColumnDescription> columnDescriptions) {
@@ -93,12 +116,32 @@ public class CsvParser implements TabularDataParser {
             columns.add(Column.builder()
                     .titles(titles)
                     .name(trimmedHeader)
-                    .cells(new ArrayList<>())
                     .number(columnNumber)
                     .table(table).build());
             columnDescriptions.add(createColumnDescription(trimmedHeader));
             columnNumber++;
         }
+    }
+
+    private List<ValidationError> createRow(String[] record, List<Column> columns, int rowNumber) throws CsvFormatException {
+        List<ValidationError> parsingErrors = new ArrayList<>();
+        int columnLength = columns.size();
+        if (record.length > 0) {
+            parsingErrors.addAll(validateRowLength(record.length, rowNumber, columnLength));
+            for (int i = 0; i < record.length; i++) {
+                String value = record[i];
+                parsingErrors.addAll(validateValue(value, rowNumber, i));
+                Column cellColumn = i < columns.size() ? columns.get(i) : null;
+                if (cellColumn != null) {
+                    if (cellColumn.isEmpty() && StringUtils.isNotBlank(value)) {
+                        cellColumn.setEmpty(false);
+                    }
+                }
+            }
+        } else {
+            parsingErrors.add(ValidationError.strictWarn("Empty row number %d.", rowNumber));
+        }
+        return parsingErrors;
     }
 
     private List<ValidationError> createRows(List<String[]> records, Table table, List<Column> columns, boolean hasHeader) throws CsvFormatException {
@@ -154,11 +197,7 @@ public class CsvParser implements TabularDataParser {
     private List<ValidationError> validateColumns(List<Column> columns) {
         List<ValidationError> errors = new ArrayList<>();
         for (Column column : columns) {
-            long notBlankNum = column.getCells().stream()
-                    .map(Cell::getStringValue)
-                    .filter(StringUtils::isNotBlank)
-                    .count();
-            if (notBlankNum == 0) {
+            if (column.isEmpty()) {
                 errors.add(ValidationError.strictWarn("Column '%s' is empty column.", column.getName()));
             }
         }
