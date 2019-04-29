@@ -168,7 +168,7 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
 
             }
         } else {
-            processingErrors.add(ValidationError.fatal("Can't download metadata from url '%s'.", metadataUrl));
+            processingErrors.add(ValidationError.fatal("error.cantDownloadMetadata", metadataUrl));
         }
         return resultCreator.createResult(settings, processingErrors, null, metadataUrl);
     }
@@ -192,7 +192,7 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
                 processMetadata(settings, metadataUrl);
             }
         } else {
-            processingErrors.add(ValidationError.fatal("Can't download valid metadata from url '%s'.", metadataUrl));
+            processingErrors.add(ValidationError.fatal("error.cantDownloadValidMetadata", metadataUrl));
         }
         return resultCreator.createResult(settings, processingErrors, tabularUrl, metadataUrl);
     }
@@ -226,7 +226,7 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
                 if (tableDescription.isCompatibleWith(embeddedMetadata)) {
                     processingErrors.addAll(modelValidator.validateTable(csvParsingResult, tableDescription));
                 } else {
-                    processingErrors.add(ValidationError.fatal("Embedded metadata are not compatible with metadata."));
+                    processingErrors.add(ValidationError.fatal("error.notCompatibleTable"));
                 }
             }
         }
@@ -248,7 +248,7 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
                 csvParsingResults.add(csvParsingResult);
                 if (!tableDesc.isCompatibleWith(csvParsingResult.getTableDescription())) {
                     processingErrors.add(
-                            ValidationError.fatal("Embedded metadata are not compatible with metadata - table '%s'.", tableDesc.getUrl().getValue())
+                            ValidationError.fatal("error.notCompatibleTableGroup", tableDesc.getUrl().getValue())
                     );
                 }
             }
@@ -271,7 +271,7 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
                 if (tableDesc != null && tableDesc.isCompatibleWith(embeddedMetadata)) {
                     processingErrors.addAll(modelValidator.validateTable(csvParsingResult, tableDesc));
                 } else {
-                    processingErrors.add(ValidationError.fatal("Embedded metadata are not compatible with metadata."));
+                    processingErrors.add(ValidationError.fatal("error.notCompatibleTable"));
                 }
             }
         }
@@ -301,7 +301,7 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
             csvParsingResult = tabularParser.parse(dialect, tabularResponse.getUrl(), tabularResponse.getFilePath());
         } else {
             csvParsingResult = new TabularParsingResult();
-            csvParsingResult.getParsingErrors().add(ValidationError.fatal("Cannot download CSV file."));
+            csvParsingResult.getParsingErrors().add(ValidationError.fatal("error.cantDownloadCsv"));
         }
         return csvParsingResult;
     }
@@ -317,8 +317,7 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
                 if (tmpResult.getTopLevelDescription().describesTabularData(csvFileResponse.getUrl())) {
                     metadataParsingResult = tmpResult;
                 } else {
-                    locatingErrors.add(ValidationError.warn("Schema '%s' does not explicitly include a" +
-                            " reference to the requested tabular data file.", csvFileResponse.getLink().getLink()));
+                    locatingErrors.add(ValidationError.warn("error.invalidSchemaReference", csvFileResponse.getLink().getLink()));
                 }
             }
         }
@@ -333,8 +332,7 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
                         metadataParsingResult = tmpResult;
                         break;
                     } else {
-                        locatingErrors.add(ValidationError.warn("Schema '%s' does not explicitly include a" +
-                                " reference to the requested tabular data file.", metadataUrl));
+                        locatingErrors.add(ValidationError.warn("error.invalidSchemaReference", metadataUrl));
                     }
                 }
             }
@@ -346,8 +344,7 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
             metadataParsingResult.setTopLevelDescription(embeddedMetadata);
             metadataParsingResult.setTopLevelType(TopLevelType.TABLE);
             metadataParsingResult.setValidationErrors(locatingErrors);
-            metadataParsingResult.getValidationErrors().add(ValidationError.strictWarn("Missing schema for tabular data." +
-                    " Validating will continue using embedded metadata"));
+            metadataParsingResult.getValidationErrors().add(ValidationError.strictWarn("error.missingSchema"));
         } else {
             metadataParsingResult.getValidationErrors().addAll(locatingErrors);
         }
@@ -371,12 +368,12 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
         if (fileResponse != null && fileResponse.isRemoteFile()) {
             ContentType contentType = fileResponse.getContentType();
             if (!TEXT_CSV_TYPE.equals(contentType.getType())) {
-                validationErrors.add(ValidationError.strictWarn("CSV file doesn't have specified 'Content-type' HTTP header."));
+                validationErrors.add(ValidationError.strictWarn("error.missingContentType"));
             }
             boolean hasUtfEncoding = UTF8_ENCODING_NAMES.stream()
                     .anyMatch(name -> StringUtils.equalsIgnoreCase(name, contentType.getCharset()));
             if (!hasUtfEncoding) {
-                validationErrors.add(ValidationError.strictWarn("CSV file doesn't have specified UTF-8 encoding in 'Content-type' HTTP header."));
+                validationErrors.add(ValidationError.strictWarn("error.missingEncoding"));
             }
         }
         return validationErrors;

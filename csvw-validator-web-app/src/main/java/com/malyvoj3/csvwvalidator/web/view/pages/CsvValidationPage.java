@@ -37,6 +37,8 @@ public class CsvValidationPage extends VerticalLayout {
         validationButton.addClickListener(event -> {
             ValidatingDataDTO bean = new ValidatingDataDTO();
             if (binder.writeBeanIfValid(bean)) {
+                // Set locale
+                validationButton.getUI().ifPresent(ui -> bean.setLocale(ui.getLocale()));
                 ComponentUtil.setData(UI.getCurrent(), ValidatingDataDTO.class, bean);
                 validationButton.getUI().ifPresent(ui -> ui.navigate("result"));
             }

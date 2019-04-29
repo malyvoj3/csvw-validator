@@ -38,7 +38,7 @@ public class DefaultMetadataParser implements MetadataParser {
             result = parseJson(new FileInputStream(file), parsingContext);
         } catch (Exception ex) {
             List<ValidationError> validationErrors = new ArrayList<>();
-            validationErrors.add(ValidationError.fatal(String.format("Error during parsing metadata JSON file '%s'", parsingContext.getMetadataUrl())));
+            validationErrors.add(ValidationError.fatal("error.invalidJson", parsingContext.getMetadataUrl()));
             result.setValidationErrors(validationErrors);
         }
         return result;
@@ -83,13 +83,13 @@ public class DefaultMetadataParser implements MetadataParser {
                     result.setParsingErrors(jsonObject.getErrors());
                     result.setNormalizationErrors(normalizationErrors);
                 } else {
-                    validationErrors.add(ValidationError.fatal("Metadata JSON does not contain valid 'url' or 'tables' property, or it contains both."));
+                    validationErrors.add(ValidationError.fatal("error.notTopLevel"));
                 }
             } else {
                 throw new ParserException();
             }
         } catch (IOException e) {
-            validationErrors.add(ValidationError.fatal(String.format("Error during parsing metadata JSON file '%s'", parsingContext.getMetadataUrl())));
+            validationErrors.add(ValidationError.fatal("error.invalidJson", parsingContext.getMetadataUrl()));
         }
         result.setValidationErrors(validationErrors);
         return result;

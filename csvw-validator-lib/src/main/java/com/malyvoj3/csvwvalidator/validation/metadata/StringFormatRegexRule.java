@@ -25,7 +25,7 @@ public class StringFormatRegexRule extends TableDescriptionValidationRule {
                         Pattern.compile(pattern);
                     } catch (Exception ex) {
                         dataTypeDesc.getFormat().getValue().setPattern(null);
-                        errors.add(ValidationError.warn("Datatype has incorrect regexp in format property."));
+                        errors.add(ValidationError.warn("error.invalidRegexp", pattern));
                     }
                 }
             }

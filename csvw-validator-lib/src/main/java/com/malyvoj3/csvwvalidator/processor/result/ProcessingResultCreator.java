@@ -4,13 +4,18 @@ import com.malyvoj3.csvwvalidator.domain.Severity;
 import com.malyvoj3.csvwvalidator.domain.ValidationError;
 import com.malyvoj3.csvwvalidator.domain.ValidationStatus;
 import com.malyvoj3.csvwvalidator.processor.ProcessingSettings;
+import com.malyvoj3.csvwvalidator.processor.Translator;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
+@RequiredArgsConstructor
 public class ProcessingResultCreator implements ResultCreator<ProcessingResult, BatchProcessingResult> {
+
+    private final Translator translator;
 
     @Override
     public ProcessingResult createResult(ProcessingSettings settings, List<? extends ValidationError> errors, String tabularUrl, String metadataUrl) {
@@ -50,17 +55,25 @@ public class ProcessingResultCreator implements ResultCreator<ProcessingResult, 
         } else if (warningCount > 0) {
             status = ValidationStatus.WARNING;
         }
-        System.out.println("HHH: last result");
+
+        List<LocalizedError> localizedErrors = validationErrors.stream()
+                .map(error -> {
+                    ValidationError msg = error.getFormattedMessage();
+                    return new LocalizedError(msg.getSeverity().name(),
+                            translator.getTranslation(msg.getMessageCode(), settings.getLocale(), msg.getParams()));
+                }).collect(Collectors.toList());
+
         return ProcessingResult.builder()
                 .tabularUrl(tabularUrl)
                 .metadataUrl(metadataUrl)
-                .errors(validationErrors)
+                .errors(localizedErrors)
                 .warningCount(warningCount)
                 .errorCount(errorCount)
                 .fatalCount(fatalCount)
                 .totalErrorsCount(validationErrors.size())
                 .validationStatus(status)
                 .settings(settings)
+                .usedLanguage(settings.getLocale().getLanguage())
                 .build();
     }
 
