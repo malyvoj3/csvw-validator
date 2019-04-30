@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -40,25 +41,22 @@ public class FileUtils {
         return true;
     }
 
-    public boolean isUtf8(byte[] array) {
-        CharsetDecoder decoder =
-                StandardCharsets.UTF_8.newDecoder();
-        try {
-            decoder.decode(
-                    ByteBuffer.wrap(array));
-        } catch (CharacterCodingException ex) {
-           return false;
-        }
-        return true;
-    }
-
-    public FileResponse downloadFile(String stringUrl) {
+    public FileResponse downloadTabularFile(String stringUrl) {
         FileResponse fileResponse;
-        // TODO predelat na Strategy pattern.
         if (isFileUrl(stringUrl)) {
             fileResponse = getLocalFile(stringUrl);
         } else {
             fileResponse = downloadRemoteFile(stringUrl);
+        }
+        return fileResponse;
+    }
+
+    public FileResponse downloadMetadataFile(String stringUrl) {
+        FileResponse fileResponse;
+        if (isFileUrl(stringUrl)) {
+            fileResponse = getLocalMetadataFile(stringUrl);
+        } else {
+            fileResponse = downloadRemoteMetadaFile(stringUrl);
         }
         return fileResponse;
     }
@@ -74,7 +72,25 @@ public class FileUtils {
         return fileResponse;
     }
 
-    public FileResponse downloadMetadataFile(@NonNull String stringUrl) {
+    private static FileResponse getLocalMetadataFile(@NonNull String stringUrl) {
+        FileResponse fileResponse = null;
+        String normalizedUrl = UriUtils.normalizeUri(stringUrl);
+        URL url;
+        try {
+            url = new URL(normalizedUrl);
+            log.info("Opening local file {}.", normalizedUrl);
+            byte[] byteArray = IOUtils.toByteArray(url);
+            fileResponse = new FileResponse();
+            fileResponse.setContent(byteArray);
+            fileResponse.setUrl(normalizedUrl);
+            fileResponse.setRemoteFile(false);
+        } catch (IOException e) {
+            log.error("Cannot open local file with url {}.", stringUrl);
+        }
+        return fileResponse;
+    }
+
+    private FileResponse downloadRemoteMetadaFile(@NonNull String stringUrl) {
         String normalizedUrl = UriUtils.normalizeUri(stringUrl);
         URL url;
         FileResponse fileResponse = null;

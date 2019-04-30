@@ -19,7 +19,6 @@ public class ProcessingResultCreator implements ResultCreator<ProcessingResult, 
 
     @Override
     public ProcessingResult createResult(ProcessingSettings settings, List<? extends ValidationError> errors, String tabularUrl, String metadataUrl) {
-        System.out.println("GGG: creating processing resuslt");
         List<? extends ValidationError> validationErrors;
         if (!settings.isStrictMode()) {
             validationErrors = errors.stream()

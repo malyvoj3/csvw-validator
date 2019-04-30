@@ -18,8 +18,22 @@ class CsvwControllerIT extends Specification {
     @LocalServerPort
     private int port
 
-    def setup() throws Exception {
+    def setup() {
         RestAssured.port = port
+    }
+
+    def setupSpec() {
+        def file = new File("tmp")
+        if (!file.exists()) {
+            file.mkdir();
+        }
+    }
+
+    def cleanupSpec() {
+        def file = new File("tmp")
+        if (file.exists()) {
+            file.deleteDir();
+        }
     }
 
     @Unroll

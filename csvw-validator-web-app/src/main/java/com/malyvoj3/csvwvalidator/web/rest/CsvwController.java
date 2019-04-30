@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @RestController
@@ -35,6 +36,10 @@ public class CsvwController {
         String tabularUrl = request.getTabularUrl();
         ProcessingSettings settings = new ProcessingSettings();
         settings.setStrictMode(request.isStrictMode());
+        Locale requestLocale = getRequestLocale(request.getLanguage());
+        if (requestLocale != null) {
+            settings.setLocale(requestLocale);
+        }
         ProcessingResult processingResult;
 
         if (StringUtils.isNotEmpty(metadataUrl) && StringUtils.isNotEmpty(tabularUrl)) {
@@ -50,12 +55,28 @@ public class CsvwController {
         return ResponseEntity.ok(createResponse(processingResult));
     }
 
+    private Locale getRequestLocale(String language) {
+        Locale locale;
+        if ("en".equals(language)) {
+            locale = new Locale("en", "GB");
+        } else if("cs".equals(language)) {
+            locale = new Locale("cs", "CZ");
+        } else {
+            locale = null;
+        }
+        return locale;
+    }
+
     @PostMapping(path = "/validateBatch",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<BatchValidationResponse> validateBatch(@RequestBody BatchValidationRequest request) {
         ProcessingSettings settings = new ProcessingSettings();
         settings.setStrictMode(request.isStrictMode());
+        Locale requestLocale = getRequestLocale(request.getLanguage());
+        if (requestLocale != null) {
+            settings.setLocale(requestLocale);
+        }
         BatchProcessingResult result = csvwProcessor.process(settings, request.getFilesToProcess());
 
         List<ValidationResponse> filesResults = result.getFilesResults().stream()

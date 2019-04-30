@@ -14,6 +14,8 @@ import com.malyvoj3.csvwvalidator.utils.FileUtils;
 import com.malyvoj3.csvwvalidator.utils.UriUtils;
 import com.univocity.parsers.csv.CsvFormat;
 import com.univocity.parsers.csv.CsvParserSettings;
+import com.univocity.parsers.csv.CsvWriter;
+import com.univocity.parsers.csv.CsvWriterSettings;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -42,74 +44,86 @@ public class CsvParser implements TabularDataParser {
         List<ValidationError> parsingErrors = new ArrayList<>();
         String resultFilePath = null;
 
-        System.out.println("111: UTF reading");
-        boolean isUtf = true;
-        try (ReadableByteChannel readerChannel = Channels.newChannel(new FileInputStream(new File(new URI(filePath))))) {
-            ByteBuffer buffer = ByteBuffer.allocate(10000);
-            while (readerChannel.read(buffer) != -1) {
-                if (!FileUtils.isUtf8(buffer)) {
-                    isUtf = false;
-                    break;
-                }
-                buffer.clear();
-            }
-        } catch (Exception ex) {
-            // nothing will fail on next try
-        }
-        System.out.println("222: UTF stop");
-
-        if (!isUtf) {
-            parsingErrors.add(ValidationError.strictWarn("error.notUtf"));
-        }
-
+        File csvFile = null;
         try {
-            File tmpFile = File.createTempFile("tmp", null, new File("tmp"));
-            tmpFile.deleteOnExit();
-            System.out.println("AAA: start parsing");
-            try (Reader reader = new InputStreamReader(new FileInputStream(new File(new URI(filePath))));
-                 BufferedWriter writer = new BufferedWriter(new FileWriter(tmpFile))) {
-                com.univocity.parsers.csv.CsvParser csvParser = new com.univocity.parsers.csv.CsvParser(defaultSettings(dialect));
-                csvParser.beginParsing(reader);
-                createColumns(csvParser, table, columns, columnDescriptions);
-                int columnsLength = columns.size();
-                int rowNumber = dialect.isHeader() ? 2 : 1;
-                String[] record;
-                while ((record = csvParser.parseNext()) != null) {
-                    parsingErrors.addAll(createRow(record, columns, rowNumber));
-                    for (int i = 0; i < columnsLength; i++) {
-                        if (!(i >= record.length || record[i] == null)) {
-                            writer.write("\"");
-                            writer.write(record[i]);
-                            writer.write("\"");
-                        }
-                        if (i < columnsLength - 1) {
-                            writer.write(',');
-                        } else {
-                            writer.newLine();
-                        }
-                    }
-                    rowNumber++;
-                }
-                System.out.println("BBB: after while");
-                parsingErrors.addAll(validateColumns(columns));
-                parsingErrors.addAll(validateCsvFormat(csvParser.getDetectedFormat()));
-                table.setColumns(columns);
-                tableDescription = createTableDescription(columnDescriptions, url);
-                resultFilePath = UriUtils.normalizeUri(tmpFile.toURI().toString());
-                System.out.println("CCC: after validating");
-            } catch (CsvFormatException ex) {
-                log.error("Invalid CSF file format. Stop parsing.");
-                parsingErrors.add(ex.getValidationError());
-            } catch (Exception ex) {
-                log.error(String.format("Error during CSV parsing of file '%s'.", url), ex);
-                parsingErrors.add(ValidationError.fatal("error.invalidCsv", url));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            // TODO
+            csvFile = new File(new URI(filePath));
+        } catch (Exception ex) {
+            log.error(String.format("Error during CSV parsing of file '%s'.", url), ex);
+            parsingErrors.add(ValidationError.fatal("error.invalidCsv", url));
         }
-        System.out.println("DDD: creating parsing result");
+
+        if (csvFile != null && csvFile.length() > 0) {
+            boolean isUtf = true;
+            try (ReadableByteChannel readerChannel = Channels.newChannel(new FileInputStream(csvFile))) {
+                ByteBuffer buffer = ByteBuffer.allocate(10000);
+                while (readerChannel.read(buffer) != -1) {
+                    if (!FileUtils.isUtf8(buffer)) {
+                        isUtf = false;
+                        break;
+                    }
+                    buffer.clear();
+                }
+            } catch (Exception ex) {
+                // nothing will fail on next try
+            }
+
+            if (!isUtf) {
+                parsingErrors.add(ValidationError.strictWarn("error.notUtf"));
+            }
+
+            try {
+                File tmpFile = File.createTempFile("tmp", null, new File("tmp"));
+                tmpFile.deleteOnExit();
+                try (Reader reader = new InputStreamReader(new FileInputStream(csvFile));
+                     BufferedWriter writer = new BufferedWriter(new FileWriter(tmpFile))) {
+                    com.univocity.parsers.csv.CsvParser csvParser = new com.univocity.parsers.csv.CsvParser(defaultSettings(dialect));
+                    CsvWriter csvWriter = new CsvWriter(writer, mySettings());
+                    csvParser.beginParsing(reader);
+                    createColumns(csvParser, table, columns, columnDescriptions);
+                    int rowNumber = dialect.isHeader() ? 2 : 1;
+                    String[] record;
+                    while ((record = csvParser.parseNext()) != null) {
+                        parsingErrors.addAll(createRow(record, columns, rowNumber));
+                        csvWriter.writeRow(record);
+                        rowNumber++;
+                    }
+                    writer.close();
+                    parsingErrors.addAll(validateColumns(columns));
+                    parsingErrors.addAll(validateCsvFormat(csvParser.getDetectedFormat()));
+                    table.setColumns(columns);
+                    tableDescription = createTableDescription(columnDescriptions, url);
+                    resultFilePath = UriUtils.normalizeUri(tmpFile.toURI().toString());
+                } catch (CsvFormatException ex) {
+                    log.error("Invalid CSF file format. Stop parsing.");
+                    parsingErrors.add(ex.getValidationError());
+                } catch (Exception ex) {
+                    log.error(String.format("Error during CSV parsing of file '%s'.", url), ex);
+                    parsingErrors.add(ValidationError.fatal("error.invalidCsv", url));
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                // TODO
+            }
+        } else if (csvFile != null && csvFile.length() <= 0) {
+            parsingErrors.add(ValidationError.fatal("error.emptyCsvFile", url));
+        }
+
         return new TabularParsingResult(url, parsingErrors, table, tableDescription, resultFilePath);
+    }
+
+    private CsvWriterSettings mySettings() {
+        CsvFormat csvFormat = new CsvFormat();
+        csvFormat.setComment('\0');
+        csvFormat.setQuoteEscape(QUOTE_ESCAPE_CHAR_DEFAULT);
+        csvFormat.setQuote(QUOTE_CHAR_DEFAULT);
+        csvFormat.setDelimiter(FIELD_DELIMITER_DEFAULT);
+        csvFormat.setLineSeparator(LINE_SEPARATOR_DEFAULT);
+        CsvWriterSettings settings = new CsvWriterSettings();
+        settings.setFormat(csvFormat);
+        settings.trimValues(false);
+        settings.setQuoteEscapingEnabled(true);
+        settings.setMaxCharsPerColumn(8192);
+        return settings;
     }
 
     private void createColumns(com.univocity.parsers.csv.CsvParser parser, Table table, List<Column> columns, List<ColumnDescription> columnDescriptions) {
