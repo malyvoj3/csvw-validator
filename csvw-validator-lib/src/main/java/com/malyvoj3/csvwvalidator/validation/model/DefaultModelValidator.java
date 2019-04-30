@@ -102,11 +102,11 @@ public class DefaultModelValidator implements ModelValidator {
                 .collect(Collectors.toList());
 
         System.out.println("XXX: Start validating");
+        int rowNumber = 1;
         try (Reader reader = new InputStreamReader(new FileInputStream(new File(new URI(resultFilePath))))) {
             com.univocity.parsers.csv.CsvParser csvParser = new com.univocity.parsers.csv.CsvParser(defaultSettings());
             csvParser.beginParsing(reader);
             int columnsLength = columns.size();
-            int rowNumber = 1;
             String[] record;
             while ((record = csvParser.parseNext()) != null) {
                 for (int i = 0; i < columnsLength; i++) {

@@ -3,6 +3,7 @@ package com.malyvoj3.csvwvalidator.web.rest;
 import com.malyvoj3.csvwvalidator.processor.CsvwProcessor;
 import com.malyvoj3.csvwvalidator.processor.ProcessingSettings;
 import com.malyvoj3.csvwvalidator.processor.result.BatchProcessingResult;
+import com.malyvoj3.csvwvalidator.processor.result.LocalizedError;
 import com.malyvoj3.csvwvalidator.processor.result.ProcessingResult;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,23 +87,8 @@ public class CsvwController {
                 .build();
     }
 
-    private ValidationError createError(com.malyvoj3.csvwvalidator.domain.ValidationError error) {
-        ErrorSeverity severity;
-        switch (error.getSeverity()) {
-            case STRICT_WARNING:
-            case WARNING:
-                severity = ErrorSeverity.WARNING;
-                break;
-            case ERROR:
-                severity = ErrorSeverity.ERROR;
-                break;
-            case FATAL:
-                severity = ErrorSeverity.FATAL;
-                break;
-            default:
-                throw new IllegalStateException(String.format("Invalid error severity %s", error.getSeverity()));
-        }
-        return new ValidationError(severity, error.getFormattedMessage());
+    private ValidationError createError(LocalizedError error) {
+        return new ValidationError(error.getSeverity(), error.getMessage());
     }
 
 }

@@ -2,6 +2,8 @@ package com.malyvoj3.csvwvalidator.web.view;
 
 import lombok.Data;
 
+import java.util.Locale;
+
 @Data
 public class ValidatingDataDTO {
 
@@ -12,5 +14,6 @@ public class ValidatingDataDTO {
     private String metadataFileName;
     private String metadatFilePath;
     private Boolean strictMode;
+    private Locale locale;
 
 }

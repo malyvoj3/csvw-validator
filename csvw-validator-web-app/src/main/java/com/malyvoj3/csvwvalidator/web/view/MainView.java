@@ -14,12 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 @HtmlImport("styles/validator-styles.html")
 @Route(value = "", layout = CsvwLayout.class)
 @PageTitle("cssw-validator")
-public class Main2View extends MainLayout implements LocaleChangeObserver {
+public class MainView extends MainLayout implements LocaleChangeObserver {
 
     @Autowired
     private CsvwProcessor csvwProcessor;
 
-    public Main2View() {
+    public MainView() {
         buildView();
     }
 
