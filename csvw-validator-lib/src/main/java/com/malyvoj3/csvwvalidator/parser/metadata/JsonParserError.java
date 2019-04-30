@@ -67,15 +67,18 @@ public class JsonParserError extends ValidationError {
     }
 
     private String createPropertyPath(@NonNull List<String> jsonKeys) {
-        int length = jsonKeys.size();
-        if (length == 1) {
-            return jsonKeys.get(0);
+        if (jsonKeys != null && jsonKeys.size() > 0) {
+            int length = jsonKeys.size();
+            if (length == 1) {
+                return jsonKeys.get(0);
+            }
+            StringBuilder stringBuilder = new StringBuilder(jsonKeys.get(length - 1));
+            for (int i = length - 2; i >= 0; i--) {
+                stringBuilder.append(".");
+                stringBuilder.append(jsonKeys.get(i));
+            }
+            return stringBuilder.toString();
         }
-        StringBuilder stringBuilder = new StringBuilder(jsonKeys.get(length - 1));
-        for (int i = length - 2; i >= 0; i--) {
-            stringBuilder.append(".");
-            stringBuilder.append(jsonKeys.get(i));
-        }
-        return stringBuilder.toString();
+        return null;
     }
 }

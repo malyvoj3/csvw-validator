@@ -14,6 +14,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.io.File;
+import java.io.IOException;
 
 public class CsvwValidatorConsoleApplication {
 
@@ -37,6 +38,16 @@ public class CsvwValidatorConsoleApplication {
     }
 
     public static void main(String[] args) {
+        File file = new File("tmp");
+        if (file.exists()) {
+            try {
+                FileUtils.deleteDirectory(file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        file.mkdir();
+
         ApplicationContext ctx = new AnnotationConfigApplicationContext(ProcessorConfig.class);
         CsvwProcessor processor = ctx.getBean(CsvwProcessor.class);
         CsvResultWriter csvWriter = ctx.getBean(CsvResultWriter.class);
@@ -58,7 +69,7 @@ public class CsvwValidatorConsoleApplication {
                     formatter.printHelp("java -jar validator.jar", HEADER, options, FOOTER, true);
                 } else {
                     ProcessingResult result = validate(line.getOptionValue('f'), line.getOptionValue('s'),
-                            line.hasOption("strict"));
+                            line.hasOption("not-strict"));
                     String fileName = line.hasOption('o') ? line.getOptionValue('o') : RESULT_FILE_NAME_DEFAULT;
                     if (line.hasOption("rdf")) {
                         byte[] rdfResult = rdfWriter.writeResult(result);
@@ -80,12 +91,12 @@ public class CsvwValidatorConsoleApplication {
         }
     }
 
-    private ProcessingResult validate(String fileUrl, String schemaUrl, boolean isStrict) {
+    private ProcessingResult validate(String fileUrl, String schemaUrl, boolean isNotStrict) {
         ProcessingResult processingResult;
         String fileAbsoluteUrl = getAbsoluteUrl(fileUrl);
         String schemaAbsoluteUrl = getAbsoluteUrl(schemaUrl);
         ProcessingSettings settings = new ProcessingSettings();
-        settings.setStrictMode(isStrict);
+        settings.setStrictMode(!isNotStrict);
         if (fileAbsoluteUrl != null && schemaAbsoluteUrl != null) {
             processingResult = csvwProcessor.process(settings, fileAbsoluteUrl, schemaAbsoluteUrl);
         } else if (fileAbsoluteUrl != null) {
@@ -105,7 +116,7 @@ public class CsvwValidatorConsoleApplication {
                 absoluteUrl = url;
             } else {
                 File file = new File(url);
-                if (file.exists()) {
+                if (file.exists() && !file.isDirectory()) {
                     absoluteUrl = file.toURI().toString();
                 }
             }
@@ -137,8 +148,8 @@ public class CsvwValidatorConsoleApplication {
                 .required(false)
                 .build());
         options.addOption(Option.builder()
-                .longOpt("strict")
-                .desc("Enables strict mode")
+                .longOpt("not-strict")
+                .desc("Disable the strict mode")
                 .required(false)
                 .build());
         options.addOption(Option.builder()

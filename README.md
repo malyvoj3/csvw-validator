@@ -35,10 +35,10 @@ Both commands will start the application server on port ```8080```. After startu
 If you want to specify the port, use these command instead:
 
 ```
-mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=XXXX
-java -jar csvw-validator-web-app-0.0.1-SNAPSHOT.jar --server.port=XXXX
+mvn spring-boot:run -Dspring-boot.run.arguments=--server.port={port}
+java -jar csvw-validator-web-app-0.0.1-SNAPSHOT.jar --server.port={port}
 ```
-where instead ```XXXX``` you can insert the port number.
+where instead ```{port}``` you can insert the port number.
 
 ## Web service
 
@@ -57,10 +57,10 @@ Both commands will start the application server on port ```8080```. After startu
 If you want to specify the port, use these command instead:
 
 ```
-mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=XXXX
-java -jar csvw-validator-web-app-0.0.1-SNAPSHOT.jar --server.port=XXXX
+mvn spring-boot:run -Dspring-boot.run.arguments=--server.port={port}
+java -jar csvw-validator-web-app-0.0.1-SNAPSHOT.jar --server.port={port}
 ```
-where instead ```XXXX``` you can insert the port number.
+where instead ```{port}``` you can insert the port number.
 
 Web service has two endpoints:
 
@@ -71,14 +71,15 @@ REST API documentation is included in RAML in file ```/resources/validator.raml`
 
 ### Validate endpoint
 
-Endpoint ```validate``` validates one tabular data file or metadata file or both together.
+Endpoint ```/validate``` validates one tabular data file or metadata file or both together.
 It receives POST HTTP requests with content-type and accept set to ```application/json```.
 So request body has to be JSON with format:
 ```
 {
   "tabularUrl": "http://www.w3.org/2013/csvw/tests/test286.csv",
   "metadataUrl": "http://www.w3.org/2013/csvw/tests/test286-metadata.json",
-  "strictMode": false
+  "strictMode": false,
+  "language": "en"
 }
 ```
 Where each property is optional, but at least one of ```tabularUrl``` or ```metadataUrl``` must be specified.
@@ -87,6 +88,7 @@ Where each property is optional, but at least one of ```tabularUrl``` or ```meta
 * ```MetadataUrl``` is string property for URL of metadata file.
 * ```StrictMode``` is boolean property, which disable/enable strict mode. By default is strict mode enabled.
 In **strict mode** tabular files are validating against **RFC 4180** (CSV comma delimiter, line endings \r\n, UTF-8 encoding,...).
+* ```Language``` is code of language in which all error messages should translate. Default is "en", validator also supports "cs".
 
 Response looks like this:
 ```
@@ -153,7 +155,7 @@ So request body has to be JSON with format:
   "filesResults": false
 }
 ```
-Where ```stricMode``` is the same boolean property as in ```/validate``` endpoint - it enables strict mode. 
+Where ```stricMode``` and ```language``` are the same properties as in ```/validate``` endpoint - it enables strict mode and set language of messages. 
 Property ```filesToProcess``` is array property, which contains object with ```tabularUrl``` and/or ```metadataUrl``` as in ```/validate``` endpoint.
 Last property is boolean property ```filesResults```, which enables or disables results for each validated file in response. By default is set to true.
 
@@ -187,7 +189,7 @@ java -jar csvw-validator-cli-app-0.0.1-SNAPSHOT.jar [-f <FILE>] [-s <SCHEMA>]
  -f,--file <FILE>       The CSV file URL to be processed
  -s,--schema <SCHEMA>   The CSVW schema URL to be processed
  -o,--output <OUTPUT>   The name of output file without suffix
-    --strict            Enables strict mode
+    --not-strict        Disables strict mode
     --csv               Validator will generate output also in CSV format.
     --rdf               Validator will generate output also in RDF format
  -h,--help              Show help    
@@ -198,7 +200,7 @@ Default file name (path) of output file is ```result```. Command-line applicatio
 default text result file (eg. ```result.txt```). 
 If --rdf or --csv arguments are specified, then validator will create extra files with these formats (eg. ```result.ttl``` and ```result.csv```).
 If OUTPUT is specified, then it is used as output file instead ```result```.
-Option ```--strict``` enables the strict mode.
+Option ```--not-strict``` disables the strict mode.
 
 Example: For validating by command line with these arguments:
 ```
