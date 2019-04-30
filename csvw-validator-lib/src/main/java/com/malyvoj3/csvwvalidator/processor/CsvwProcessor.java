@@ -56,7 +56,7 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
         for (ProcessingInput input : inputs) {
             log.info("Processing file {}", input.getTabularUrl());
             if (input.getTabularUrl() != null && input.getMetadataUrl() != null) {
-                processingResults.add(processTabularData(settings, input.getTabularUrl(), input.getMetadataUrl()));
+                processingResults.add(process(settings, input.getTabularUrl(), input.getMetadataUrl()));
             } else if (input.getTabularUrl() != null) {
                 processingResults.add(processTabularData(settings, input.getTabularUrl()));
             } else if (input.getMetadataUrl() != null) {
@@ -127,7 +127,7 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
      */
     @Override
     public ProcessingResult processTabularData(ProcessingSettings settings, String tabularUrl, InputStream metadataFile, String metadataFileName) {
-        FileResponse tabularResponse = FileUtils.downloadFile(tabularUrl);
+        FileResponse tabularResponse = FileUtils.downloadTabularFile(tabularUrl);
         List<ValidationError> processingErrors = validateCsvFileResponse(tabularResponse);
         TabularParsingResult csvParsingResult = parseCsv(tabularResponse);
         String metadataUrl = UriUtils.resolveUri(tabularUrl, metadataFileName);
@@ -181,7 +181,7 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
             processingErrors.addAll(metadataParsingResult.getValidationErrors());
             if (metadataParsingResult.getTopLevelDescription().describesTabularData(tabularUrl)
                     && hasNoFatalError(processingErrors)) {
-                FileResponse tabularResponse = FileUtils.downloadFile(tabularUrl);
+                FileResponse tabularResponse = FileUtils.downloadTabularFile(tabularUrl);
                 TabularParsingResult csvParsingResult = parseCsv(tabularResponse);
                 processingErrors.addAll(csvParsingResult.getParsingErrors());
                 processingErrors.addAll(validateCsvFileResponse(tabularResponse));
@@ -199,12 +199,10 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
 
     @Override
     public ProcessingResult processTabularData(ProcessingSettings settings, String tabularUrl) {
-        FileResponse tabularResponse = FileUtils.downloadFile(tabularUrl);
+        FileResponse tabularResponse = FileUtils.downloadTabularFile(tabularUrl);
         List<ValidationError> processingErrors = validateCsvFileResponse(tabularResponse);
         TabularParsingResult csvParsingResult = parseCsv(tabularResponse);
-        System.out.println("EEE: return from parsing");
         processingErrors.addAll(csvParsingResult.getParsingErrors());
-        System.out.println("FFF: adding erros to result");
 
         if (hasNoFatalError(processingErrors)) {
             MetadataParsingResult metadataParsingResult = locateMetadata(tabularResponse, csvParsingResult.getTableDescription());
@@ -217,7 +215,7 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
         List<ValidationError> processingErrors = new ArrayList<>(metadataValidator.validateTable(tableDescription));
         if (hasNoFatalError(processingErrors)) {
             String tabularUrl = tableDescription.getUrl().getValue();
-            FileResponse tabularResponse = FileUtils.downloadFile(tabularUrl);
+            FileResponse tabularResponse = FileUtils.downloadTabularFile(tabularUrl);
             TabularParsingResult csvParsingResult = parseCsv(tabularResponse);
             processingErrors.addAll(validateCsvFileResponse(tabularResponse));
             processingErrors.addAll(csvParsingResult.getParsingErrors());
@@ -241,7 +239,7 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
             List<TabularParsingResult> csvParsingResults = new ArrayList<>();
             for (TableDescription tableDesc : tableGroupDescription.getTables().getValue()) {
                 String tabularUrl = tableDesc.getUrl().getValue();
-                FileResponse tabularResponse = FileUtils.downloadFile(tabularUrl);
+                FileResponse tabularResponse = FileUtils.downloadTabularFile(tabularUrl);
                 TabularParsingResult csvParsingResult = parseCsv(tabularResponse);
                 processingErrors.addAll(validateCsvFileResponse(tabularResponse));
                 processingErrors.addAll(csvParsingResult.getParsingErrors());

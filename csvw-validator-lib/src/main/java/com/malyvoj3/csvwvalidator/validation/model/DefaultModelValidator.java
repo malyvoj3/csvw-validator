@@ -101,12 +101,11 @@ public class DefaultModelValidator implements ModelValidator {
                 .filter(tableRule -> tableRule.init(extractedTable, columns))
                 .collect(Collectors.toList());
 
-        System.out.println("XXX: Start validating");
-        int rowNumber = 1;
         try (Reader reader = new InputStreamReader(new FileInputStream(new File(new URI(resultFilePath))))) {
             com.univocity.parsers.csv.CsvParser csvParser = new com.univocity.parsers.csv.CsvParser(defaultSettings());
             csvParser.beginParsing(reader);
             int columnsLength = columns.size();
+            int rowNumber = 1;
             String[] record;
             while ((record = csvParser.parseNext()) != null) {
                 for (int i = 0; i < columnsLength; i++) {
@@ -120,7 +119,6 @@ public class DefaultModelValidator implements ModelValidator {
         } catch (Exception ex) {
             log.error("Error during model validation.", ex);
         }
-        System.out.println("YYY: End validating");
         tableRules.stream()
                 .map(rule -> {
                     rule.finishValidating();
@@ -153,7 +151,7 @@ public class DefaultModelValidator implements ModelValidator {
         settings.trimValues(false);
         settings.setLineSeparatorDetectionEnabled(true);
         settings.setQuoteDetectionEnabled(false);
-        settings.setSkipEmptyLines(false);
+        settings.setSkipEmptyLines(true);
         settings.setHeaderExtractionEnabled(false);
         settings.setMaxCharsPerColumn(8192);
         return settings;

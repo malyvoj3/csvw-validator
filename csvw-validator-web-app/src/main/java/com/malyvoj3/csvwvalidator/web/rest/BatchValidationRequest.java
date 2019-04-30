@@ -11,6 +11,7 @@ public class BatchValidationRequest {
 
     private List<ProcessingInput> filesToProcess = new ArrayList<>();
     private boolean strictMode = true;
+    private String language;
     private boolean filesResults = true;
 
 }

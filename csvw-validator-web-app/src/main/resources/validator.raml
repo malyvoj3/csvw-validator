@@ -45,6 +45,16 @@ types:
       - ERROR
       - FATAL
 
+  Language:
+    type: string
+    description: |
+      Languages in which are error messages localized. By default it is set to english.
+      * cs - Czech language.
+      * en - English language.
+    enum:
+      - cs
+      - en
+
   ProcessingInput:
     type: object
     description: Input for validator, consists of tabular data file URL and/or metadata file URL.
@@ -128,12 +138,16 @@ types:
     properties:
       filesToProcess:
         type: ProcessingInput[]
-        description:
+        description: Files to process.
         required: true
       strictMode:
         type: boolean
         required: false
         description: If true, then strict mode is enabled for validating. By default it is true.
+      language:
+        type: Language
+        description: Language in which should be all error messages translated.
+        required: false
       filesResults:
         type: boolean
         required: false
@@ -167,6 +181,14 @@ types:
         type: ValidationResponse[]
         required: false
         description: Validation response for each file.
+      strictMode:
+        type: boolean
+        required: false
+        description: If true, then strict mode is enabled for validating. By default it is true.
+      language:
+        type: Language
+        description: Language in which should be all error messages translated.
+        required: false
 
 /validate:
   post:
