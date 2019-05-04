@@ -1,29 +1,33 @@
 package com.malyvoj3.csvwvalidator.web.view;
 
-import com.malyvoj3.csvwvalidator.processor.CsvwProcessor;
-import com.malyvoj3.csvwvalidator.web.view.components.LocalizedButton;
-import com.vaadin.flow.component.Html;
-import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.dependency.HtmlImport;
-import com.vaadin.flow.i18n.LocaleChangeEvent;
-import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.annotation.PostConstruct;
 
 @HtmlImport("styles/validator-styles.html")
 @Route(value = "", layout = CsvwLayout.class)
 @PageTitle("cssw-validator")
-public class MainView extends MainLayout implements LocaleChangeObserver {
-
-    @Autowired
-    private CsvwProcessor csvwProcessor;
+public class MainView extends MainLayout {
 
     public MainView() {
-        buildView();
+        getUI().ifPresent(ui -> ui.navigate("validation"));
     }
 
     @Override
+    protected void onAttach(AttachEvent attachEvent) {
+        super.onAttach(attachEvent);
+        attachEvent.getUI().navigate("validation");
+    }
+
+    @PostConstruct
+    public void init() {
+        getUI().ifPresent(ui -> ui.navigate("validation"));
+    }
+
+    /*@Override
     public void localeChange(LocaleChangeEvent localeChangeEvent) {
         removeAll();
         buildView();
@@ -40,6 +44,6 @@ public class MainView extends MainLayout implements LocaleChangeObserver {
         });
         add(validationButton);
         setSizeFull();
-    }
+    }*/
 
 }

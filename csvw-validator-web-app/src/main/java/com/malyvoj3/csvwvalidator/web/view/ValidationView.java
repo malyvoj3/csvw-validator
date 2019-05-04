@@ -59,6 +59,8 @@ public class ValidationView extends MainLayout implements LocaleChangeObserver {
         tabsToPages.put(tab2, page2);
         tabsToPages.put(tab3, page3);
         Tabs tabs = new Tabs(tab1, tab2, tab3);
+        tabs.addClassName("validation-tabs");
+        tabs.setSizeFull();
         Div pages = new Div(page1, page2, page3);
         Set<Component> pagesShown = Stream.of(page1)
                 .collect(Collectors.toSet());

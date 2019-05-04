@@ -9,7 +9,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 public class MainLayout extends VerticalLayout {
 
     protected Header createHeader(String propertyName) {
-        Button cz = new Button("CZ",
+        Button cz = new Button("CS",
                 event -> getUI().get().getSession().setLocale(TranslationProvider.LOCALE_CZ));
         Button en = new Button("EN",
                 event -> getUI().get().getSession().setLocale(TranslationProvider.LOCALE_EN));

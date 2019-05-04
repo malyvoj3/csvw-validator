@@ -133,7 +133,7 @@ public class ValidationThread extends Thread {
         validationButton.addClassName("page-middle-button");
         validationButton.addThemeVariants(ButtonVariant.MATERIAL_CONTAINED);
         validationButton.addClickListener(event -> {
-            validationButton.getUI().ifPresent(ui -> ui.navigate("validation"));
+            validationButton.getUI().ifPresent(ui -> ui.navigate(ValidationView.class));
         });
         resultDiv.add(validationButton);
         resultDiv.setHorizontalComponentAlignment(FlexComponent.Alignment.CENTER,
