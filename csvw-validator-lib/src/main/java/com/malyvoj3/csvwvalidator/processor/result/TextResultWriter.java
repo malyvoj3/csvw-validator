@@ -34,7 +34,7 @@ public class TextResultWriter implements ResultWriter {
         }
         writer.write("Result: " + result.getValidationStatus().name());
         writer.newLine();
-        writer.write("Strict mode: " + (result.getSettings().isStrictMode() ? "true" : "false"));
+        writer.write("Strict mode: " + (result.isStrictMode() ? "true" : "false"));
         writer.newLine();
         writer.write("Total errors: " + result.getTotalErrorsCount());
         writer.newLine();

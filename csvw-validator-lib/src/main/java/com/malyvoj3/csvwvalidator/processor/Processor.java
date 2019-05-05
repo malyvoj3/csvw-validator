@@ -3,29 +3,25 @@ package com.malyvoj3.csvwvalidator.processor;
 import com.malyvoj3.csvwvalidator.processor.result.BatchResult;
 import com.malyvoj3.csvwvalidator.processor.result.Result;
 
-import java.io.InputStream;
 import java.util.List;
 
 public interface Processor<RESULT extends Result, BATCH_RESULT extends BatchResult<RESULT>> {
 
-    BATCH_RESULT process(ProcessingSettings settings, List<ProcessingInput> inputs);
+    BATCH_RESULT process(ProcessingContext context, List<ProcessingInput> inputs);
 
-    RESULT process(ProcessingSettings settings, String tabularFile, String tabularFileName,
+    RESULT process(ProcessingContext context, String tabularFile, String tabularFileName,
                    String metadataFile, String metadataFileName);
 
-    RESULT process(ProcessingSettings settings, String tabularUrl, String metadataUrl);
+    RESULT process(ProcessingContext context, String tabularUrl, String metadataUrl);
 
-    RESULT processTabularData(ProcessingSettings settings, String tabularFile, String fileName);
+    RESULT processTabularData(ProcessingContext context, String tabularFile, String fileName);
 
-    RESULT processMetadata(ProcessingSettings settings, String metadataFile, String fileName);
+    RESULT processMetadata(ProcessingContext context, String metadataFile, String fileName);
 
-    RESULT processTabularData(ProcessingSettings settings, String tabularUrl,
-                                        InputStream metadataFile, String metadataFileName);
-
-    RESULT processMetadata(ProcessingSettings settings, String metadataUrl);
+    RESULT processMetadata(ProcessingContext context, String metadataUrl);
 
 
-    RESULT processTabularData(ProcessingSettings settings, String tabularUrl);
+    RESULT processTabularData(ProcessingContext context, String tabularUrl);
 
 
 }

@@ -1,5 +1,6 @@
 package com.malyvoj3.csvwvalidator.web.rest;
 
+import com.malyvoj3.csvwvalidator.processor.ProcessingContext;
 import com.malyvoj3.csvwvalidator.processor.ProcessingSettings;
 import com.malyvoj3.csvwvalidator.processor.Processor;
 import com.malyvoj3.csvwvalidator.processor.result.BatchProcessingResult;
@@ -36,6 +37,7 @@ public class CsvwController {
         String tabularUrl = request.getTabularUrl();
         ProcessingSettings settings = new ProcessingSettings();
         settings.setStrictMode(request.isStrictMode());
+        ProcessingContext context = new ProcessingContext(settings);
         Locale requestLocale = getRequestLocale(request.getLanguage());
         if (requestLocale != null) {
             settings.setLocale(requestLocale);
@@ -43,11 +45,11 @@ public class CsvwController {
         PersistentResult processingResult;
 
         if (StringUtils.isNotEmpty(metadataUrl) && StringUtils.isNotEmpty(tabularUrl)) {
-            processingResult = processor.process(settings, tabularUrl, metadataUrl);
+            processingResult = processor.process(context, tabularUrl, metadataUrl);
         } else if (StringUtils.isNotEmpty(metadataUrl)) {
-            processingResult = processor.processMetadata(settings, metadataUrl);
+            processingResult = processor.processMetadata(context, metadataUrl);
         } else if (StringUtils.isNotEmpty(tabularUrl)) {
-            processingResult = processor.processTabularData(settings, tabularUrl);
+            processingResult = processor.processTabularData(context, tabularUrl);
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
@@ -73,11 +75,12 @@ public class CsvwController {
     public ResponseEntity<BatchValidationResponse> validateBatch(@RequestBody BatchValidationRequest request) {
         ProcessingSettings settings = new ProcessingSettings();
         settings.setStrictMode(request.isStrictMode());
+        ProcessingContext context = new ProcessingContext(settings);
         Locale requestLocale = getRequestLocale(request.getLanguage());
         if (requestLocale != null) {
             settings.setLocale(requestLocale);
         }
-        BatchProcessingResult<PersistentResult> result = processor.process(settings, request.getFilesToProcess());
+        BatchProcessingResult<PersistentResult> result = processor.process(context, request.getFilesToProcess());
 
         List<ValidationResult> filesResults = result.getFilesResults().stream()
                 .map(this::createResponse)

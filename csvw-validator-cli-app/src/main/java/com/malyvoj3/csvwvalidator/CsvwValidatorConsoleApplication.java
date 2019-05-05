@@ -2,6 +2,7 @@ package com.malyvoj3.csvwvalidator;
 
 import com.malyvoj3.csvwvalidator.config.ProcessorConfig;
 import com.malyvoj3.csvwvalidator.processor.CsvwProcessor;
+import com.malyvoj3.csvwvalidator.processor.ProcessingContext;
 import com.malyvoj3.csvwvalidator.processor.ProcessingSettings;
 import com.malyvoj3.csvwvalidator.processor.result.CsvResultWriter;
 import com.malyvoj3.csvwvalidator.processor.result.ProcessingResult;
@@ -97,12 +98,13 @@ public class CsvwValidatorConsoleApplication {
         String schemaAbsoluteUrl = getAbsoluteUrl(schemaUrl);
         ProcessingSettings settings = new ProcessingSettings();
         settings.setStrictMode(!isNotStrict);
+        ProcessingContext context = new ProcessingContext(settings);
         if (fileAbsoluteUrl != null && schemaAbsoluteUrl != null) {
-            processingResult = csvwProcessor.process(settings, fileAbsoluteUrl, schemaAbsoluteUrl);
+            processingResult = csvwProcessor.process(context, fileAbsoluteUrl, schemaAbsoluteUrl);
         } else if (fileAbsoluteUrl != null) {
-            processingResult = csvwProcessor.processTabularData(settings, fileAbsoluteUrl);
+            processingResult = csvwProcessor.processTabularData(context, fileAbsoluteUrl);
         } else if (schemaAbsoluteUrl != null) {
-            processingResult = csvwProcessor.processMetadata(settings, schemaAbsoluteUrl);
+            processingResult = csvwProcessor.processMetadata(context, schemaAbsoluteUrl);
         } else {
             throw new IllegalStateException();
         }

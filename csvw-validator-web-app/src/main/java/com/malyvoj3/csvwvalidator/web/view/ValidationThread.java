@@ -1,5 +1,6 @@
 package com.malyvoj3.csvwvalidator.web.view;
 
+import com.malyvoj3.csvwvalidator.processor.ProcessingContext;
 import com.malyvoj3.csvwvalidator.processor.ProcessingSettings;
 import com.malyvoj3.csvwvalidator.processor.Processor;
 import com.malyvoj3.csvwvalidator.processor.result.BatchProcessingResult;
@@ -13,7 +14,7 @@ public class ValidationThread extends Thread {
     private final ValidatingDataDTO inputData;
     private final Processor<PersistentResult, BatchProcessingResult<PersistentResult>> processor;
 
-    public ValidationThread(UI ui, ValidatingView resultView, ValidatingDataDTO inputData,
+    public ValidationThread(UI ui, ValidatingDataDTO inputData,
                             Processor<PersistentResult, BatchProcessingResult<PersistentResult>> processor) {
         this.ui = ui;
         this.inputData = inputData;
@@ -24,6 +25,7 @@ public class ValidationThread extends Thread {
     public void run() {
         ProcessingSettings settings = new ProcessingSettings();
         settings.setStrictMode(inputData.getStrictMode() == null ? true : inputData.getStrictMode());
+        ProcessingContext context = new ProcessingContext(settings);
         if (inputData.getLocale() != null) {
             settings.setLocale(inputData.getLocale());
         }
@@ -35,19 +37,19 @@ public class ValidationThread extends Thread {
         boolean isMetadataUrl = StringUtils.isNotBlank(inputData.getMetadataUrl());
         PersistentResult persistentResult = null;
         if (isTabularUpload && isMetadataUpload) {
-            persistentResult = processor.process(settings, inputData.getCsvFilePath(), inputData.getCsvFileName(),
+            persistentResult = processor.process(context, inputData.getCsvFilePath(), inputData.getCsvFileName(),
                     inputData.getMetadatFilePath(), inputData.getMetadataFileName());
         } else if (isCsvUrl && isMetadataUrl) {
-            persistentResult = processor.process(settings, inputData.getCsvUrl(), inputData.getMetadataUrl());
+            persistentResult = processor.process(context, inputData.getCsvUrl(), inputData.getMetadataUrl());
         } else if (isMetadataUrl) {
-            persistentResult = processor.processMetadata(settings, inputData.getMetadataUrl());
+            persistentResult = processor.processMetadata(context, inputData.getMetadataUrl());
         } else if (isCsvUrl) {
-            persistentResult = processor.processTabularData(settings, inputData.getCsvUrl());
+            persistentResult = processor.processTabularData(context, inputData.getCsvUrl());
         } else if (isTabularUpload) {
-            persistentResult = processor.processTabularData(settings, inputData.getCsvFilePath(),
+            persistentResult = processor.processTabularData(context, inputData.getCsvFilePath(),
                     inputData.getCsvFileName());
         } else if (isMetadataUpload) {
-            persistentResult = processor.processMetadata(settings, inputData.getMetadatFilePath(),
+            persistentResult = processor.processMetadata(context, inputData.getMetadatFilePath(),
                     inputData.getMetadataFileName());
         } else {
             throw new IllegalStateException("Invalid combination of inputs for processing.");

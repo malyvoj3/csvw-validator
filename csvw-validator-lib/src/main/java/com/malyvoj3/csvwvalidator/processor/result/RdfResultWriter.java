@@ -83,7 +83,7 @@ public class RdfResultWriter implements ResultWriter {
                 .addProperty(DC.date, model.createTypedLiteral(Calendar.getInstance()))
                 .addProperty(EARL.mode, EARL.automatic)
                 .addProperty(EARL.outcome, outcomeMap.get(result.getValidationStatus().name()));
-        if (result.getSettings().isStrictMode()) {
+        if (result.isStrictMode()) {
             mainResult.addProperty(EARL.mode, strictMode);
         }
         assertion.addProperty(EARL.result, mainResult);
@@ -95,7 +95,7 @@ public class RdfResultWriter implements ResultWriter {
                     .addProperty(EARL.mode, EARL.automatic)
                     .addProperty(EARL.info, model.createLiteral(error.getMessage(), result.getUsedLanguage()))
                     .addProperty(EARL.outcome, outcomeMap.get(error.getSeverity()));
-            if (result.getSettings().isStrictMode()) {
+            if (result.isStrictMode()) {
                 errorResult.addProperty(EARL.mode, strictMode);
             }
             assertion.addProperty(EARL.result, errorResult);

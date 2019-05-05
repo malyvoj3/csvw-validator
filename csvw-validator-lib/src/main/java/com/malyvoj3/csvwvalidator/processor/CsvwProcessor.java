@@ -17,7 +17,6 @@ import com.malyvoj3.csvwvalidator.processor.result.BatchProcessingResult;
 import com.malyvoj3.csvwvalidator.processor.result.ProcessingResult;
 import com.malyvoj3.csvwvalidator.processor.result.ResultCreator;
 import com.malyvoj3.csvwvalidator.utils.FileUtils;
-import com.malyvoj3.csvwvalidator.utils.UriUtils;
 import com.malyvoj3.csvwvalidator.validation.metadata.MetadataValidator;
 import com.malyvoj3.csvwvalidator.validation.model.ModelValidator;
 import lombok.RequiredArgsConstructor;
@@ -51,19 +50,20 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
     private final ResultCreator<ProcessingResult, BatchProcessingResult<ProcessingResult>> resultCreator;
 
     @Override
-    public BatchProcessingResult<ProcessingResult> process(ProcessingSettings settings, List<ProcessingInput> inputs) {
+    public BatchProcessingResult<ProcessingResult> process(ProcessingContext context, List<ProcessingInput> inputs) {
         List<ProcessingResult> processingResults = new ArrayList<>();
         for (ProcessingInput input : inputs) {
             log.info("Processing file {}", input.getTabularUrl());
+            ProcessingContext newContext = new ProcessingContext(context.getSettings());
             if (input.getTabularUrl() != null && input.getMetadataUrl() != null) {
-                processingResults.add(process(settings, input.getTabularUrl(), input.getMetadataUrl()));
+                processingResults.add(process(newContext, input.getTabularUrl(), input.getMetadataUrl()));
             } else if (input.getTabularUrl() != null) {
-                processingResults.add(processTabularData(settings, input.getTabularUrl()));
+                processingResults.add(processTabularData(newContext, input.getTabularUrl()));
             } else if (input.getMetadataUrl() != null) {
-                processingResults.add(processMetadata(settings, input.getMetadataUrl()));
+                processingResults.add(processMetadata(newContext, input.getMetadataUrl()));
             }
         }
-        return resultCreator.createBatchResult(settings, processingResults);
+        return resultCreator.createBatchResult(context, processingResults);
     }
 
     /**
@@ -73,13 +73,12 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
      * @param fileName
      */
     @Override
-    public ProcessingResult processTabularData(ProcessingSettings settings, String tabularFile, String fileName) {
+    public ProcessingResult processTabularData(ProcessingContext context, String tabularFile, String fileName) {
         Dialect dialect = Dialect.builder().header(true).build();
-        List<ValidationError> errors = new ArrayList<>();
         TabularParsingResult csvParsingResult;
         csvParsingResult = tabularParser.parse(dialect, fileName, tabularFile);
-        errors = csvParsingResult.getParsingErrors();
-        return resultCreator.createResult(settings, errors, fileName, null);
+        context.addTabularResult(csvParsingResult);
+        return resultCreator.createResult(context, fileName, null);
     }
 
     /**
@@ -89,56 +88,34 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
      * @param fileName
      */
     @Override
-    public ProcessingResult processMetadata(ProcessingSettings settings, String metadataFile, String fileName) {
+    public ProcessingResult processMetadata(ProcessingContext context, String metadataFile, String fileName) {
         String metadataUrl = DEFAULT_URL + fileName;
         MetadataParsingResult metadataParsingResult = metadataParser.parseJson(metadataFile, new ParsingContext(metadataUrl));
-        List<ValidationError> processingErrors = new ArrayList<>(metadataParsingResult.getErrors());
-        if (hasNoFatalError(processingErrors)) {
-            processingErrors.addAll(validateMetadata(metadataParsingResult));
+        context.addErrors(metadataParsingResult.getErrors());
+        if (context.isNotFatal()) {
+            context.addErrors(validateMetadata(metadataParsingResult));
         }
-        return resultCreator.createResult(settings, metadataParsingResult.getParsingErrors(), null, fileName);
+        return resultCreator.createResult(context, null, fileName);
     }
 
     @Override
-    public ProcessingResult process(ProcessingSettings settings, String tabularFile, String tabularFileName,
+    public ProcessingResult process(ProcessingContext context, String tabularFile, String tabularFileName,
                                     String metadataFile, String metadataFileName) {
         String tabularUrl = DEFAULT_URL + tabularFileName;
         String metadataUrl = DEFAULT_URL + metadataFileName;
         Dialect dialect = Dialect.builder().header(true).build();
         TabularParsingResult csvParsingResult;
         csvParsingResult = tabularParser.parse(dialect, tabularUrl, tabularFile);
-        List<ValidationError> processingErrors = new ArrayList<>(csvParsingResult.getParsingErrors());
-        if (hasNoFatalError(processingErrors)) {
+        context.addTabularResult(csvParsingResult);
+        if (context.isNotFatal()) {
             MetadataParsingResult metadataParsingResult = metadataParser.parseJson(metadataFile,
                     new ParsingContext(metadataUrl));
-            if (hasNoFatalError(processingErrors)) {
-                processingErrors.addAll(process(csvParsingResult, metadataParsingResult));
+            context.addErrors(metadataParsingResult.getErrors());
+            if (context.isNotFatal()) {
+                process(context, csvParsingResult, metadataParsingResult);
             }
         }
-        return resultCreator.createResult(settings, processingErrors, tabularFileName, metadataFileName);
-    }
-
-    /**
-     * Processing tabular data URL and uploaded metadata file. URL of metadata file is set to URL of tabular data.
-     *
-     * @param tabularUrl
-     * @param metadataFile
-     * @param metadataFileName
-     */
-    @Override
-    public ProcessingResult processTabularData(ProcessingSettings settings, String tabularUrl, InputStream metadataFile, String metadataFileName) {
-        FileResponse tabularResponse = FileUtils.downloadTabularFile(tabularUrl);
-        List<ValidationError> processingErrors = validateCsvFileResponse(tabularResponse);
-        TabularParsingResult csvParsingResult = parseCsv(tabularResponse);
-        String metadataUrl = UriUtils.resolveUri(tabularUrl, metadataFileName);
-        MetadataParsingResult metadataParsingResult = metadataParser.parseJson(metadataFile,
-                new ParsingContext(metadataUrl));
-        processingErrors.addAll(csvParsingResult.getParsingErrors());
-
-        if (hasNoFatalError(processingErrors)) {
-            processingErrors.addAll(process(csvParsingResult, metadataParsingResult));
-        }
-        return resultCreator.createResult(settings, processingErrors, tabularUrl, metadataUrl);
+        return resultCreator.createResult(context, tabularFileName, metadataFileName);
     }
 
     /**
@@ -147,133 +124,126 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
      * @param metadataUrl
      */
     @Override
-    public ProcessingResult processMetadata(ProcessingSettings settings, String metadataUrl) {
+    public ProcessingResult processMetadata(ProcessingContext context, String metadataUrl) {
         FileResponse metadataResponse = FileUtils.downloadMetadataFile(metadataUrl);
-        List<ValidationError> processingErrors = new ArrayList<>();
         if (metadataResponse != null && metadataResponse.getContent() != null) {
             InputStream inputStream = new ByteArrayInputStream(metadataResponse.getContent());
             MetadataParsingResult metadataParsingResult = metadataParser.parseJson(inputStream,
                     new ParsingContext(metadataResponse.getUrl()));
             if (metadataParsingResult != null) {
-                processingErrors.addAll(metadataParsingResult.getErrors());
-                if (hasNoFatalError(processingErrors)) {
+                context.addErrors(metadataParsingResult.getErrors());
+                if (context.isNotFatal()) {
                     if (TopLevelType.TABLE == metadataParsingResult.getTopLevelType()) {
                         TableDescription tableDesc = (TableDescription) metadataParsingResult.getTopLevelDescription();
-                        processingErrors.addAll(processMetadata(tableDesc));
+                        processMetadata(context, tableDesc);
                     } else {
                         TableGroupDescription tableGrpDesc = (TableGroupDescription) metadataParsingResult.getTopLevelDescription();
-                        processingErrors.addAll(processMetadata(tableGrpDesc));
+                        processMetadata(context, tableGrpDesc);
                     }
                 }
-
             }
         } else {
-            processingErrors.add(ValidationError.fatal("error.cantDownloadMetadata", metadataUrl));
+            context.addError(ValidationError.fatal("error.cantDownloadMetadata", metadataUrl));
         }
-        return resultCreator.createResult(settings, processingErrors, null, metadataUrl);
+        return resultCreator.createResult(context, null, metadataUrl);
     }
 
     @Override
-    public ProcessingResult process(ProcessingSettings settings, String tabularUrl, String metadataUrl) {
+    public ProcessingResult process(ProcessingContext context, String tabularUrl, String metadataUrl) {
         MetadataParsingResult metadataParsingResult = downloadAndParseMetadata(metadataUrl);
-        List<ValidationError> processingErrors = new ArrayList<>();
         if (metadataParsingResult != null && metadataParsingResult.getTopLevelDescription() != null) {
-            processingErrors.addAll(metadataParsingResult.getValidationErrors());
+            context.addErrors(metadataParsingResult.getValidationErrors());
             if (metadataParsingResult.getTopLevelDescription().describesTabularData(tabularUrl)
-                    && hasNoFatalError(processingErrors)) {
+                    && context.isNotFatal()) {
                 FileResponse tabularResponse = FileUtils.downloadTabularFile(tabularUrl);
                 TabularParsingResult csvParsingResult = parseCsv(tabularResponse);
-                processingErrors.addAll(csvParsingResult.getParsingErrors());
-                processingErrors.addAll(validateCsvFileResponse(tabularResponse));
-                if (hasNoFatalError(processingErrors)) {
-                    processingErrors.addAll(process(csvParsingResult, metadataParsingResult));
+                context.addErrors(validateCsvFileResponse(tabularResponse));
+                context.addTabularResult(csvParsingResult);
+                if (context.isNotFatal()) {
+                    process(context, csvParsingResult, metadataParsingResult);
                 }
             } else {
-                processMetadata(settings, metadataUrl);
+                processMetadata(context, metadataUrl);
             }
         } else {
-            processingErrors.add(ValidationError.fatal("error.cantDownloadValidMetadata", metadataUrl));
+            context.addError(ValidationError.fatal("error.cantDownloadValidMetadata", metadataUrl));
         }
-        return resultCreator.createResult(settings, processingErrors, tabularUrl, metadataUrl);
+        return resultCreator.createResult(context, tabularUrl, metadataUrl);
     }
 
     @Override
-    public ProcessingResult processTabularData(ProcessingSettings settings, String tabularUrl) {
+    public ProcessingResult processTabularData(ProcessingContext context, String tabularUrl) {
         FileResponse tabularResponse = FileUtils.downloadTabularFile(tabularUrl);
-        List<ValidationError> processingErrors = validateCsvFileResponse(tabularResponse);
+        context.addErrors(validateCsvFileResponse(tabularResponse));
         TabularParsingResult csvParsingResult = parseCsv(tabularResponse);
-        processingErrors.addAll(csvParsingResult.getParsingErrors());
+        context.addTabularResult(csvParsingResult);
 
-        if (hasNoFatalError(processingErrors)) {
+        if (context.isNotFatal()) {
             MetadataParsingResult metadataParsingResult = locateMetadata(tabularResponse, csvParsingResult.getTableDescription());
-            processingErrors.addAll(process(csvParsingResult, metadataParsingResult));
+            context.addErrors(metadataParsingResult.getErrors());
+            process(context, csvParsingResult, metadataParsingResult);
         }
-        return resultCreator.createResult(settings, processingErrors, tabularUrl, null);
+        return resultCreator.createResult(context, tabularUrl, null);
     }
 
-    private List<? extends ValidationError> processMetadata(TableDescription tableDescription) {
-        List<ValidationError> processingErrors = new ArrayList<>(metadataValidator.validateTable(tableDescription));
-        if (hasNoFatalError(processingErrors)) {
+    private void processMetadata(ProcessingContext context, TableDescription tableDescription) {
+        context.addErrors(metadataValidator.validateTable(tableDescription));
+        if (context.isNotFatal()) {
             String tabularUrl = tableDescription.getUrl().getValue();
             FileResponse tabularResponse = FileUtils.downloadTabularFile(tabularUrl);
             TabularParsingResult csvParsingResult = parseCsv(tabularResponse);
-            processingErrors.addAll(validateCsvFileResponse(tabularResponse));
-            processingErrors.addAll(csvParsingResult.getParsingErrors());
-            if (hasNoFatalError(processingErrors)) {
+            context.addErrors(validateCsvFileResponse(tabularResponse));
+            context.addTabularResult(csvParsingResult);
+            if (context.isNotFatal()) {
                 TableDescription embeddedMetadata = csvParsingResult.getTableDescription();
                 if (tableDescription.isCompatibleWith(embeddedMetadata)) {
-                    processingErrors.addAll(modelValidator.validateTable(csvParsingResult, tableDescription));
+                    context.addErrors(modelValidator.validateTable(csvParsingResult, tableDescription));
                 } else {
-                    processingErrors.add(ValidationError.fatal("error.notCompatibleTable"));
+                    context.addError(ValidationError.fatal("error.notCompatibleTable"));
                 }
             }
         }
-        return processingErrors;
     }
 
-    private List<? extends ValidationError> processMetadata(TableGroupDescription tableGroupDescription) {
-        List<ValidationError> processingErrors = new ArrayList<>(
-                metadataValidator.validateTableGroup(tableGroupDescription)
-        );
-        if (hasNoFatalError(processingErrors)) {
+    private void processMetadata(ProcessingContext context, TableGroupDescription tableGroupDescription) {
+        context.addErrors(metadataValidator.validateTableGroup(tableGroupDescription));
+        if (context.isNotFatal()) {
             List<TabularParsingResult> csvParsingResults = new ArrayList<>();
             for (TableDescription tableDesc : tableGroupDescription.getTables().getValue()) {
                 String tabularUrl = tableDesc.getUrl().getValue();
                 FileResponse tabularResponse = FileUtils.downloadTabularFile(tabularUrl);
                 TabularParsingResult csvParsingResult = parseCsv(tabularResponse);
-                processingErrors.addAll(validateCsvFileResponse(tabularResponse));
-                processingErrors.addAll(csvParsingResult.getParsingErrors());
+                context.addErrors(validateCsvFileResponse(tabularResponse));
+                context.addTabularResult(csvParsingResult);
                 csvParsingResults.add(csvParsingResult);
                 if (!tableDesc.isCompatibleWith(csvParsingResult.getTableDescription())) {
-                    processingErrors.add(
+                    context.addError(
                             ValidationError.fatal("error.notCompatibleTableGroup", tableDesc.getUrl().getValue())
                     );
                 }
             }
-            if (hasNoFatalError(processingErrors)) {
-                processingErrors.addAll(modelValidator.validateTableGroup(csvParsingResults, tableGroupDescription));
+            if (context.isNotFatal()) {
+                context.addErrors(modelValidator.validateTableGroup(csvParsingResults, tableGroupDescription));
             }
         }
-        return processingErrors;
     }
 
-    private List<ValidationError> process(TabularParsingResult csvParsingResult,
-                                          MetadataParsingResult metadataParsingResult) {
-        List<ValidationError> processingErrors = new ArrayList<>(metadataParsingResult.getErrors());
+    private void process(ProcessingContext context,
+                         TabularParsingResult csvParsingResult,
+                         MetadataParsingResult metadataParsingResult) {
         TableDescription embeddedMetadata = csvParsingResult.getTableDescription();
-        if (hasNoFatalError(processingErrors)) {
-            processingErrors.addAll(validateMetadata(metadataParsingResult));
-            if (hasNoFatalError(processingErrors)) {
+        if (context.isNotFatal()) {
+            context.addErrors(validateMetadata(metadataParsingResult));
+            if (context.isNotFatal()) {
                 TableDescription tableDesc = getTableDescription(metadataParsingResult, csvParsingResult.getTabularUrl());
                 // Embedded metadata has to be compatible with metadata.
                 if (tableDesc != null && tableDesc.isCompatibleWith(embeddedMetadata)) {
-                    processingErrors.addAll(modelValidator.validateTable(csvParsingResult, tableDesc));
+                    context.addErrors(modelValidator.validateTable(csvParsingResult, tableDesc));
                 } else {
-                    processingErrors.add(ValidationError.fatal("error.notCompatibleTable"));
+                    context.addError(ValidationError.fatal("error.notCompatibleTable"));
                 }
             }
         }
-        return processingErrors;
     }
 
     private List<? extends ValidationError> validateMetadata(MetadataParsingResult result) {

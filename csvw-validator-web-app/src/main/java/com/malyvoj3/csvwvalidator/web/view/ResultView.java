@@ -202,7 +202,7 @@ public class ResultView extends MainLayout implements HasUrlParameter<String> {
             revalidateButton.addClickListener(event -> {
                 ValidatingDataDTO bean = new ValidatingDataDTO();
                 finalRevalidateButton.getUI().ifPresent(ui -> bean.setLocale(ui.getLocale()));
-                bean.setStrictMode(result.getSettings().isStrictMode());
+                bean.setStrictMode(result.isStrictMode());
                 bean.setCsvUrl(csvUrl);
                 bean.setMetadataUrl(metadataUrl);
                 ComponentUtil.setData(UI.getCurrent(), ValidatingDataDTO.class, bean);
@@ -223,7 +223,7 @@ public class ResultView extends MainLayout implements HasUrlParameter<String> {
     }
 
     private void buildEmptyResult() {
-        LocalizedLabel label = new LocalizedLabel("result.requestExpired");
+        LocalizedLabel label = new LocalizedLabel("result.invalidResultId");
         label.addClassName("page-text");
         add(label);
         LocalizedButton validationButton = new LocalizedButton("main.startValidation");

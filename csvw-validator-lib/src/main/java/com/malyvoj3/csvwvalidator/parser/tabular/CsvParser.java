@@ -39,6 +39,8 @@ public class CsvParser implements TabularDataParser {
         Table table = new Table();
         table.setUrl(url);
         List<Column> columns = new ArrayList<>();
+        Long columnsNumber = null;
+        Long rowsNumber = null;
         List<ColumnDescription> columnDescriptions = new ArrayList<>();
         TableDescription tableDescription = null;
         List<ValidationError> parsingErrors = new ArrayList<>();
@@ -80,7 +82,7 @@ public class CsvParser implements TabularDataParser {
                     CsvWriter csvWriter = new CsvWriter(writer, mySettings());
                     csvParser.beginParsing(reader);
                     createColumns(csvParser, table, columns, columnDescriptions);
-                    int rowNumber = dialect.isHeader() ? 2 : 1;
+                    long rowNumber = dialect.isHeader() ? 2L : 1L;
                     String[] record;
                     while ((record = csvParser.parseNext()) != null) {
                         parsingErrors.addAll(createRow(record, columns, rowNumber));
@@ -91,6 +93,8 @@ public class CsvParser implements TabularDataParser {
                     parsingErrors.addAll(validateColumns(columns));
                     parsingErrors.addAll(validateCsvFormat(csvParser.getDetectedFormat()));
                     table.setColumns(columns);
+                    columnsNumber = (long) columns.size();
+                    rowsNumber = dialect.isHeader() ? rowNumber - 1 : rowNumber;
                     tableDescription = createTableDescription(columnDescriptions, url);
                     resultFilePath = UriUtils.normalizeUri(tmpFile.toURI().toString());
                 } catch (CsvFormatException ex) {
@@ -108,7 +112,7 @@ public class CsvParser implements TabularDataParser {
             parsingErrors.add(ValidationError.fatal("error.emptyCsvFile", url));
         }
 
-        return new TabularParsingResult(url, parsingErrors, table, tableDescription, resultFilePath);
+        return new TabularParsingResult(url, parsingErrors, table, tableDescription, resultFilePath, rowsNumber, columnsNumber);
     }
 
     private CsvWriterSettings mySettings() {
@@ -145,7 +149,7 @@ public class CsvParser implements TabularDataParser {
         }
     }
 
-    private List<ValidationError> createRow(String[] record, List<Column> columns, int rowNumber) throws CsvFormatException {
+    private List<ValidationError> createRow(String[] record, List<Column> columns, long rowNumber) throws CsvFormatException {
         List<ValidationError> parsingErrors = new ArrayList<>();
         int columnLength = columns.size();
         if (record.length > 0) {
@@ -166,7 +170,7 @@ public class CsvParser implements TabularDataParser {
         return parsingErrors;
     }
 
-    private List<ValidationError> validateRowLength(int recordLength, int rowNumber, int columnLength) {
+    private List<ValidationError> validateRowLength(int recordLength, long rowNumber, int columnLength) {
         List<ValidationError> errors = new ArrayList<>();
         if (recordLength > columnLength) {
             errors.add(ValidationError.fatal(
@@ -190,7 +194,7 @@ public class CsvParser implements TabularDataParser {
         return errors;
     }
 
-    private List<ValidationError> validateValue(String value, int rowNumber, int columnNumber) {
+    private List<ValidationError> validateValue(String value, long rowNumber, int columnNumber) {
         List<ValidationError> errors = Collections.emptyList();
         if (value == null) {
             errors = Collections.emptyList();
