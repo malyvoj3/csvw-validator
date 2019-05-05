@@ -15,6 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ValidationResponse {
 
+    private String id;
     private ValidationStatus validationStatus;
     private String tabularUrl;
     private String metadataUrl;

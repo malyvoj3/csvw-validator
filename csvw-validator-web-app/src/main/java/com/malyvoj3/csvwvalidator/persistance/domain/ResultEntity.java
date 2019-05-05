@@ -4,10 +4,7 @@ import com.malyvoj3.csvwvalidator.domain.ValidationStatus;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.List;
 
 @Data
@@ -23,8 +20,11 @@ public class ResultEntity {
     private String metadataUrl;
     private ValidationStatus validationStatus;
 
-    @ElementCollection(targetClass = ErrorEntity.class)
+    @ElementCollection(targetClass = ErrorEntity.class, fetch = FetchType.EAGER)
     private List<ErrorEntity> errors;
+
+    @Embedded
+    private ProcessingSettings settings;
     private Long warningCount;
     private Long errorCount;
     private Long fatalCount;

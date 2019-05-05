@@ -2,6 +2,7 @@ package com.malyvoj3.csvwvalidator.web.view.pages;
 
 import com.malyvoj3.csvwvalidator.utils.UriUtils;
 import com.malyvoj3.csvwvalidator.web.view.ValidatingDataDTO;
+import com.malyvoj3.csvwvalidator.web.view.ValidatingView;
 import com.malyvoj3.csvwvalidator.web.view.components.*;
 import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.component.UI;
@@ -59,7 +60,7 @@ public class LocalValidationPage extends VerticalLayout {
                 ValidatingDataDTO finalBean = bean;
                 validationButton.getUI().ifPresent(ui -> finalBean.setLocale(ui.getLocale()));
                 ComponentUtil.setData(UI.getCurrent(), ValidatingDataDTO.class, finalBean);
-                validationButton.getUI().ifPresent(ui -> ui.navigate("result"));
+                validationButton.getUI().ifPresent(ui -> ui.navigate(ValidatingView.class));
             } else {
                 Notification.show(getTranslation("upload.emptyInput"), 10000, Notification.Position.TOP_END);
             }

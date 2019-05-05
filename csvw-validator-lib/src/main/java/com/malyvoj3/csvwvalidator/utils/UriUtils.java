@@ -174,6 +174,22 @@ public class UriUtils {
         return resolvedString;
     }
 
+    /**
+     * Return if given string is absolute URI with HTTP/HTTPS schema.
+     * @param uri Validated string.
+     * @return True if uri is absolute URI with HTTP/HTTPS schema, otherwise false.
+     */
+    public boolean isHttpUri(String uri) {
+        boolean result = false;
+        if (uri != null) {
+            String normalizedUri = normalizeUri(uri);
+            if (normalizedUri != null) {
+                result = getFileScheme(uri) == null;
+            }
+        }
+        return result;
+    }
+
     public String expandTemplate(String template, Map<String, Object> variables) {
         return UriTemplate.expand(template, variables);
     }

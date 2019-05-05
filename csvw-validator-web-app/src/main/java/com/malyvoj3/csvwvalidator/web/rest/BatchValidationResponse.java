@@ -18,6 +18,6 @@ public class BatchValidationResponse {
     private Long passedFilesCount;
     private Long warningFilesCount;
     private Long errorFilesCount;
-    private List<ValidationResponse> filesResults = new ArrayList<>();
+    private List<ValidationResult> filesResults = new ArrayList<>();
 
 }
