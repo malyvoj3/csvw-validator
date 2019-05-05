@@ -6,7 +6,7 @@ import com.malyvoj3.csvwvalidator.processor.result.Result;
 import java.io.InputStream;
 import java.util.List;
 
-public interface Processor<RESULT extends Result, BATCH_RESULT extends BatchResult<? extends Result>> {
+public interface Processor<RESULT extends Result, BATCH_RESULT extends BatchResult<RESULT>> {
 
     BATCH_RESULT process(ProcessingSettings settings, List<ProcessingInput> inputs);
 
