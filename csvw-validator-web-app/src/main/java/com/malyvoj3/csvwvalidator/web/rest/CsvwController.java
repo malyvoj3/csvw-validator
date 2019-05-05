@@ -4,7 +4,7 @@ import com.malyvoj3.csvwvalidator.processor.ProcessingSettings;
 import com.malyvoj3.csvwvalidator.processor.Processor;
 import com.malyvoj3.csvwvalidator.processor.result.BatchProcessingResult;
 import com.malyvoj3.csvwvalidator.processor.result.LocalizedError;
-import com.malyvoj3.csvwvalidator.processor.result.ProcessingResult;
+import com.malyvoj3.csvwvalidator.processor.result.PersistentResult;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,10 +21,10 @@ import java.util.stream.Collectors;
 @RestController
 public class CsvwController {
 
-    private final Processor<ProcessingResult, BatchProcessingResult<ProcessingResult>> processor;
+    private final Processor<PersistentResult, BatchProcessingResult<PersistentResult>> processor;
 
     @Autowired
-    public CsvwController(Processor<ProcessingResult, BatchProcessingResult<ProcessingResult>> processor) {
+    public CsvwController(Processor<PersistentResult, BatchProcessingResult<PersistentResult>> processor) {
         this.processor = processor;
     }
 
@@ -40,7 +40,7 @@ public class CsvwController {
         if (requestLocale != null) {
             settings.setLocale(requestLocale);
         }
-        ProcessingResult processingResult;
+        PersistentResult processingResult;
 
         if (StringUtils.isNotEmpty(metadataUrl) && StringUtils.isNotEmpty(tabularUrl)) {
             processingResult = processor.process(settings, tabularUrl, metadataUrl);
@@ -77,10 +77,12 @@ public class CsvwController {
         if (requestLocale != null) {
             settings.setLocale(requestLocale);
         }
-        BatchProcessingResult<ProcessingResult> result = processor.process(settings, request.getFilesToProcess());
+        BatchProcessingResult<PersistentResult> result = processor.process(settings, request.getFilesToProcess());
 
-        List<ValidationResponse> filesResults = result.getFilesResults().stream()
+        List<ValidationResult> filesResults = result.getFilesResults().stream()
                 .map(this::createResponse)
+                .map(validationResponse -> new ValidationResult(validationResponse.getId(),
+                        request.isFilesResults() ? validationResponse : null))
                 .collect(Collectors.toList());
         BatchValidationResponse response = BatchValidationResponse.builder()
                 .filesCount(result.getFilesCount())
@@ -93,8 +95,9 @@ public class CsvwController {
         return ResponseEntity.ok(response);
     }
 
-    private ValidationResponse createResponse(ProcessingResult result) {
+    private ValidationResponse createResponse(PersistentResult result) {
         return ValidationResponse.builder()
+                .id(result.getId())
                 .tabularUrl(result.getTabularUrl())
                 .metadataUrl(result.getMetadataUrl())
                 .warningCount(result.getWarningCount())

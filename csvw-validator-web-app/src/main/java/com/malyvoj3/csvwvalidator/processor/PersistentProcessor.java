@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -26,11 +27,22 @@ public class PersistentProcessor implements Processor<PersistentResult, BatchPro
         this.objectMapper = objectMapper;
     }
 
-
     @Override
     public BatchProcessingResult<PersistentResult> process(ProcessingSettings settings, List<ProcessingInput> inputs) {
-        //return processor.process(settings, inputs);
-        return new BatchProcessingResult<>();
+        BatchProcessingResult<ProcessingResult> processingResult = processor.process(settings, inputs);
+        List<ResultEntity> resultEntities = new ArrayList<>();
+        for (ProcessingResult result : processingResult.getFilesResults()) {
+            resultEntities.add(objectMapper.toResult(result));
+        }
+        Iterable<ResultEntity> savedResults = repository.saveAll(resultEntities);
+        processingResult.setFilesResults(null);
+        BatchProcessingResult<PersistentResult> batchResult = objectMapper.toPersistentResult(processingResult);
+        List<PersistentResult> persistentResults = new ArrayList<>();
+        for (ResultEntity savedResult : savedResults) {
+            persistentResults.add(objectMapper.toResult(savedResult));
+        }
+        batchResult.setFilesResults(persistentResults);
+        return batchResult;
     }
 
     @Override

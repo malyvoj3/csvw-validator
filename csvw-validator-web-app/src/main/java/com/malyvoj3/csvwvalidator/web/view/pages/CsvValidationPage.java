@@ -1,6 +1,7 @@
 package com.malyvoj3.csvwvalidator.web.view.pages;
 
 import com.malyvoj3.csvwvalidator.web.view.ValidatingDataDTO;
+import com.malyvoj3.csvwvalidator.web.view.ValidatingView;
 import com.malyvoj3.csvwvalidator.web.view.components.LocalizedButton;
 import com.malyvoj3.csvwvalidator.web.view.components.LocalizedCheckbox;
 import com.malyvoj3.csvwvalidator.web.view.components.LocalizedTextField;
@@ -40,7 +41,7 @@ public class CsvValidationPage extends VerticalLayout {
                 // Set locale
                 validationButton.getUI().ifPresent(ui -> bean.setLocale(ui.getLocale()));
                 ComponentUtil.setData(UI.getCurrent(), ValidatingDataDTO.class, bean);
-                validationButton.getUI().ifPresent(ui -> ui.navigate("result"));
+                validationButton.getUI().ifPresent(ui -> ui.navigate(ValidatingView.class));
             }
         });
         add(validationButton);
