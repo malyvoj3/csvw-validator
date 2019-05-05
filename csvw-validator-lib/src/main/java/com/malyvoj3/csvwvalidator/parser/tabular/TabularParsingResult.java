@@ -20,5 +20,7 @@ public class TabularParsingResult {
     private Table table;
     private TableDescription tableDescription;
     private String resultFilePath;
+    private Long rowsNumber;
+    private Long columnsNumber;
 
 }

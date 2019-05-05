@@ -1,7 +1,6 @@
 package com.malyvoj3.csvwvalidator;
 
 import com.malyvoj3.csvwvalidator.persistance.domain.ErrorEntity;
-import com.malyvoj3.csvwvalidator.persistance.domain.ProcessingSettings;
 import com.malyvoj3.csvwvalidator.persistance.domain.ResultEntity;
 import com.malyvoj3.csvwvalidator.processor.result.BatchProcessingResult;
 import com.malyvoj3.csvwvalidator.processor.result.LocalizedError;
@@ -17,6 +16,4 @@ public abstract class ObjectMapper {
     public abstract ResultEntity toResult(ProcessingResult processingResult);
     public abstract PersistentResult toResult(ResultEntity processingResult);
     public abstract BatchProcessingResult<PersistentResult> toPersistentResult(BatchProcessingResult<ProcessingResult> processingResult);
-    public abstract ProcessingSettings toProcessingSettings(com.malyvoj3.csvwvalidator.processor.ProcessingSettings settings);
-    public abstract com.malyvoj3.csvwvalidator.processor.ProcessingSettings toProcessingSettings(ProcessingSettings settings);
 }

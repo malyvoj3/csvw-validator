@@ -3,6 +3,7 @@ package com.malyvoj3.csvwvalidator
 import com.malyvoj3.csvwvalidator.config.ProcessorConfig
 import com.malyvoj3.csvwvalidator.domain.ValidationStatus
 import com.malyvoj3.csvwvalidator.processor.CsvwProcessor
+import com.malyvoj3.csvwvalidator.processor.ProcessingContext
 import com.malyvoj3.csvwvalidator.processor.ProcessingSettings
 import com.malyvoj3.csvwvalidator.processor.result.ProcessingResult
 import org.springframework.beans.factory.annotation.Autowired
@@ -38,12 +39,13 @@ class CsvwProcessorIT extends Specification {
         ProcessingResult result
         ProcessingSettings settings = new ProcessingSettings()
         settings.setStrictMode(false)
+        ProcessingContext context = new ProcessingContext(settings);
         if (tabularUrl != null && metadataUrl != null) {
-            result = csvwProcessor.process(settings, tabularUrl, metadataUrl)
+            result = csvwProcessor.process(context, tabularUrl, metadataUrl)
         } else if (tabularUrl != null) {
-            result = csvwProcessor.processTabularData(settings, tabularUrl)
+            result = csvwProcessor.processTabularData(context, tabularUrl)
         } else if (metadataUrl != null) {
-            result = csvwProcessor.processMetadata(settings, metadataUrl)
+            result = csvwProcessor.processMetadata(context, metadataUrl)
         }
         then: "It is successfully validated"
         expectedResult == result.getValidationStatus()

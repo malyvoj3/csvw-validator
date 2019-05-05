@@ -46,7 +46,7 @@ public class ValidatingView extends MainLayout {
         if (bean != null) {
             ComponentUtil.setData(UI.getCurrent(), ValidatingDataDTO.class, null);
             validationThread = new
-                    ValidationThread(attachEvent.getUI(), this, bean, processor);
+                    ValidationThread(attachEvent.getUI(), bean, processor);
             validationThread.start();
         }
     }
@@ -58,13 +58,6 @@ public class ValidatingView extends MainLayout {
         if (validationThread != null) {
             validationThread.interrupt();
             validationThread = null;
-        }
-    }
-
-    public void clearProgressBar() {
-        if (progressBar != null) {
-            remove(progressBar);
-            progressBar = null;
         }
     }
 

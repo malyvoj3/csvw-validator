@@ -23,12 +23,11 @@ public class ResultEntity {
     @ElementCollection(targetClass = ErrorEntity.class, fetch = FetchType.EAGER)
     private List<ErrorEntity> errors;
 
-    @Embedded
-    private ProcessingSettings settings;
     private Long warningCount;
     private Long errorCount;
     private Long fatalCount;
     private Long totalErrorsCount;
     private String usedLanguage;
+    private Boolean strictMode;
 
 }

@@ -9,7 +9,6 @@ import com.malyvoj3.csvwvalidator.processor.result.ProcessingResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,8 +27,8 @@ public class PersistentProcessor implements Processor<PersistentResult, BatchPro
     }
 
     @Override
-    public BatchProcessingResult<PersistentResult> process(ProcessingSettings settings, List<ProcessingInput> inputs) {
-        BatchProcessingResult<ProcessingResult> processingResult = processor.process(settings, inputs);
+    public BatchProcessingResult<PersistentResult> process(ProcessingContext context, List<ProcessingInput> inputs) {
+        BatchProcessingResult<ProcessingResult> processingResult = processor.process(context, inputs);
         List<ResultEntity> resultEntities = new ArrayList<>();
         for (ProcessingResult result : processingResult.getFilesResults()) {
             resultEntities.add(objectMapper.toResult(result));
@@ -46,56 +45,48 @@ public class PersistentProcessor implements Processor<PersistentResult, BatchPro
     }
 
     @Override
-    public PersistentResult process(ProcessingSettings settings, String tabularFile, String tabularFileName, String metadataFile, String metadataFileName) {
-        ProcessingResult processingResult = processor.process(settings, tabularFile, tabularFileName, metadataFile, metadataFileName);
+    public PersistentResult process(ProcessingContext context, String tabularFile, String tabularFileName, String metadataFile, String metadataFileName) {
+        ProcessingResult processingResult = processor.process(context, tabularFile, tabularFileName, metadataFile, metadataFileName);
         ResultEntity resultEntity = objectMapper.toResult(processingResult);
         resultEntity = repository.save(resultEntity);
         return objectMapper.toResult(resultEntity);
     }
 
     @Override
-    public PersistentResult process(ProcessingSettings settings, String tabularUrl, String metadataUrl) {
-        ProcessingResult processingResult = processor.process(settings, tabularUrl, metadataUrl);
+    public PersistentResult process(ProcessingContext context, String tabularUrl, String metadataUrl) {
+        ProcessingResult processingResult = processor.process(context, tabularUrl, metadataUrl);
         ResultEntity resultEntity = objectMapper.toResult(processingResult);
         resultEntity = repository.save(resultEntity);
         return objectMapper.toResult(resultEntity);
     }
 
     @Override
-    public PersistentResult processTabularData(ProcessingSettings settings, String tabularFile, String fileName) {
-        ProcessingResult processingResult = processor.processTabularData(settings, tabularFile, fileName);
+    public PersistentResult processTabularData(ProcessingContext context, String tabularFile, String fileName) {
+        ProcessingResult processingResult = processor.processTabularData(context, tabularFile, fileName);
         ResultEntity resultEntity = objectMapper.toResult(processingResult);
         resultEntity = repository.save(resultEntity);
         return objectMapper.toResult(resultEntity);
     }
 
     @Override
-    public PersistentResult processMetadata(ProcessingSettings settings, String metadataFile, String fileName) {
-        ProcessingResult processingResult = processor.processMetadata(settings, metadataFile, fileName);
+    public PersistentResult processMetadata(ProcessingContext context, String metadataFile, String fileName) {
+        ProcessingResult processingResult = processor.processMetadata(context, metadataFile, fileName);
         ResultEntity resultEntity = objectMapper.toResult(processingResult);
         resultEntity = repository.save(resultEntity);
         return objectMapper.toResult(resultEntity);
     }
 
     @Override
-    public PersistentResult processTabularData(ProcessingSettings settings, String tabularUrl, InputStream metadataFile, String metadataFileName) {
-        ProcessingResult processingResult = processor.processTabularData(settings, tabularUrl, metadataFile, metadataFileName);
+    public PersistentResult processMetadata(ProcessingContext context, String metadataUrl) {
+        ProcessingResult processingResult = processor.processMetadata(context, metadataUrl);
         ResultEntity resultEntity = objectMapper.toResult(processingResult);
         resultEntity = repository.save(resultEntity);
         return objectMapper.toResult(resultEntity);
     }
 
     @Override
-    public PersistentResult processMetadata(ProcessingSettings settings, String metadataUrl) {
-        ProcessingResult processingResult = processor.processMetadata(settings, metadataUrl);
-        ResultEntity resultEntity = objectMapper.toResult(processingResult);
-        resultEntity = repository.save(resultEntity);
-        return objectMapper.toResult(resultEntity);
-    }
-
-    @Override
-    public PersistentResult processTabularData(ProcessingSettings settings, String tabularUrl) {
-        ProcessingResult processingResult = processor.processTabularData(settings, tabularUrl);
+    public PersistentResult processTabularData(ProcessingContext context, String tabularUrl) {
+        ProcessingResult processingResult = processor.processTabularData(context, tabularUrl);
         ResultEntity resultEntity = objectMapper.toResult(processingResult);
         resultEntity = repository.save(resultEntity);
         return objectMapper.toResult(resultEntity);

@@ -3,6 +3,7 @@ package com.malyvoj3.csvwvalidator.processor.result;
 import com.malyvoj3.csvwvalidator.domain.Severity;
 import com.malyvoj3.csvwvalidator.domain.ValidationError;
 import com.malyvoj3.csvwvalidator.domain.ValidationStatus;
+import com.malyvoj3.csvwvalidator.processor.ProcessingContext;
 import com.malyvoj3.csvwvalidator.processor.ProcessingSettings;
 import com.malyvoj3.csvwvalidator.processor.Translator;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +19,10 @@ public class ProcessingResultCreator implements ResultCreator<ProcessingResult, 
     private final Translator translator;
 
     @Override
-    public ProcessingResult createResult(ProcessingSettings settings, List<? extends ValidationError> errors, String tabularUrl, String metadataUrl) {
+    public ProcessingResult createResult(ProcessingContext context, String tabularUrl, String metadataUrl) {
         List<? extends ValidationError> validationErrors;
+        ProcessingSettings settings = context.getSettings();
+        List<ValidationError> errors = context.getErrors();
         if (!settings.isStrictMode()) {
             validationErrors = errors.stream()
                     .filter(error -> error.getSeverity() != Severity.STRICT_WARNING)
@@ -71,13 +74,13 @@ public class ProcessingResultCreator implements ResultCreator<ProcessingResult, 
         result.setFatalCount(fatalCount);
         result.setTotalErrorsCount(validationErrors.size());
         result.setValidationStatus(status);
-        result.setSettings(settings);
+        result.setStrictMode(settings.isStrictMode());
         result.setUsedLanguage(settings.getLocale().getLanguage());
         return result;
     }
 
     @Override
-    public BatchProcessingResult<ProcessingResult> createBatchResult(ProcessingSettings settings, List<ProcessingResult> processingResults) {
+    public BatchProcessingResult<ProcessingResult> createBatchResult(ProcessingContext context, List<ProcessingResult> processingResults) {
         long passedCount = 0L;
         long warningCount = 0L;
         long errorCount = 0L;
