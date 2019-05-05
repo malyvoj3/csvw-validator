@@ -1,7 +1,9 @@
 package com.malyvoj3.csvwvalidator.web.view;
 
-import com.malyvoj3.csvwvalidator.processor.CsvwProcessor;
+import com.malyvoj3.csvwvalidator.processor.Processor;
+import com.malyvoj3.csvwvalidator.processor.result.BatchProcessingResult;
 import com.malyvoj3.csvwvalidator.processor.result.CsvResultWriter;
+import com.malyvoj3.csvwvalidator.processor.result.PersistentResult;
 import com.malyvoj3.csvwvalidator.processor.result.RdfResultWriter;
 import com.malyvoj3.csvwvalidator.web.view.components.LabeledProgressBar;
 import com.malyvoj3.csvwvalidator.web.view.components.LocalizedButton;
@@ -21,16 +23,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 @PageTitle("Result")
 public class ResultView extends MainLayout {
 
-    private final CsvwProcessor csvwProcessor;
+    private final Processor<PersistentResult, BatchProcessingResult<PersistentResult>> csvwProcessor;
     private final CsvResultWriter csvResultWriter;
     private final RdfResultWriter rdfResultWriter;
     private Thread validationThread;
     private LabeledProgressBar progressBar;
 
-    public ResultView(@Autowired CsvwProcessor csvwProcessor,
-                      @Autowired CsvResultWriter csvResultWriter,
-                      @Autowired RdfResultWriter rdfResultWriter) {
-        this.csvwProcessor = csvwProcessor;
+    @Autowired
+    public ResultView(Processor<PersistentResult, BatchProcessingResult<PersistentResult>> processor,
+                      CsvResultWriter csvResultWriter,
+                      RdfResultWriter rdfResultWriter) {
+        this.csvwProcessor = processor;
         this.csvResultWriter = csvResultWriter;
         this.rdfResultWriter = rdfResultWriter;
 

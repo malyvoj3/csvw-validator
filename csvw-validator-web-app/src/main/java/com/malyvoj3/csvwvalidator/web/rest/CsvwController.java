@@ -1,7 +1,7 @@
 package com.malyvoj3.csvwvalidator.web.rest;
 
-import com.malyvoj3.csvwvalidator.processor.CsvwProcessor;
 import com.malyvoj3.csvwvalidator.processor.ProcessingSettings;
+import com.malyvoj3.csvwvalidator.processor.Processor;
 import com.malyvoj3.csvwvalidator.processor.result.BatchProcessingResult;
 import com.malyvoj3.csvwvalidator.processor.result.LocalizedError;
 import com.malyvoj3.csvwvalidator.processor.result.ProcessingResult;
@@ -21,11 +21,11 @@ import java.util.stream.Collectors;
 @RestController
 public class CsvwController {
 
-    private final CsvwProcessor csvwProcessor;
+    private final Processor<ProcessingResult, BatchProcessingResult<ProcessingResult>> processor;
 
     @Autowired
-    public CsvwController(CsvwProcessor csvwProcessor) {
-        this.csvwProcessor = csvwProcessor;
+    public CsvwController(Processor<ProcessingResult, BatchProcessingResult<ProcessingResult>> processor) {
+        this.processor = processor;
     }
 
     @PostMapping(path = "/validate",
@@ -43,11 +43,11 @@ public class CsvwController {
         ProcessingResult processingResult;
 
         if (StringUtils.isNotEmpty(metadataUrl) && StringUtils.isNotEmpty(tabularUrl)) {
-            processingResult = csvwProcessor.process(settings, tabularUrl, metadataUrl);
+            processingResult = processor.process(settings, tabularUrl, metadataUrl);
         } else if (StringUtils.isNotEmpty(metadataUrl)) {
-            processingResult = csvwProcessor.processMetadata(settings, metadataUrl);
+            processingResult = processor.processMetadata(settings, metadataUrl);
         } else if (StringUtils.isNotEmpty(tabularUrl)) {
-            processingResult = csvwProcessor.processTabularData(settings, tabularUrl);
+            processingResult = processor.processTabularData(settings, tabularUrl);
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
@@ -59,7 +59,7 @@ public class CsvwController {
         Locale locale;
         if ("en".equals(language)) {
             locale = new Locale("en", "GB");
-        } else if("cs".equals(language)) {
+        } else if ("cs".equals(language)) {
             locale = new Locale("cs", "CZ");
         } else {
             locale = null;
@@ -77,7 +77,7 @@ public class CsvwController {
         if (requestLocale != null) {
             settings.setLocale(requestLocale);
         }
-        BatchProcessingResult result = csvwProcessor.process(settings, request.getFilesToProcess());
+        BatchProcessingResult<ProcessingResult> result = processor.process(settings, request.getFilesToProcess());
 
         List<ValidationResponse> filesResults = result.getFilesResults().stream()
                 .map(this::createResponse)

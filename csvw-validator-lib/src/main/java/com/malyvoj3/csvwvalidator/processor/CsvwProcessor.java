@@ -35,7 +35,7 @@ import java.util.stream.Stream;
 
 @Slf4j
 @RequiredArgsConstructor
-public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessingResult> {
+public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessingResult<ProcessingResult>> {
 
     private static final String DEFAULT_URL = "http://example.com/";
     private static final String TEXT_CSV_TYPE = "text/csv";
@@ -48,10 +48,10 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
     private final SchemaLocator schemaLocator;
     private final MetadataValidator metadataValidator;
     private final ModelValidator modelValidator;
-    private final ResultCreator<ProcessingResult, BatchProcessingResult> resultCreator;
+    private final ResultCreator<ProcessingResult, BatchProcessingResult<ProcessingResult>> resultCreator;
 
     @Override
-    public BatchProcessingResult process(ProcessingSettings settings, List<ProcessingInput> inputs) {
+    public BatchProcessingResult<ProcessingResult> process(ProcessingSettings settings, List<ProcessingInput> inputs) {
         List<ProcessingResult> processingResults = new ArrayList<>();
         for (ProcessingInput input : inputs) {
             log.info("Processing file {}", input.getTabularUrl());

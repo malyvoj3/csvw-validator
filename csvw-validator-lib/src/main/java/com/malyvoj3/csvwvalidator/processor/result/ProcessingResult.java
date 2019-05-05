@@ -2,13 +2,11 @@ package com.malyvoj3.csvwvalidator.processor.result;
 
 import com.malyvoj3.csvwvalidator.domain.ValidationStatus;
 import com.malyvoj3.csvwvalidator.processor.ProcessingSettings;
-import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-@Builder
 public class ProcessingResult implements Result {
 
     private String tabularUrl;

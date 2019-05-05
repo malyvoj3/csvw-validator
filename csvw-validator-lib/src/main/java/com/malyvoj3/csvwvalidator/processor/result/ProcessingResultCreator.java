@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
-public class ProcessingResultCreator implements ResultCreator<ProcessingResult, BatchProcessingResult> {
+public class ProcessingResultCreator implements ResultCreator<ProcessingResult, BatchProcessingResult<ProcessingResult>> {
 
     private final Translator translator;
 
@@ -62,22 +62,22 @@ public class ProcessingResultCreator implements ResultCreator<ProcessingResult, 
                             translator.getTranslation(msg.getMessageCode(), settings.getLocale(), msg.getParams()));
                 }).collect(Collectors.toList());
 
-        return ProcessingResult.builder()
-                .tabularUrl(tabularUrl)
-                .metadataUrl(metadataUrl)
-                .errors(localizedErrors)
-                .warningCount(warningCount)
-                .errorCount(errorCount)
-                .fatalCount(fatalCount)
-                .totalErrorsCount(validationErrors.size())
-                .validationStatus(status)
-                .settings(settings)
-                .usedLanguage(settings.getLocale().getLanguage())
-                .build();
+        ProcessingResult result = new ProcessingResult();
+        result.setTabularUrl(tabularUrl);
+        result.setMetadataUrl(metadataUrl);
+        result.setErrors(localizedErrors);
+        result.setWarningCount(warningCount);
+        result.setErrorCount(errorCount);
+        result.setFatalCount(fatalCount);
+        result.setTotalErrorsCount(validationErrors.size());
+        result.setValidationStatus(status);
+        result.setSettings(settings);
+        result.setUsedLanguage(settings.getLocale().getLanguage());
+        return result;
     }
 
     @Override
-    public BatchProcessingResult createBatchResult(ProcessingSettings settings, List<ProcessingResult> processingResults) {
+    public BatchProcessingResult<ProcessingResult> createBatchResult(ProcessingSettings settings, List<ProcessingResult> processingResults) {
         long passedCount = 0L;
         long warningCount = 0L;
         long errorCount = 0L;

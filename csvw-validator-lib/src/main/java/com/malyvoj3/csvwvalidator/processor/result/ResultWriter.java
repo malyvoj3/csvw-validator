@@ -1,7 +1,7 @@
 package com.malyvoj3.csvwvalidator.processor.result;
 
-public interface ResultWriter {
+public interface ResultWriter<T extends ProcessingResult> {
 
-    byte[] writeResult(ProcessingResult processingResult);
+    byte[] writeResult(T processingResult);
 
 }
