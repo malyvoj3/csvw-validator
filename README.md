@@ -64,8 +64,9 @@ where instead ```{port}``` you can insert the port number.
 
 Web service has two endpoints:
 
-* ```http://localhost:8080/validate``` - for validating one tabular data file and/or metadata file.
-* ```http://localhost:8080/validateBatch``` - for validating multiple files.
+* ```/validate``` - for validating one tabular data file and/or metadata file.
+* ```/validateBatch``` - for validating multiple files.
+* ```/validationResult/{resultId}``` - for obtaining result of validation.
 
 REST API documentation is included in RAML in file ```/resources/validator.raml```.
 
@@ -93,6 +94,7 @@ In **strict mode** tabular files are validating against **RFC 4180** (CSV comma 
 Response looks like this:
 ```
 {
+  "id": "resultId",
   "validationStatus": "ERROR",
   "tabularUrl": "http://www.w3.org/2013/csvw/tests/test286.csv",
   "metadataUrl": "http://www.w3.org/2013/csvw/tests/test286-metadata.json",
@@ -108,6 +110,7 @@ Response looks like this:
   "totalErrorsCount": 1
 }
 ```
+```Id``` identifier of the result.
 ```ValidationStatus``` is result of validation - PASSED, WARNING or ERROR.
 ```TabularUrl``` and ```metadataUrl``` are URL of validated files.
 ```ValidationErrors``` contains errors created during validation. Each error has severity (WARNING, ERROR, FATAL).
@@ -157,26 +160,45 @@ So request body has to be JSON with format:
 ```
 Where ```stricMode``` and ```language``` are the same properties as in ```/validate``` endpoint - it enables strict mode and set language of messages. 
 Property ```filesToProcess``` is array property, which contains object with ```tabularUrl``` and/or ```metadataUrl``` as in ```/validate``` endpoint.
-Last property is boolean property ```filesResults```, which enables or disables results for each validated file in response. By default is set to true.
+Last property is boolean property ```filesResults```, which enables or disables results for each validated file in response.
+If it is disabled, only result ID is sent back and not the whole result. By default is set to true.
 
 Response can look like this JSON:
 
 ```
 {
-  " filesCount ": 3 ,
-  " passedFilesCount ": 3 ,
-  " warningFilesCount ": 0 ,
-  " errorFilesCount ": 0 ,
-  " filesResults ": []
+  "filesCount": 3 ,
+  "passedFilesCount": 3 ,
+  "warningFilesCount": 0 ,
+  "errorFilesCount": 0 ,
+  "filesResults": [
+    {
+      "id": "resultId1"
+    },
+    {
+      "id": "resultId2"
+    },
+    {
+      "id": "resultId3"
+    },
+    {
+      "id": "resultId4"
+    }
+  ]
 }
 ```
 
 It has property ```filesCount```, which contains number of validated files. 
 Then there are counters for passed (```passedFileCount```), warning (```warningFileCount```) and error (```errorFileCount```) files.
-For each validated files, there is ValidationResponse (object from ```/validate``` endpoint) in ```filesResults``` property in case when ```filesResults```
-property was set to true in the request.
+For each validated files, there is resultId and ValidationResponse (object from ```/validate``` endpoint) in ```filesResults```. 
+In case when property ```filesResults``` was set to false in the request, there are just resultIds and not ValidationResponses.
 
 In project there is Shell script ```batchValidate.sh``` which runs batchValidation with over 1000 files.
+
+### ValidationResult endpoint
+
+Endpoint ```/validationResult/{resultId}``` returns result in JSON format as in ```/validate``` endpoint.
+If result with given ID doesn't exists, endpoint will return 404 response code.
 
 ## Command-line application
 
@@ -250,7 +272,7 @@ If you use Maven you can easily add dependency, but first you need to add ```mav
 </build>
 ```
 
-then you can add the dependency, eg.:
+then you have to add dependencies:
 
 ```
 <dependencies>
@@ -258,6 +280,11 @@ then you can add the dependency, eg.:
     <groupId>com.malyvoj3</groupId>
     <artifactId>csvw-validator-lib</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+  </dependency>
+  <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-core</artifactId>
+      <version>5.0.8.RELEASE</version>
   </dependency>
 </dependencies>
 ```

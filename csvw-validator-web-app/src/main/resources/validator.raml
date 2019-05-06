@@ -18,6 +18,11 @@ traits:
         body:
           application/json:
             type: string
+      404:
+        description: Entity not found.
+        body:
+          application/json:
+            type: string
 
 types:
 
@@ -204,6 +209,21 @@ types:
           application/json:
             type: ValidationResponse
         description: Input was successfully validated.
+
+/validationResult/{resultId}:
+  uriParameters:
+    resultId:
+      description: Id of the result.
+  get:
+    description: Return result of the validation.
+    is:
+      - Default
+    responses:
+      200:
+        body:
+          application/json:
+            type: ValidationResponse
+        description: Result exist for the given id.
 
 /validateBatch:
   post:

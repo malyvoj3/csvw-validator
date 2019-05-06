@@ -1,5 +1,8 @@
 package com.malyvoj3.csvwvalidator.web.rest;
 
+import com.malyvoj3.csvwvalidator.ObjectMapper;
+import com.malyvoj3.csvwvalidator.persistance.domain.ResultEntity;
+import com.malyvoj3.csvwvalidator.persistance.repository.ResultRepository;
 import com.malyvoj3.csvwvalidator.processor.ProcessingContext;
 import com.malyvoj3.csvwvalidator.processor.ProcessingSettings;
 import com.malyvoj3.csvwvalidator.processor.Processor;
@@ -11,9 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Locale;
@@ -23,10 +24,16 @@ import java.util.stream.Collectors;
 public class CsvwController {
 
     private final Processor<PersistentResult, BatchProcessingResult<PersistentResult>> processor;
+    private final ResultRepository resultRepository;
+    private final ObjectMapper objectMapper;
 
     @Autowired
-    public CsvwController(Processor<PersistentResult, BatchProcessingResult<PersistentResult>> processor) {
+    public CsvwController(Processor<PersistentResult, BatchProcessingResult<PersistentResult>> processor,
+                          ResultRepository resultRepository,
+                          ObjectMapper objectMapper) {
         this.processor = processor;
+        this.resultRepository = resultRepository;
+        this.objectMapper = objectMapper;
     }
 
     @PostMapping(path = "/validate",
@@ -55,6 +62,23 @@ public class CsvwController {
         }
 
         return ResponseEntity.ok(createResponse(processingResult));
+    }
+
+    @GetMapping(path = "/validationResult/{resultId}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ValidationResponse> validate(@PathVariable(value = "resultId") String resultId) {
+        PersistentResult result = null;
+        if (resultId != null) {
+            ResultEntity resultEntity = resultRepository.findById(resultId).orElse(null);
+            if (resultEntity != null) {
+                result = objectMapper.toResult(resultEntity);
+            }
+        }
+        if (result != null) {
+            return ResponseEntity.ok(createResponse(result));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 
     private Locale getRequestLocale(String language) {
@@ -92,7 +116,7 @@ public class CsvwController {
                 .passedFilesCount(result.getPassedFilesCount())
                 .warningFilesCount(result.getWarningFilesCount())
                 .errorFilesCount(result.getErrorFilesCount())
-                .filesResults(request.isFilesResults() ? filesResults : null)
+                .filesResults(filesResults)
                 .build();
 
         return ResponseEntity.ok(response);
