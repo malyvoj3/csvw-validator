@@ -13,8 +13,6 @@ import java.util.Map;
 public class Column {
 
     private String aboutUrl;
-    @Builder.Default
-    private List<Cell> cells = new ArrayList<>();
     private DataType datatype;
     private String defaultValue;
     private String lang;

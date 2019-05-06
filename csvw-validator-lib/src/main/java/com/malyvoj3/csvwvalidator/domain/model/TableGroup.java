@@ -9,7 +9,6 @@ import java.util.List;
 public class TableGroup {
 
     private String id;
-    private List<Note> notes = new ArrayList<>();
     private List<Table> tables = new ArrayList<>();
 
 }
