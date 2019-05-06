@@ -16,6 +16,9 @@ public class ProcessingResult implements Result {
     private long errorCount;
     private long fatalCount;
     private long totalErrorsCount;
+    private Long rowsNumber;
+    private Long columnsNumber;
+    private long tablesNumber;
     private String usedLanguage;
     private boolean strictMode;
 

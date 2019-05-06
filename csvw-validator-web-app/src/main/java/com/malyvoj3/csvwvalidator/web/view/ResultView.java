@@ -37,6 +37,8 @@ import java.util.List;
 @PageTitle("Result")
 public class ResultView extends MainLayout implements HasUrlParameter<String> {
 
+    private static final String NOT_AVAILABLE = "N/A";
+
     private final ResultRepository resultRepository;
     private final CsvResultWriter csvResultWriter;
     private final RdfResultWriter rdfResultWriter;
@@ -108,6 +110,23 @@ public class ResultView extends MainLayout implements HasUrlParameter<String> {
             upperGrid.setHorizontalComponentAlignment(FlexComponent.Alignment.START,
                     metadataLabel);
         }
+
+        LocalizedParamLabel tablesLabel = new LocalizedParamLabel("result.processTables",
+                result.getTablesNumber());
+        upperGrid.add(tablesLabel);
+        upperGrid.setHorizontalComponentAlignment(FlexComponent.Alignment.START,
+                tablesLabel);
+        LocalizedParamLabel rowsLabel = new LocalizedParamLabel("result.processRows",
+                result.getTablesNumber() == 0 ? NOT_AVAILABLE : result.getRowsNumber());
+        upperGrid.add(rowsLabel);
+        upperGrid.setHorizontalComponentAlignment(FlexComponent.Alignment.START,
+                rowsLabel);
+        LocalizedParamLabel columnsLabel = new LocalizedParamLabel("result.processColumns",
+                result.getTablesNumber() == 0 ? NOT_AVAILABLE : result.getColumnsNumber());
+        upperGrid.add(columnsLabel);
+        upperGrid.setHorizontalComponentAlignment(FlexComponent.Alignment.START,
+                columnsLabel);
+
         HorizontalLayout downloadButtons = new HorizontalLayout(csvButtonWrapper, rdfButtonWrapper);
         upperGrid.add(downloadButtons);
         upperGrid.setHorizontalComponentAlignment(FlexComponent.Alignment.CENTER,
@@ -139,8 +158,8 @@ public class ResultView extends MainLayout implements HasUrlParameter<String> {
                 newValidationButton);
         validateButtons.add(newValidationButton);
 
-        upperGrid.add(validateButtons);
-        upperGrid.setHorizontalComponentAlignment(FlexComponent.Alignment.CENTER,
+        resultDiv.add(validateButtons);
+        resultDiv.setHorizontalComponentAlignment(FlexComponent.Alignment.CENTER,
                 validateButtons);
 
         resultDiv.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);

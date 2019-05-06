@@ -27,6 +27,9 @@ public class ResultEntity {
     private Long errorCount;
     private Long fatalCount;
     private Long totalErrorsCount;
+    private Long rowsNumber;
+    private Long columnsNumber;
+    private long tablesNumber;
     private String usedLanguage;
     private Boolean strictMode;
 
