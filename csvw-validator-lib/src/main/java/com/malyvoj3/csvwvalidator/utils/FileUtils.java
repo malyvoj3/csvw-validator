@@ -159,8 +159,6 @@ public class FileUtils {
                 fileResponse.setContentType(createContentType(connection.getContentType()));
                 fileResponse.setLink(createLink(connection.getHeaderFields().get("Link"), normalizedUrl));
                 File tmpFile = File.createTempFile("tmp", null, new File("tmp"));
-                tmpFile.setReadable(true);
-                tmpFile.deleteOnExit();
                 try (ReadableByteChannel readerChannel = Channels.newChannel(connection.getInputStream());
                      WritableByteChannel writerChannel = Channels.newChannel(new FileOutputStream(tmpFile))) {
                     fileResponse.setFilePath(UriUtils.normalizeUri(tmpFile.toURI().toString()));

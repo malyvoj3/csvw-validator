@@ -49,7 +49,7 @@ public class CsvwShemaLocator implements SchemaLocator {
 
     private List<String> getUriTemplates(String wellKnownLocation) throws IOException {
         List<String> templates = new ArrayList<>();
-        FileResponse fileResponse = FileUtils.downloadTabularFile(wellKnownLocation);
+        FileResponse fileResponse = FileUtils.downloadMetadataFile(wellKnownLocation);
         if (fileResponse != null && fileResponse.getContent() != null) {
             try (BufferedReader br = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(fileResponse.getContent())))) {
                 String line;
