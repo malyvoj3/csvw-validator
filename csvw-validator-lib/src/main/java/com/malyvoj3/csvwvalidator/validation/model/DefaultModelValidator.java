@@ -25,6 +25,7 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -125,6 +126,12 @@ public class DefaultModelValidator implements ModelValidator {
                     return rule.createErrors();
                 })
                 .forEach(errors::addAll);
+
+        try {
+            org.apache.commons.io.FileUtils.deleteQuietly(new File(new URI(resultFilePath)));
+        } catch (URISyntaxException e) {
+            log.error("Cannot delete temporary file.");
+        }
 
         return errors;
     }

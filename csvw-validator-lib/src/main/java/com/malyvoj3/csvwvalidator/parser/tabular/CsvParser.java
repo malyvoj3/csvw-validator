@@ -75,7 +75,6 @@ public class CsvParser implements TabularDataParser {
 
             try {
                 File tmpFile = File.createTempFile("tmp", null, new File("tmp"));
-                tmpFile.deleteOnExit();
                 try (Reader reader = new InputStreamReader(new FileInputStream(csvFile));
                      BufferedWriter writer = new BufferedWriter(new FileWriter(tmpFile))) {
                     com.univocity.parsers.csv.CsvParser csvParser = new com.univocity.parsers.csv.CsvParser(defaultSettings(dialect));
@@ -111,6 +110,8 @@ public class CsvParser implements TabularDataParser {
         } else if (csvFile != null && csvFile.length() <= 0) {
             parsingErrors.add(ValidationError.fatal("error.emptyCsvFile", url));
         }
+
+        org.apache.commons.io.FileUtils.deleteQuietly(csvFile);
 
         return new TabularParsingResult(url, parsingErrors, table, tableDescription, resultFilePath, rowsNumber, columnsNumber);
     }
