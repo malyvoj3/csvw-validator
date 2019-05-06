@@ -44,6 +44,12 @@ public class TextResultWriter implements ResultWriter {
         writer.newLine();
         writer.write("Fatal errors: " + result.getFatalCount());
         writer.newLine();
+        writer.write("Processed tables: " + result.getTablesNumber());
+        writer.newLine();
+        writer.write("Processed rows: " + result.getRowsNumber());
+        writer.newLine();
+        writer.write("Processed columns: " + result.getColumnsNumber());
+        writer.newLine();
         writer.write("Errors:");
         writer.newLine();
         for (LocalizedError error : result.getErrors()) {

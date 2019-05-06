@@ -73,6 +73,9 @@ public class ProcessingResultCreator implements ResultCreator<ProcessingResult, 
         result.setErrorCount(errorCount);
         result.setFatalCount(fatalCount);
         result.setTotalErrorsCount(validationErrors.size());
+        result.setRowsNumber(context.getRowsNumber());
+        result.setColumnsNumber(context.getColumnsNumber());
+        result.setTablesNumber(context.getTablesNumber());
         result.setValidationStatus(status);
         result.setStrictMode(settings.isStrictMode());
         result.setUsedLanguage(settings.getLocale().getLanguage());
