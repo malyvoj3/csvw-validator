@@ -18,11 +18,6 @@ traits:
         body:
           application/json:
             type: string
-      404:
-        description: Entity not found.
-        body:
-          application/json:
-            type: string
 
 types:
 
@@ -93,18 +88,27 @@ types:
         type: boolean
         required: false
         description: If true, then strict mode is enabled for validating. By default it is true.
+      language:
+        type: Language
+        description: Language in which should be all error messages translated. Default language is 'en'.
+        required: false
 
   ValidationResponse:
     type: object
     description: Response for result of one file validating.
     properties:
+      id:
+        type: string
+        required: true
+        description: Validation result identifier
+        maxLength: 50
       validationStatus:
         type: ValidationStatus
         required: true
         description: Result of the validation.
       tabularUrl:
         type: string
-        required: true
+        required: false
         description: URL of inserted (and validated) tabular data file.
         maxLength: 300
       metadataUrl:
@@ -136,6 +140,35 @@ types:
         minimum: 0
         required: true
         description: Number of all created errors in this validation.
+      rowsNumber:
+        type: integer
+        minimum: 0
+        required: false
+        description: Total number of processed rows.
+      columnsNumber:
+        type: integer
+        minimum: 0
+        required: false
+        description: Total number of processed columns.
+      tablesNumber:
+        type: integer
+        minimum: 0
+        required: true
+        description: Total number of processed tables.
+
+  ValidationResult:
+    type: object
+    description: Result of one validation from batch validation.
+    properties:
+      id:
+        type: string
+        required: true
+        description: The validation result identifier.
+        maxLength: 50
+      result:
+        type: ValidationResponse
+        required: false
+        description: The validation result.
 
   BatchValidationRequest:
     type: object
@@ -151,12 +184,12 @@ types:
         description: If true, then strict mode is enabled for validating. By default it is true.
       language:
         type: Language
-        description: Language in which should be all error messages translated.
+        description: Language in which should be all error messages translated. Default language is 'en'.
         required: false
       filesResults:
         type: boolean
         required: false
-        description: If true, then response for this request will contains filesResults. Otherwise there won't be filesResults. By default it is true.
+        description: If true, then response for this request will contains results for filesResults. Otherwise there will be just id of results. By default it is true.
 
   BatchValidationResponse:
     type: object
@@ -183,9 +216,9 @@ types:
         required: true
         description: Number of files with ValidationStatus ERROR.
       filesResults:
-        type: ValidationResponse[]
+        type: ValidationResult[]
         required: false
-        description: Validation response for each file.
+        description: Validation result for each file.
       strictMode:
         type: boolean
         required: false
@@ -224,6 +257,11 @@ types:
           application/json:
             type: ValidationResponse
         description: Result exist for the given id.
+      404:
+        description: Entity not found.
+        body:
+          application/json:
+            type: string
 
 /validateBatch:
   post:
