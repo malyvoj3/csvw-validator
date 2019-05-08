@@ -35,7 +35,7 @@ public class CsvParser implements TabularDataParser {
     private static final char QUOTE_ESCAPE_CHAR_DEFAULT = '"';
 
     @Override
-    public TabularParsingResult parse(Dialect dialect, String url, String filePath) {
+    public TabularParsingResult parse(Dialect dialect, String url, String filePath, boolean remoteFile) {
         Table table = new Table();
         table.setUrl(url);
         List<Column> columns = new ArrayList<>();
@@ -111,7 +111,9 @@ public class CsvParser implements TabularDataParser {
             parsingErrors.add(ValidationError.fatal("error.emptyCsvFile", url));
         }
 
-        org.apache.commons.io.FileUtils.deleteQuietly(csvFile);
+        if (remoteFile) {
+            org.apache.commons.io.FileUtils.deleteQuietly(csvFile);
+        }
 
         return new TabularParsingResult(url, parsingErrors, table, tableDescription, resultFilePath, rowsNumber, columnsNumber);
     }

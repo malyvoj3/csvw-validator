@@ -41,7 +41,7 @@ public class PrimaryKeyRule implements TableValidationRule {
     public void finishValidating() {
         finished = true;
         // Check if last row primary key is not valid.
-        if (!primaryKeys.add(tmpPrimaryKey.toString())) {
+        if (isValid && !primaryKeys.add(tmpPrimaryKey.toString())) {
             failedRow = rowCount;
             isValid = false;
             primaryKeys = null;

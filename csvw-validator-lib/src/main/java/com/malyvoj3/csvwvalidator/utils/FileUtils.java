@@ -154,6 +154,7 @@ public class FileUtils {
             }
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 fileResponse = new FileResponse();
+                fileResponse.setRemoteFile(true);
                 fileResponse.setResponseCode(responseCode);
                 fileResponse.setUrl(normalizedUrl);
                 fileResponse.setContentType(createContentType(connection.getContentType()));

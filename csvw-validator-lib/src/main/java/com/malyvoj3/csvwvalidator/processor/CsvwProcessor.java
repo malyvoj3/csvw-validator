@@ -76,7 +76,7 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
     public ProcessingResult processTabularData(ProcessingContext context, String tabularFile, String fileName) {
         Dialect dialect = Dialect.builder().header(true).build();
         TabularParsingResult csvParsingResult;
-        csvParsingResult = tabularParser.parse(dialect, fileName, tabularFile);
+        csvParsingResult = tabularParser.parse(dialect, fileName, tabularFile, false);
         context.addTabularResult(csvParsingResult);
         return resultCreator.createResult(context, fileName, null);
     }
@@ -105,7 +105,7 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
         String metadataUrl = DEFAULT_URL + metadataFileName;
         Dialect dialect = Dialect.builder().header(true).build();
         TabularParsingResult csvParsingResult;
-        csvParsingResult = tabularParser.parse(dialect, tabularUrl, tabularFile);
+        csvParsingResult = tabularParser.parse(dialect, tabularUrl, tabularFile, false);
         context.addTabularResult(csvParsingResult);
         if (context.isNotFatal()) {
             MetadataParsingResult metadataParsingResult = metadataParser.parseJson(metadataFile,
@@ -266,7 +266,7 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
             Dialect dialect = Dialect.builder()
                     .header(!HEADER_ABSENT.equals(header))
                     .build();
-            csvParsingResult = tabularParser.parse(dialect, tabularResponse.getUrl(), tabularResponse.getFilePath());
+            csvParsingResult = tabularParser.parse(dialect, tabularResponse.getUrl(), tabularResponse.getFilePath(), tabularResponse.isRemoteFile());
         } else {
             csvParsingResult = new TabularParsingResult();
             csvParsingResult.getParsingErrors().add(ValidationError.fatal("error.cantDownloadCsv"));
