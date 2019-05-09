@@ -1,0 +1,9 @@
+com.malyvoj3.csvwvalidator
+com.malyvoj3.csvwvalidator.persistance.domain
+com.malyvoj3.csvwvalidator.persistance.repository
+com.malyvoj3.csvwvalidator.processor
+com.malyvoj3.csvwvalidator.processor.result
+com.malyvoj3.csvwvalidator.web.rest
+com.malyvoj3.csvwvalidator.web.view
+com.malyvoj3.csvwvalidator.web.view.components
+com.malyvoj3.csvwvalidator.web.view.pages

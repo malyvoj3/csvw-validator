@@ -1,5 +1,5 @@
 # csvw-validator
 
-[REST API documentation](https://malyvoj3.github.io/csvw-validator/docs/restApi.html)
+[REST API documentation](https://malyvoj3.github.io/csvw-validator/restApi.html)
 
-[Source code documentation](https://www.google.com)
+[Source code documentation](https://malyvoj3.github.io/csvw-validator/sourceCode.html)
