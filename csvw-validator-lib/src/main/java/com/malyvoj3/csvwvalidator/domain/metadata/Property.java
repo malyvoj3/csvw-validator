@@ -6,6 +6,10 @@ import lombok.Data;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Abstract class for CSV on the Web properties.
+ * @param <T>
+ */
 @Data
 public abstract class Property<T> implements Normalizable {
 

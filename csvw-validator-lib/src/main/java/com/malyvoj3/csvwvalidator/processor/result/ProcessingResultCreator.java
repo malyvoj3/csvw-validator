@@ -19,7 +19,7 @@ public class ProcessingResultCreator implements ResultCreator<ProcessingResult, 
     private final Translator translator;
 
     @Override
-    public ProcessingResult createResult(ProcessingContext context, String tabularUrl, String metadataUrl) {
+    public ProcessingResult createResult(ProcessingContext context, String tabularIrl, String metadataIrl) {
         List<? extends ValidationError> validationErrors;
         ProcessingSettings settings = context.getSettings();
         List<ValidationError> errors = context.getErrors();
@@ -66,8 +66,8 @@ public class ProcessingResultCreator implements ResultCreator<ProcessingResult, 
                 }).collect(Collectors.toList());
 
         ProcessingResult result = new ProcessingResult();
-        result.setTabularUrl(tabularUrl);
-        result.setMetadataUrl(metadataUrl);
+        result.setTabularUrl(tabularIrl);
+        result.setMetadataUrl(metadataIrl);
         result.setErrors(localizedErrors);
         result.setWarningCount(warningCount);
         result.setErrorCount(errorCount);

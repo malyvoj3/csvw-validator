@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Object description from CSV on the Web - JSON-LD document.
+ */
 @Data
 public abstract class ObjectDescription implements Normalizable {
 

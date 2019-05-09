@@ -12,6 +12,9 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Proxy for {@link CsvwProcessor} which takes its results and save them to DB.
+ */
 @Component
 public class PersistentProcessor implements Processor<PersistentResult, BatchProcessingResult<PersistentResult>> {
 

@@ -26,17 +26,17 @@ Web application is in module ```csvw-validator-web-app```. After project install
 mvn spring-boot:run
 ```
 
-or you can take generated JAR (eg. csvw-validator-web-app-0.0.1-SNAPSHOT.jar) and run command:
+or you can take generated JAR (eg. csvw-validator-web-app-1.0.0-SNAPSHOT.jar) and run command:
 
 ```
-java -jar csvw-validator-web-app-0.0.1-SNAPSHOT.jar
+java -jar csvw-validator-web-app-1.0.0-SNAPSHOT.jar
 ```
 Both commands will start the application server on port ```8080```. After startup open ```http://localhost:8080/``` in your browser.
 If you want to specify the port, use these command instead:
 
 ```
 mvn spring-boot:run -Dspring-boot.run.arguments=--server.port={port}
-java -jar csvw-validator-web-app-0.0.1-SNAPSHOT.jar --server.port={port}
+java -jar csvw-validator-web-app-1.0.0-SNAPSHOT.jar --server.port={port}
 ```
 where instead ```{port}``` you can insert the port number.
 
@@ -48,17 +48,17 @@ Web service is in module ```csvw-validator-web-app```. After project installatio
 mvn spring-boot:run
 ```
 
-or you can take generated JAR (eg. csvw-validator-web-app-0.0.1-SNAPSHOT.jar) and run command:
+or you can take generated JAR (eg. csvw-validator-web-app-1.0.0-SNAPSHOT.jar) and run command:
 
 ```
-java -jar csvw-validator-web-app-0.0.1-SNAPSHOT.jar
+java -jar csvw-validator-web-app-1.0.0-SNAPSHOT.jar
 ```
 Both commands will start the application server on port ```8080```. After startup you will have ready REST web service at ```http://localhost:8080/```.
 If you want to specify the port, use these command instead:
 
 ```
 mvn spring-boot:run -Dspring-boot.run.arguments=--server.port={port}
-java -jar csvw-validator-web-app-0.0.1-SNAPSHOT.jar --server.port={port}
+java -jar csvw-validator-web-app-1.0.0-SNAPSHOT.jar --server.port={port}
 ```
 where instead ```{port}``` you can insert the port number.
 
@@ -203,9 +203,9 @@ If result with given ID doesn't exists, endpoint will return 404 response code.
 ## Command-line application
 
 Command-line application is located in module ```csvw-validator-cli-app```.
-Take generated JAR (eg. ```csvw-validator-cli-app-0.0.1-SNAPSHOT.jar```.) and start the application with command:
+Take generated JAR (eg. ```csvw-validator-cli-app-1.0.0-SNAPSHOT.jar```.) and start the application with command:
 ```
-java -jar csvw-validator-cli-app-0.0.1-SNAPSHOT.jar [-f <FILE>] [-s <SCHEMA>]
+java -jar csvw-validator-cli-app-1.0.0-SNAPSHOT.jar [-f <FILE>] [-s <SCHEMA>]
 [-o <OUTPUT>] [--strict] [-h] [--rdf] [--csv] 
 
  -f,--file <FILE>       The CSV file URL to be processed
@@ -279,7 +279,7 @@ then you have to add dependencies:
   <dependency>
     <groupId>com.malyvoj3</groupId>
     <artifactId>csvw-validator-lib</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
   </dependency>
   <dependency>
       <groupId>org.springframework</groupId>
@@ -308,6 +308,8 @@ mvn javadoc:javadoc
 ```
 
 After that, each module will have HTML documentation in ```/target/site``` folder.
+
+Or it is at GitHub pages: https://malyvoj3.github.io/csvw-validator/
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/) 

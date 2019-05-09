@@ -24,12 +24,12 @@ public class CsvwShemaLocator implements SchemaLocator {
             .collect(Collectors.toList());
 
     @Override
-    public List<String> getMetadataUris(String csvUri) {
+    public List<String> getMetadataUris(String tabularIri) {
         List<String> metadataUris = new ArrayList<>();
 
         // Get possible locations of metadata from site-wide configuration.
-        String wellKnownLocation = UriUtils.resolveUri(csvUri, WELL_KNOWN_URI);
-        Map<String, Object> uriVariable = Collections.singletonMap("url", csvUri);
+        String wellKnownLocation = UriUtils.resolveUri(tabularIri, WELL_KNOWN_URI);
+        Map<String, Object> uriVariable = Collections.singletonMap("url", tabularIri);
         List<String> uriTemplates = Collections.emptyList();
         try {
             uriTemplates = getUriTemplates(wellKnownLocation);
@@ -37,12 +37,12 @@ public class CsvwShemaLocator implements SchemaLocator {
             log.error(String.format("Error during parsing site-wide configuration with url '%s'", wellKnownLocation));
         }
         for (String uriTemplate : uriTemplates) {
-            metadataUris.add(UriUtils.expandAndResolveTemplate(csvUri, uriTemplate, uriVariable));
+            metadataUris.add(UriUtils.expandAndResolveTemplate(tabularIri, uriTemplate, uriVariable));
         }
 
         // Get default locations of metadata.
         for (String uriTemplate : defaultLocations) {
-            metadataUris.add(UriUtils.expandAndResolveTemplate(csvUri, uriTemplate, uriVariable));
+            metadataUris.add(UriUtils.expandAndResolveTemplate(tabularIri, uriTemplate, uriVariable));
         }
         return metadataUris;
     }

@@ -66,12 +66,6 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
         return resultCreator.createBatchResult(context, processingResults);
     }
 
-    /**
-     * Processing just upload tabular data file, which means that this file is validated without scheme.
-     *
-     * @param tabularFile
-     * @param fileName
-     */
     @Override
     public ProcessingResult processTabularData(ProcessingContext context, String tabularFile, String fileName) {
         Dialect dialect = Dialect.builder().header(true).build();
@@ -81,12 +75,6 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
         return resultCreator.createResult(context, fileName, null);
     }
 
-    /**
-     * Processing just upload metadata file, which means that this file is just validated, that it is valid CSVW metadata.
-     *
-     * @param metadataFile
-     * @param fileName
-     */
     @Override
     public ProcessingResult processMetadata(ProcessingContext context, String metadataFile, String fileName) {
         String metadataUrl = DEFAULT_URL + fileName;
@@ -118,11 +106,6 @@ public class CsvwProcessor implements Processor<ProcessingResult, BatchProcessin
         return resultCreator.createResult(context, tabularFileName, metadataFileName);
     }
 
-    /**
-     * Processing metadata URL, which also downloads tabular data files defined in metadata and validates them.
-     *
-     * @param metadataUrl
-     */
     @Override
     public ProcessingResult processMetadata(ProcessingContext context, String metadataUrl) {
         FileResponse metadataResponse = FileUtils.downloadMetadataFile(metadataUrl);
